@@ -1,0 +1,104 @@
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { colors, typography } from '../../../../theme';
+import infoIcon from '../../../../assets/images/info-icon.png';
+import ZultsButton from '../../../ui/ZultsButton';
+import ScreenHeader from '../../../ui/ScreenHeader';
+import ScreenWrapper from '../../../ui/ScreenWrapper';
+
+export default function SMSScreen() {
+  const [phone, setPhone] = useState('');
+  const navigation = useNavigation();
+
+  const isValid = phone.length >= 8;
+
+  return (
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <ScreenWrapper>
+          <ScreenHeader
+            title="SMS"
+            subtitle="Send someone an anonymous nudge to get tested"
+          />
+
+          <View style={styles.inputWrapper}>
+            <TextInput
+              style={styles.input}
+              value={phone}
+              onChangeText={setPhone}
+              placeholder="Add phone number"
+              placeholderTextColor={colors.neutralText.subtext}
+              keyboardType="phone-pad"
+            />
+          </View>
+
+          <View style={styles.smsInfo}>
+            <Image source={infoIcon} style={styles.infoIcon} />
+            <Text style={styles.infoText}>
+              You have <Text style={styles.infoHighlight}>1 of 1</Text> SMS available this week
+            </Text>
+          </View>
+
+          <ZultsButton
+            label="Continue"
+            type="primary"
+            size="large"
+            fullWidth
+            disabled={!isValid}
+            onPress={() => navigation.navigate('ReviewSMS', { phone })}
+          />
+        </ScreenWrapper>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
+  );
+}
+
+const styles = StyleSheet.create({
+  inputWrapper: {
+    borderWidth: 1,
+    borderColor: colors.neutral[0],
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    marginBottom: 20,
+  },
+  input: {
+    ...typography.bodyRegular,
+    color: colors.foreground.default,
+  },
+  smsInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#0D3E2D',
+    padding: 12,
+    borderRadius: 12,
+    marginBottom: 32,
+  },
+  infoIcon: {
+    width: 16,
+    height: 16,
+    marginRight: 8,
+    tintColor: '#1DCA7A',
+  },
+  infoText: {
+    ...typography.captionSmallRegular,
+    color: colors.neutral[0],
+  },
+  infoHighlight: {
+    color: '#1DCA7A',
+  },
+});
