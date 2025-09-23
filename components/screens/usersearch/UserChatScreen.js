@@ -24,8 +24,8 @@ import fallbackAvatar from "../../../assets/images/melany.png";
 const TomasAvatar = require("../../../assets/images/tomas.png");
 const BinkeyAvatar = require("../../../assets/images/melany.png");
 
-// cache holds chat history + state per user
-const chatCache = {};
+// ✅ exported so ActivitiesScreen can import the live cache
+export const chatCache = {};
 
 function TypingDots() {
   const dot1 = useRef(new Animated.Value(0.3)).current;
@@ -94,15 +94,16 @@ export default function UserChatScreen() {
     }
   }, []);
 
-  // persist to cache
+  // persist to cache (✅ also saving user for Activities list)
   useEffect(() => {
     const key = user.name || "default";
     chatCache[key] = {
       chatData,
       chatState,
       binkeyState,
+      user,
     };
-  }, [chatData, chatState, binkeyState]);
+  }, [chatData, chatState, binkeyState, user]);
 
   // keyboard listeners
   useEffect(() => {
@@ -293,11 +294,11 @@ export default function UserChatScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingHorizontal: 8,
-          paddingTop: 180,
-          paddingBottom: 140 + keyboardHeight,
+          paddingTop: 180,           // ✅ baseline
+          paddingBottom: 140 + keyboardHeight, // ✅ baseline + keyboard lift
         }}
         onContentSizeChange={(w, h) => {
-          flatListRef.current?.scrollToOffset({ offset: h + 50, animated: true });
+          flatListRef.current?.scrollToOffset({ offset: h + 50, animated: true }); // ✅ baseline auto-scroll
         }}
         ListHeaderComponent={
           <View style={styles.dateDivider}>
@@ -436,12 +437,8 @@ const styles = StyleSheet.create({
   stopButton: { width: "100%", paddingVertical: 16, borderRadius: 20, backgroundColor: colors.brand.purple1, alignItems: "center" },
   stopButtonText: { ...typography.bodyMedium, color: colors.neutral[0], fontWeight: "600" },
   dateDivider: {
-    alignSelf: "center",
-    backgroundColor: colors.background.surface2,
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    marginVertical: 8,
+    alignSelf: "center", backgroundColor: colors.background.surface2,
+    borderRadius: 12, paddingHorizontal: 12, paddingVertical: 4, marginVertical: 8,
   },
   dateText: { ...typography.captionSmallRegular, color: colors.foreground.muted },
 });

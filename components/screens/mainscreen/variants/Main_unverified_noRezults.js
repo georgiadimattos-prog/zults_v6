@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, ScrollView, StatusBar, StyleSheet } from 'react-native';
+import { View, ScrollView, StatusBar, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { colors } from '../../../../theme';
 import UserProfileHeader from '../../../ui/UserProfileHeader';
@@ -34,6 +34,9 @@ export default function MainUnverifiedNoRezults() {
 
         <View style={{ marginTop: 15 }}>
           <ActivitiesHeader hasUnread />
+          <TouchableOpacity onPress={() => navigation.navigate('Activities')}>
+            <Text style={{ color: colors.brand.purple1, marginTop: 8 }}>View All</Text>
+          </TouchableOpacity>
         </View>
 
         <View style={{ marginTop: 8 }}>

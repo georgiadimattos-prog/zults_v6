@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,179 +6,100 @@ import {
   FlatList,
   TouchableOpacity,
   Image,
+  Platform,
 } from "react-native";
+import { BlurView } from "expo-blur";
 import { useNavigation } from "@react-navigation/native";
 import { colors, typography } from "../../../theme";
-import ScreenWrapper from "../../ui/ScreenWrapper";
 
-const sampleActivities = [
-  {
-    id: "1",
-    name: "Binkey",
-    avatar: require("../../../assets/images/melany.png"),
-    action: "shared Rezults with you",
-    time: "10:12 AM",
-    unread: true,
-  },
-  {
-    id: "2",
-    name: "TomasB.",
-    avatar: require("../../../assets/images/tomas.png"),
-    action: "requested your Rezults",
-    time: "Yesterday",
-    unread: false,
-  },
-];
+import { chatCache } from "../usersearch/UserChatScreen";
+import fallbackAvatar from "../../../assets/images/melany.png";
+import arrowLeft from "../../../assets/images/navbar-arrow.png";
 
 export default function ActivitiesScreen() {
   const navigation = useNavigation();
-  const [tab, setTab] = useState("All");
+  const [activities, setActivities] = useState([]);
 
-  const filtered =
-    tab === "Unread"
-      ? sampleActivities.filter((a) => a.unread)
-      : tab === "Favorites"
-      ? [] // placeholder for future favorites logic
-      : sampleActivities;
+  useEffect(() => {
+    const data = Object.keys(chatCache).map((username) => {
+      const chat = chatCache[username] || {};
+      const lastMsg = chat.chatData?.[chat.chatData.length - 1];
+      return {
+        id: username,
+        name: username,
+        avatar: chat.user?.image || fallbackAvatar,
+        lastText: lastMsg ? lastMsg.type : "No activity yet",
+        lastTimestamp: lastMsg ? lastMsg.timestamp : "",
+      };
+    });
+    setActivities(data);
+  }, [chatCache]);
+
+  const renderItem = ({ item }) => (
+    <TouchableOpacity
+      style={styles.row}
+      onPress={() =>
+        navigation.navigate("UserChat", {
+          user: { name: item.name, image: item.avatar },
+        })
+      }
+    >
+      <Image source={item.avatar} style={styles.avatar} />
+      <View style={{ flex: 1 }}>
+        <Text style={styles.username}>{item.name}</Text>
+        <Text style={styles.lastText}>{item.lastText}</Text>
+      </View>
+      <Text style={styles.timestamp}>{item.lastTimestamp}</Text>
+    </TouchableOpacity>
+  );
 
   return (
-    <ScreenWrapper style={styles.wrapper}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.backArrow}>←</Text>
+    <View style={styles.root}>
+      <BlurView intensity={40} tint="dark" style={styles.topBlur}>
+        <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
+          <Image source={arrowLeft} style={styles.backIcon} />
         </TouchableOpacity>
         <Text style={styles.title}>Activities</Text>
-      </View>
+      </BlurView>
 
-      {/* Tabs */}
-      <View style={styles.tabs}>
-        {["All", "Unread", "Favorites"].map((t) => (
-          <TouchableOpacity
-            key={t}
-            style={[styles.tab, tab === t && styles.tabActive]}
-            onPress={() => setTab(t)}
-          >
-            <Text
-              style={[styles.tabText, tab === t && styles.tabTextActive]}
-            >
-              {t}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      {/* List */}
       <FlatList
-        data={filtered}
+        data={activities}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View
-            style={[
-              styles.row,
-              item.unread && styles.unreadRow,
-            ]}
-          >
-            <Image source={item.avatar} style={styles.avatar} />
-            <View style={styles.textContainer}>
-              <Text
-                style={[
-                  styles.name,
-                  item.unread && styles.unreadText,
-                ]}
-              >
-                {item.name}
-              </Text>
-              <Text style={styles.action}>{item.action}</Text>
-            </View>
-            <Text style={styles.time}>{item.time}</Text>
-          </View>
-        )}
-        contentContainerStyle={{ paddingBottom: 80 }}
+        renderItem={renderItem}
+        contentContainerStyle={{ paddingTop: 100, paddingHorizontal: 16 }}
+        ListEmptyComponent={<Text style={styles.empty}>No activities yet</Text>}
       />
-    </ScreenWrapper>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  wrapper: {
-    flex: 1,
-    backgroundColor: colors.background.surface1,
-  },
-  header: {
+  root: { flex: 1, backgroundColor: colors.background.surface1 },
+  topBlur: {
+    paddingTop: Platform.OS === "ios" ? 72 : 56,
+    paddingBottom: 16,
+    paddingHorizontal: 16,
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 10,
     flexDirection: "row",
     alignItems: "center",
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.background.surface2,
+    gap: 12,
   },
-  backArrow: {
-    fontSize: 22,
-    color: colors.foreground.default,
-    marginRight: 12,
-  },
-  title: {
-    ...typography.headlineMedium,
-    color: colors.foreground.default,
-  },
-  tabs: {
-    flexDirection: "row",
-    marginHorizontal: 16,
-    marginVertical: 10,
-    backgroundColor: colors.background.surface2,
-    borderRadius: 20,
-    overflow: "hidden",
-  },
-  tab: {
-    flex: 1,
-    paddingVertical: 8,
-    alignItems: "center",
-  },
-  tabActive: {
-    backgroundColor: colors.brand.purple1,
-  },
-  tabText: {
-    ...typography.bodyMedium,
-    color: colors.foreground.muted,
-  },
-  tabTextActive: {
-    color: "#fff",
-    fontWeight: "600",
-  },
+  backIcon: { width: 28, height: 28, tintColor: colors.foreground.default },
+  title: { ...typography.bodyMedium, color: colors.foreground.default, fontWeight: "600" },
   row: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 14,
+    paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: colors.background.surface2,
+    borderColor: colors.background.surface2,
   },
-  unreadRow: {
-    backgroundColor: colors.background.surface2, // subtle highlight
-  },
-  avatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    marginRight: 12,
-  },
-  textContainer: {
-    flex: 1,
-  },
-  name: {
-    ...typography.bodyMedium,
-    color: colors.foreground.default,
-  },
-  action: {
-    ...typography.bodyRegular,
-    color: colors.foreground.muted,
-  },
-  unreadText: {
-    fontWeight: "700",
-  },
-  time: {
-    ...typography.captionSmallRegular,
-    color: colors.foreground.muted,
-    marginLeft: 8,
-  },
+  avatar: { width: 44, height: 44, borderRadius: 22, marginRight: 12 },
+  username: { ...typography.bodyMedium, color: colors.foreground.default },
+  lastText: { ...typography.captionSmallRegular, color: colors.foreground.muted },
+  timestamp: { ...typography.captionSmallRegular, color: colors.foreground.muted },
+  empty: { textAlign: "center", marginTop: 200, color: colors.foreground.muted },
 });

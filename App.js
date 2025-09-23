@@ -9,7 +9,7 @@ import { Text, View } from 'react-native';
 import MainScreen from './components/screens/mainscreen/MainScreen';
 import SettingsScreen from './components/screens/settings/SettingsScreen';
 
-// ✅ NEW: Activities (separate screen, WhatsApp-style list)
+// Activities
 import ActivitiesScreen from './components/screens/activities/ActivitiesScreen';
 
 // Get Rezults Screens
@@ -54,36 +54,22 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator
-        initialRouteName="MainScreen"     // ✅ Default entry = your baseline main
-        screenOptions={{ headerShown: false }}
-      >
-        {/* Main entry */}
+      <Stack.Navigator initialRouteName="MainScreen" screenOptions={{ headerShown: false }}>
         <Stack.Screen name="MainScreen" component={MainScreen} />
-
-        {/* Settings */}
         <Stack.Screen name="Settings" component={SettingsScreen} />
-
-        {/* Activities (full screen) */}
         <Stack.Screen name="Activities" component={ActivitiesScreen} />
-
-        {/* Get Rezults flow (all routes restored) */}
         <Stack.Screen name="GetRezults" component={GetRezultsScreen} />
         <Stack.Screen name="GetRezultsProvider" component={GetRezults_SelectProviderScreen} />
         <Stack.Screen name="GetRezultsLinkInput" component={GetRezults_PasteLinkScreen} />
         <Stack.Screen name="GetRezultsLoading" component={GetRezults_LoadingScreen} />
         <Stack.Screen name="GetRezultsConfirm" component={GetRezults_ConfirmScreen} />
         <Stack.Screen name="GetRezultsHowToFindLink" component={GetRezults_HowToFindLinkScreen} />
-
-        {/* Share flow (all routes restored) */}
         <Stack.Screen name="Share" component={ShareScreen} />
         <Stack.Screen name="SMSRequestSent" component={SMSRequestSent} />
         <Stack.Screen name="ReviewSMS" component={ReviewSMSRequest} />
         <Stack.Screen name="LinkShareSheet" component={LinkScreenShareSheet} />
         <Stack.Screen name="LinkSuccess" component={LinkScreenSuccess} />
         <Stack.Screen name="LinkOffline" component={LinkScreenOffline} />
-
-        {/* Chat + Rezults */}
         <Stack.Screen name="UserChat" component={UserChatScreen} />
         <Stack.Screen name="Rezults" component={RezultsScreen} />
       </Stack.Navigator>
