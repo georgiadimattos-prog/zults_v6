@@ -97,16 +97,24 @@ export default function UserChatScreen() {
     if (user.id === "zults-demo") {
       setChatData([
         {
-          id: "demo-msg-1",
-          type: "share",
-          direction: "from-other",
-          username: "Zults (Demo)",
-          avatar: user.image,
-          text:
-            "Hi there, this is a demo Rezults so you can see how they appear in the app. 💜 We hope you enjoy using Zults and make the most of it to stay safe, healthy, and confident! ✨",
-          timestamp: "Now",
-        },
-      ]);
+      id: "demo-msg-1",
+      type: "share",
+      direction: "from-other",
+      username: "Zults (Demo)",
+      avatar: user.image,
+      timestamp: "Now",
+    },
+    {
+      id: "demo-msg-2",
+      type: "text",
+      direction: "from-other",
+      username: "Zults (Demo)",
+      avatar: user.image,
+      text:
+        "Hi there, this is a demo Rezults so you can see how they appear in the app. 💜 We hope you enjoy using Zults and make the most of it to stay safe, healthy, and confident! ✨",
+      timestamp: "Now",
+    },
+  ]);
       setBinkeyState({ hasShared: true, hasRequested: false });
     }
   }, []);
