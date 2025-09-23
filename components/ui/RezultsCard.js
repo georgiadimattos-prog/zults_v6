@@ -16,9 +16,10 @@ import Animated, {
 } from "react-native-reanimated";
 import { colors, typography } from "../../theme";
 
-import logoIcon from "../../assets/images/rezults-icon.png"; // ✅ Zults logo
+import logoIcon from "../../assets/images/rezults-icon.png";
+import expandIcon from "../../assets/images/expandIcon.png";
+import collapseIcon from "../../assets/images/collapseIcon.png";
 
-// ✅ dynamic sizing (same as placeholder)
 const screenWidth = Dimensions.get("window").width;
 const CARD_WIDTH = screenWidth - 32;
 const CARD_HEIGHT = CARD_WIDTH / 1.586;
@@ -28,14 +29,21 @@ export default function RezultsCard({
   providerName = "Sexual Health London",
   testDate = "12 Dec 2025",
   videoSource = require("../../assets/videos/Card_All_GlowingBorder_25sec.mp4"),
+  showExpand = false, // ✅ new prop
+  onExpand, // ✅ new callback from parent
 }) {
   const [showBack, setShowBack] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   const rotate = useSharedValue(0);
 
   const flipCard = () => {
     rotate.value = withTiming(showBack ? 0 : 180, { duration: 400 });
     setShowBack(!showBack);
+  };
+
+  const toggleExpand = () => {
+    setExpanded(!expanded);
   };
 
   const frontAnimatedStyle = useAnimatedStyle(() => ({
@@ -66,10 +74,8 @@ export default function RezultsCard({
             resizeMode="cover"
           />
 
-          {/* ✅ Zults logo top-right */}
           <Image source={logoIcon} style={styles.logo} resizeMode="contain" />
 
-          {/* Text overlay */}
           <View style={styles.overlay}>
             <View>
               <Text style={styles.name}>{userName}</Text>
@@ -81,34 +87,44 @@ export default function RezultsCard({
 
         {/* Back */}
         <Animated.View style={[styles.cardBack, backAnimatedStyle]}>
-          {/* Top: test date */}
-          <View style={styles.backHeader}>
-            <Text style={styles.testedOn}>
-              Tested on <Text style={styles.testedDate}>{testDate}</Text>
-            </Text>
-          </View>
+  <View style={styles.backHeader}>
+    <Text style={styles.testedOn}>
+      Tested on <Text style={styles.testedDate}>{testDate}</Text>
+    </Text>
 
-          {/* Bottom: pills */}
-          <View style={styles.pillsBottom}>
-            {[
-              "Tested negative:",
-              "Gonorrhea",
-              "HIV",
-              "Syphilis",
-              "Chlamydia",
-              "Hepatitis B",
-              "Hepatitis C",
-              "Gardnerella",
-              "Trichomoniasis",
-              "Ureaplasma",
-              "Mycoplasma",
-            ].map((label, idx) => (
-              <View key={idx} style={styles.pill}>
-                <Text style={styles.pillText}>{label}</Text>
-              </View>
-            ))}
-          </View>
-        </Animated.View>
+    {showExpand && (
+      <TouchableWithoutFeedback onPress={onExpand}>
+        <View style={styles.expandButton}>
+          <Image
+            source={expandIcon}
+            style={{ width: 16, height: 16 }}
+            resizeMode="contain"
+          />
+        </View>
+      </TouchableWithoutFeedback>
+    )}
+  </View>
+
+  <View style={styles.pillsBottom}>
+    {[
+      "Tested negative:",
+      "Gonorrhea",
+      "HIV",
+      "Syphilis",
+      "Chlamydia",
+      "Hepatitis B",
+      "Hepatitis C",
+      "Gardnerella",
+      "Trichomoniasis",
+      "Ureaplasma",
+      "Mycoplasma",
+    ].map((label, idx) => (
+      <View key={idx} style={styles.pill}>
+        <Text style={styles.pillText}>{label}</Text>
+      </View>
+    ))}
+  </View>
+</Animated.View>
       </View>
     </TouchableWithoutFeedback>
   );
@@ -121,7 +137,6 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     justifyContent: "center",
     alignItems: "center",
-
   },
   cardFront: {
     position: "absolute",
@@ -136,11 +151,11 @@ const styles = StyleSheet.create({
   },
   logo: {
     position: "absolute",
-    top: CARD_HEIGHT * 0.06, // ~6% from top
-    right: CARD_WIDTH * 0.04, // ~4% from right
-    width: CARD_WIDTH * 0.1, // ~10% of card width
+    top: CARD_HEIGHT * 0.06,
+    right: CARD_WIDTH * 0.04,
+    width: CARD_WIDTH * 0.1,
     height: CARD_WIDTH * 0.1,
-    opacity: 0.7, // ✅ subtle transparency for glow
+    opacity: 0.7,
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
@@ -178,7 +193,17 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   backHeader: {
-    alignItems: "flex-start",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  expandButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "rgba(255,255,255,0.05)",
+    alignItems: "center",
+    justifyContent: "center",
   },
   testedOn: {
     ...typography.captionSmallRegular,

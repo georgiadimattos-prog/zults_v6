@@ -351,7 +351,7 @@ export default function UserChatScreen() {
                 chatState.hasShared && styles.rezultsButtonActive,
               ]}
               disabled={chatState.hasRequested && !binkeyState.hasShared}
-              onPress={() => {
+onPress={() => {
   if (binkeyState.hasShared) {
     navigation.navigate("Rezults", {
       username: user.name,
@@ -359,9 +359,10 @@ export default function UserChatScreen() {
       realName:
         user.name && user.name.toLowerCase() === "binkey"
           ? "Melany J Rabideau" // ✅ mapped real name
-          : undefined,           // ✅ fallback → will show username
+          : undefined,           // fallback → will show username
       providerName: "Sexual Health London",
       testDate: "12 Dec 2025",
+      showExpand: true, // ✅ incoming Rezults should show expand button
     });
     return;
   }
