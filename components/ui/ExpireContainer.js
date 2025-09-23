@@ -13,8 +13,8 @@ const CONTAINER_WIDTH = screenWidth - 32; // ✅ match RezultsCard + Share butto
 
 export default function ExpireContainer({
   expiryDate = "29 Sep 2025",
-  daysLeft = 43,
 }) {
+  const daysLeft = 43; // ✅ force demo lock
   const percentLeft = daysLeft / 90;
 
   // animate fill
