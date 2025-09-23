@@ -108,7 +108,7 @@ export default function RezultsCard({
                 <View style={styles.expandButton}>
                   <Animated.Image
                     source={expanded ? collapseIcon : expandIcon}
-                    style={[{ width: 16, height: 16, tintColor: "#FFF" }, iconAnimatedStyle]}
+                    style={[{ width: 20, height: 20, tintColor: "#FFF" }, iconAnimatedStyle]}
                     resizeMode="contain"
                   />
                 </View>
@@ -209,8 +209,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   expandButton: {
-    width: 32,
-    height: 32,
+    width: 40,
+    height: 40,
     borderRadius: 16,
     backgroundColor: "rgba(255,255,255,0.05)",
     alignItems: "center",
