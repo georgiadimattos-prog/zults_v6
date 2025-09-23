@@ -92,6 +92,23 @@ export default function UserChatScreen() {
       setChatState(saved.chatState || { hasShared: false, hasRequested: false });
       setBinkeyState(saved.binkeyState || { hasShared: false, hasRequested: false });
     }
+
+    // ✅ preload demo chat
+    if (user.id === "zults-demo") {
+      setChatData([
+        {
+          id: "demo-msg-1",
+          type: "share",
+          direction: "from-other",
+          username: "Zults (Demo)",
+          avatar: user.image,
+          text:
+            "Hi there, this is a demo Rezults so you can see how they appear in the app. 💜 We hope you enjoy using Zults and make the most of it to stay safe, healthy, and confident! ✨",
+          timestamp: "Now",
+        },
+      ]);
+      setBinkeyState({ hasShared: true, hasRequested: false });
+    }
   }, []);
 
   // ✅ persist to cache only if an action happened
@@ -145,6 +162,16 @@ export default function UserChatScreen() {
       shareTimers.current = [];
     };
   }, []);
+
+  // ✅ auto-scroll when new messages are added
+  useEffect(() => {
+    if (chatData.length > 0) {
+    flatListRef.current?.scrollToOffset({
+      offset: Math.max(0, chatData.length * 80 - 200), // 80 = rough bubble height, 200 = space above footer
+      animated: true,
+    });
+  }
+}, [chatData]);
 
   const addTyping = () => {
     if (typingIdRef.current) return;
@@ -464,6 +491,18 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingHorizontal: 14,
     paddingVertical: 10,
+  },
+  sendButtonText: { 
+    ...typography.bodyMedium, 
+    color: colors.neutral[0], 
+    fontWeight: "600" 
+  },
+  stopButton: {
+    width: "100%",
+    paddingVertical: 16,
+    borderRadius: 20,
+    backgroundColor: colors.brand.purple1,
+    alignItems: "center",
   },
   stopButtonText: { 
     ...typography.bodyMedium, 

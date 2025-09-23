@@ -19,6 +19,7 @@ import arrowLeft from "../../../assets/images/navbar-arrow.png";
 // ⭐ icons from assets
 import star from "../../../assets/images/star.png";
 import starFilled from "../../../assets/images/star-filled.png";
+import zultsLogo from "../../../assets/images/zults.png"; // ✅ new logo avatar
 
 export default function ActivitiesScreen() {
   const navigation = useNavigation();
@@ -63,6 +64,21 @@ export default function ActivitiesScreen() {
         favorite: chat.favorite || false,
       };
     });
+
+    // ✅ If no activities, inject demo entry
+    if (data.length === 0) {
+      data.push({
+        id: "zults-demo",
+        name: "Zults (Demo)",
+        avatar: zultsLogo, // ✅ use Zults logo
+        lastText:
+          "Hi there, this is a demo Rezults so you can see how they appear in the app. 💜 We hope you enjoy using Zults and make the most of it to stay safe, healthy, and confident! ✨",
+        lastTimestamp: "Now",
+        hasUnread: false,
+        favorite: false,
+      });
+    }
+
     setActivities(data);
   }, [chatCache]);
 
@@ -86,10 +102,17 @@ export default function ActivitiesScreen() {
     <TouchableOpacity
       style={styles.row}
       onPress={() => {
-        if (chatCache[item.id]) chatCache[item.id].hasUnread = false;
-        navigation.navigate("UserChat", {
-          user: { name: item.name, image: item.avatar },
-        });
+        if (item.id !== "zults-demo") {
+          if (chatCache[item.id]) chatCache[item.id].hasUnread = false;
+          navigation.navigate("UserChat", {
+            user: { name: item.name, image: item.avatar },
+          });
+        } else {
+          // ✅ demo chat should also open UserChat
+          navigation.navigate("UserChat", {
+            user: { id: "zults-demo", name: "Zults (Demo)", image: zultsLogo },
+          });
+        }
       }}
     >
       <Image source={item.avatar} style={styles.avatar} />
@@ -101,15 +124,17 @@ export default function ActivitiesScreen() {
         <Text style={styles.lastText}>{item.lastText}</Text>
       </View>
       <Text style={styles.timestamp}>{item.lastTimestamp}</Text>
-      <TouchableOpacity onPress={() => toggleFavorite(item.id)}>
-        <Image
-          source={item.favorite ? starFilled : star}
-          style={[
-            styles.starIcon,
-            { tintColor: item.favorite ? colors.brand.purple1 : colors.foreground.muted },
-          ]}
-        />
-      </TouchableOpacity>
+      {item.id !== "zults-demo" && (
+        <TouchableOpacity onPress={() => toggleFavorite(item.id)}>
+          <Image
+            source={item.favorite ? starFilled : star}
+            style={[
+              styles.starIcon,
+              { tintColor: item.favorite ? colors.brand.purple1 : colors.foreground.muted },
+            ]}
+          />
+        </TouchableOpacity>
+      )}
     </TouchableOpacity>
   );
 
@@ -178,7 +203,7 @@ const styles = StyleSheet.create({
   tabs: {
     flexDirection: "row",
     justifyContent: "space-around",
-    marginTop: Platform.OS === "ios" ? 140 : 80, // ✅ sits below nav
+    marginTop: Platform.OS === "ios" ? 140 : 80,
     paddingHorizontal: 16,
   },
   tab: {

@@ -18,25 +18,38 @@ import ScreenWrapper from '../../../ui/ScreenWrapper';
 
 // import chatCache to show live recent users
 import { chatCache } from '../../usersearch/UserChatScreen';
-import fallbackAvatar from '../../../../assets/images/melany.png';
+import zultsLogo from '../../../../assets/images/zults.png'; // ✅ use Zults logo avatar
 
 export default function MainUnverifiedNoRezults() {
   const navigation = useNavigation();
   const [recentUsers, setRecentUsers] = useState([]);
 
   useEffect(() => {
-    const users = Object.keys(chatCache)
+    let users = Object.keys(chatCache)
       .map((username) => {
         const chat = chatCache[username] || {};
         const lastMsg = chat.chatData?.[chat.chatData.length - 1];
         return {
           id: username,
           name: username,
-          avatar: chat.user?.image || fallbackAvatar,
+          avatar: chat.user?.image || zultsLogo,
           lastTimestamp: lastMsg ? lastMsg.timestamp : '',
         };
       })
       .sort((a, b) => (a.lastTimestamp < b.lastTimestamp ? 1 : -1)); // latest first
+
+    // ✅ If no users, inject demo entry
+    if (users.length === 0) {
+      users = [
+        {
+          id: 'zults-demo',
+          name: 'Zults (Demo)',
+          avatar: zultsLogo,
+          lastTimestamp: 'Now',
+        },
+      ];
+    }
+
     setRecentUsers(users);
   }, [chatCache]);
 
