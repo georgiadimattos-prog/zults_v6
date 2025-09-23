@@ -5,17 +5,22 @@ import settingsIcon from '../../assets/images/settings.png';
 import tomas from '../../assets/images/tomas.png';
 import GetVerifiedBadge from '../ui/GetVerifiedBadge';
 
-export default function UserProfileHeader() {
+export default function UserProfileHeader({ hideVerification = false }) {
   return (
     <View style={styles.header}>
       <Image source={tomas} style={styles.avatar} />
       <View style={styles.profileInfo}>
         <Text style={styles.name}>Jonster</Text>
-        <GetVerifiedBadge />
+        {/* ✅ Only show the badge if not hidden */}
+        {!hideVerification && <GetVerifiedBadge />}
       </View>
       <TouchableOpacity style={styles.settingsButton}>
         <View style={styles.settingsIconContainer}>
-          <Image source={settingsIcon} style={styles.settingsIconImage} resizeMode="contain" />
+          <Image
+            source={settingsIcon}
+            style={styles.settingsIconImage}
+            resizeMode="contain"
+          />
         </View>
       </TouchableOpacity>
     </View>
@@ -26,7 +31,6 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    // ❌ removed paddingTop, paddingHorizontal, paddingBottom
     backgroundColor: colors.background.surface1,
     zIndex: 10,
     paddingBottom: 24,

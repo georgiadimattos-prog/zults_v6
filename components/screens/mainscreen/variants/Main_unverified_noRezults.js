@@ -81,7 +81,8 @@ export default function MainUnverifiedNoRezults() {
         barStyle="light-content"
         backgroundColor={colors.background.surface1}
       />
-      <UserProfileHeader />
+      {/* ✅ Hide verification badge only on this screen */}
+      <UserProfileHeader hideVerification />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <RezultsCardPlaceholder />
