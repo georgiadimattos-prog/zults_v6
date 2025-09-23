@@ -1,9 +1,21 @@
 import React from "react";
-import { Modal, View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
+import {
+  Modal,
+  View,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  StyleSheet,
+} from "react-native";
 import { colors, typography } from "../../theme";
-import closeIcon from "../../assets/images/close-cross.png";
 
-export default function ActionModal({ visible, onClose, title, description, actions = [] }) {
+export default function ActionModal({
+  visible,
+  onClose,
+  title,
+  description,
+  actions = [],
+}) {
   return (
     <Modal
       visible={visible}
@@ -11,39 +23,45 @@ export default function ActionModal({ visible, onClose, title, description, acti
       animationType="slide"
       onRequestClose={onClose}
     >
-      <View style={styles.overlay}>
-        <View style={styles.container}>
-          {/* Close button */}
-          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-            <Image source={closeIcon} style={{ width: 16, height: 16 }} />
-          </TouchableOpacity>
+      {/* Tap outside to close */}
+      <TouchableWithoutFeedback onPress={onClose}>
+        <View style={styles.overlay}>
+          {/* Prevent closing when tapping inside content */}
+          <TouchableWithoutFeedback>
+            <View style={styles.container}>
+              {/* Title */}
+              <Text style={styles.title}>{title}</Text>
 
-          {/* Title */}
-          <Text style={styles.title}>{title}</Text>
+              {/* Description */}
+              {description ? (
+                <Text style={styles.description}>{description}</Text>
+              ) : null}
 
-          {/* Description */}
-          {description ? <Text style={styles.description}>{description}</Text> : null}
+              {/* Action buttons */}
+              {actions.map((action, idx) => (
+                <TouchableOpacity
+                  key={idx}
+                  style={styles.primaryButton}
+                  onPress={() => {
+                    action.onPress?.();
+                    onClose();
+                  }}
+                >
+                  <Text style={styles.primaryText}>{action.label}</Text>
+                </TouchableOpacity>
+              ))}
 
-          {/* Actions */}
-          {actions.map((action, idx) => (
-            <TouchableOpacity
-              key={idx}
-              style={styles.primaryButton}
-              onPress={() => {
-                action.onPress?.();
-                onClose();
-              }}
-            >
-              <Text style={styles.primaryText}>{action.label}</Text>
-            </TouchableOpacity>
-          ))}
-
-          {/* Cancel button */}
-          <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
-            <Text style={styles.cancelText}>Cancel</Text>
-          </TouchableOpacity>
+              {/* Cancel button */}
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={onClose}
+              >
+                <Text style={styles.cancelText}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </TouchableWithoutFeedback>
         </View>
-      </View>
+      </TouchableWithoutFeedback>
     </Modal>
   );
 }
@@ -61,17 +79,6 @@ const styles = StyleSheet.create({
     paddingTop: 24,
     paddingHorizontal: 20,
     paddingBottom: 20,
-  },
-  closeButton: {
-    position: "absolute",
-    right: 20,
-    top: 20,
-    width: 32,
-    height: 32,
-    borderRadius: 12,
-    backgroundColor: "rgba(255,255,255,0.05)",
-    alignItems: "center",
-    justifyContent: "center",
   },
   title: {
     ...typography.title1Medium,
