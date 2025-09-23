@@ -27,9 +27,17 @@ import ExpireContainer from "../../../ui/ExpireContainer";
 // ✅ Header container
 import RezultsHeaderContainer from "../../../ui/RezultsHeaderContainer";
 
+// ✅ Confirm modal (for Add Rezults)
+import ConfirmModal from "../../../ui/ConfirmModal";
+
+// ✅ Delete modal (for Delete Rezults)
+import DeleteModal from "../../../ui/DeleteModal";
+
 export default function MainUnverifiedWithRezults() {
   const navigation = useNavigation();
   const [recentUsers, setRecentUsers] = useState([]);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
     let users = Object.keys(chatCache)
@@ -82,15 +90,11 @@ export default function MainUnverifiedWithRezults() {
   };
 
   const handleAddRezults = () => {
-    console.log("Add new Rezults tapped");
-    // later -> navigation.navigate("GetRezultsProvider");
+    setShowAddModal(true);
   };
 
   const handleDeleteRezults = () => {
-    console.log("Delete Rezults tapped");
-    rezultsCache.hasRezults = false;
-    rezultsCache.card = null;
-    navigation.navigate("MainScreen"); // back to no Rezults variant
+    setShowDeleteModal(true);
   };
 
   return (
@@ -139,6 +143,31 @@ export default function MainUnverifiedWithRezults() {
 
         <NotificationCard />
       </ScrollView>
+
+      {/* ✅ Confirm Modal for Add Rezults */}
+      <ConfirmModal
+        visible={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        title="Add a new Rezults?"
+        description="By adding a new Rezults, your current card will be replaced with the latest one."
+        confirmLabel="Continue"
+        onConfirm={() => {
+          setShowAddModal(false);
+          navigation.navigate("GetRezultsProvider");
+        }}
+      />
+
+      {/* ✅ Delete Modal for Delete Rezults */}
+      <DeleteModal
+        visible={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={() => {
+          setShowDeleteModal(false);
+          rezultsCache.hasRezults = false;
+          rezultsCache.card = null;
+          navigation.navigate("MainUnverifiedNoRezults"); // shows MainUnverifiedNoRezults
+        }}
+      />
     </ScreenWrapper>
   );
 }
