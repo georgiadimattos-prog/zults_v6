@@ -24,6 +24,7 @@ import fallbackAvatar from "../../../assets/images/melany.png";
 const TomasAvatar = require("../../../assets/images/tomas.png");
 const BinkeyAvatar = require("../../../assets/images/melany.png");
 
+// cache holds chat history + state per user
 const chatCache = {};
 
 function TypingDots() {
@@ -71,7 +72,10 @@ export default function UserChatScreen() {
 
   const flatListRef = useRef(null);
   const typingIdRef = useRef(null);
-  const timersRef = useRef([]);
+
+  // separate timer refs
+  const requestTimers = useRef([]);
+  const shareTimers = useRef([]);
 
   // live refs to use inside timers
   const chatStateRef = useRef(chatState);
@@ -79,17 +83,26 @@ export default function UserChatScreen() {
   useEffect(() => { chatStateRef.current = chatState; }, [chatState]);
   useEffect(() => { binkeyStateRef.current = binkeyState; }, [binkeyState]);
 
-  // restore cache
+  // restore from cache
   useEffect(() => {
     const key = user.name || "default";
-    if (chatCache[key]) setChatData(chatCache[key]);
+    if (chatCache[key]) {
+      const saved = chatCache[key];
+      setChatData(saved.chatData || []);
+      setChatState(saved.chatState || { hasShared: false, hasRequested: false });
+      setBinkeyState(saved.binkeyState || { hasShared: false, hasRequested: false });
+    }
   }, []);
 
-  // persist cache
+  // persist to cache
   useEffect(() => {
     const key = user.name || "default";
-    chatCache[key] = chatData;
-  }, [chatData]);
+    chatCache[key] = {
+      chatData,
+      chatState,
+      binkeyState,
+    };
+  }, [chatData, chatState, binkeyState]);
 
   // keyboard listeners
   useEffect(() => {
@@ -113,35 +126,17 @@ export default function UserChatScreen() {
     };
   }, []);
 
-  // clear timers on unmount
+  // cleanup timers
   useEffect(() => {
     return () => {
-      timersRef.current.forEach((t) => clearTimeout(t));
-      timersRef.current = [];
+      [...requestTimers.current, ...shareTimers.current].forEach((t) => clearTimeout(t));
+      requestTimers.current = [];
+      shareTimers.current = [];
     };
   }, []);
 
-  // cancel pending Binkey actions if Tomas shares
-  useEffect(() => {
-    if (chatState.hasShared) {
-      timersRef.current.forEach((t) => clearTimeout(t));
-      timersRef.current = [];
-      if (typingIdRef.current) {
-        setChatData((prev) => prev.filter((m) => m.id !== typingIdRef.current));
-        typingIdRef.current = null;
-      }
-      setBinkeyState((prev) => ({ ...prev, hasRequested: false }));
-    }
-  }, [chatState.hasShared]);
-
   const addTyping = () => {
-    if (chatStateRef.current.hasShared && !binkeyStateRef.current.hasShared) {
-      // still allow typing before Binkey shares back
-    } else if (chatStateRef.current.hasShared && binkeyStateRef.current.hasShared) {
-      return; // already shared, no typing needed
-    } else if (chatStateRef.current.hasShared === false) {
-      // allowed in request flow
-    }
+    if (typingIdRef.current) return;
     typingIdRef.current = `typing-${Date.now()}`;
     setChatData((prev) => [
       ...prev,
@@ -156,84 +151,73 @@ export default function UserChatScreen() {
     }
   };
 
-  const triggerBinkeyResponse = (action) => {
-    timersRef.current.forEach((t) => clearTimeout(t));
-    timersRef.current = [];
+  // --- FLOWS ---
+  const startRequestFlow = () => {
+    requestTimers.current.forEach((t) => clearTimeout(t));
+    requestTimers.current = [];
 
-    if (action === "request") {
-      // typing after 3s
-      timersRef.current.push(setTimeout(() => addTyping(), 3000));
+    // typing then request
+    requestTimers.current.push(setTimeout(() => addTyping(), 3000));
+    requestTimers.current.push(setTimeout(() => {
+      if (chatStateRef.current.hasShared) { removeTyping(); return; }
+      removeTyping();
+      setBinkeyState({ hasRequested: true, hasShared: false });
+      setChatData((prev) => [
+        ...prev,
+        { id: Date.now().toString(), type: "request", direction: "from-other", username: "Binkey", avatar: BinkeyAvatar, timestamp: "10:07AM" },
+      ]);
+    }, 5000));
 
-      // Binkey requests after 5s (only if Tomas not sharing)
-      timersRef.current.push(
-        setTimeout(() => {
-          if (chatStateRef.current.hasShared) { removeTyping(); return; }
-          removeTyping();
-          setBinkeyState({ hasRequested: true, hasShared: false });
+    // then share if Tomas still hasn't shared
+    requestTimers.current.push(setTimeout(() => {
+      if (chatStateRef.current.hasShared) { removeTyping(); return; }
+      addTyping();
+      requestTimers.current.push(setTimeout(() => {
+        if (chatStateRef.current.hasShared) { removeTyping(); return; }
+        removeTyping();
+        setBinkeyState({ hasRequested: false, hasShared: true });
+        setChatData((prev) => [
+          ...prev,
+          { id: Date.now().toString(), type: "share", direction: "from-other", username: "Binkey", avatar: BinkeyAvatar, timestamp: "10:12AM" },
+        ]);
+        // stop after 15s
+        requestTimers.current.push(setTimeout(() => {
+          setBinkeyState({ hasShared: false, hasRequested: false });
+          setChatState({ hasShared: chatStateRef.current.hasShared, hasRequested: false });
           setChatData((prev) => [
             ...prev,
-            { id: Date.now().toString(), type: "request", direction: "from-other", username: "Binkey", avatar: BinkeyAvatar, timestamp: "10:07AM" },
+            { id: Date.now().toString(), type: "stop-share", direction: "from-other", username: "Binkey", avatar: BinkeyAvatar, timestamp: "10:27AM" },
           ]);
-        }, 5000)
-      );
-
-      // Binkey shares after 10s (if Tomas still not sharing)
-      timersRef.current.push(
-        setTimeout(() => {
-          if (chatStateRef.current.hasShared) { removeTyping(); return; }
-          addTyping();
-          timersRef.current.push(
-            setTimeout(() => {
-              if (chatStateRef.current.hasShared) { removeTyping(); return; }
-              removeTyping();
-              setBinkeyState({ hasRequested: false, hasShared: true });
-              setChatData((prev) => [
-                ...prev,
-                { id: Date.now().toString(), type: "share", direction: "from-other", username: "Binkey", avatar: BinkeyAvatar, timestamp: "10:12AM" },
-              ]);
-              // stop sharing after 15s
-              timersRef.current.push(
-                setTimeout(() => {
-                  setBinkeyState({ hasShared: false, hasRequested: false });
-                  setChatData((prev) => [
-                    ...prev,
-                    { id: Date.now().toString(), type: "stop-share", direction: "from-other", username: "Binkey", avatar: BinkeyAvatar, timestamp: "10:27AM" },
-                  ]);
-                }, 15000)
-              );
-            }, 2000)
-          );
-        }, 10000)
-      );
-    }
-
-    if (action === "share") {
-      // Tomas shares first → Binkey shares back
-      timersRef.current.push(setTimeout(() => addTyping(), 3000));
-
-      timersRef.current.push(
-        setTimeout(() => {
-          removeTyping();
-          setBinkeyState({ hasRequested: false, hasShared: true });
-          setChatData((prev) => [
-            ...prev,
-            { id: Date.now().toString(), type: "share", direction: "from-other", username: "Binkey", avatar: BinkeyAvatar, timestamp: "10:12AM" },
-          ]);
-          // stop sharing after 15s
-          timersRef.current.push(
-            setTimeout(() => {
-              setBinkeyState({ hasShared: false, hasRequested: false });
-              setChatData((prev) => [
-                ...prev,
-                { id: Date.now().toString(), type: "stop-share", direction: "from-other", username: "Binkey", avatar: BinkeyAvatar, timestamp: "10:27AM" },
-              ]);
-            }, 15000)
-          );
-        }, 10000)
-      );
-    }
+        }, 15000));
+      }, 2000));
+    }, 10000));
   };
 
+  const startShareFlow = () => {
+    shareTimers.current.forEach((t) => clearTimeout(t));
+    shareTimers.current = [];
+
+    shareTimers.current.push(setTimeout(() => addTyping(), 3000));
+    shareTimers.current.push(setTimeout(() => {
+      removeTyping();
+      setBinkeyState({ hasRequested: false, hasShared: true });
+      setChatData((prev) => [
+        ...prev,
+        { id: Date.now().toString(), type: "share", direction: "from-other", username: "Binkey", avatar: BinkeyAvatar, timestamp: "10:12AM" },
+      ]);
+      // stop after 15s
+      shareTimers.current.push(setTimeout(() => {
+        setBinkeyState({ hasShared: false, hasRequested: false });
+        setChatState({ hasShared: chatStateRef.current.hasShared, hasRequested: false });
+        setChatData((prev) => [
+          ...prev,
+          { id: Date.now().toString(), type: "stop-share", direction: "from-other", username: "Binkey", avatar: BinkeyAvatar, timestamp: "10:27AM" },
+        ]);
+      }, 15000));
+    }, 10000));
+  };
+
+  // --- UI ---
   const renderMessage = ({ item }) => {
     if (item.type === "typing") {
       return <View style={styles.typingBubble}><TypingDots /></View>;
@@ -279,7 +263,7 @@ export default function UserChatScreen() {
                   ...prev,
                   { id: Date.now().toString(), type: "request", direction: "from-user", username: currentUser.name, avatar: currentUser.avatar, timestamp: "10:02AM" }
                 ]);
-                triggerBinkeyResponse("request");
+                startRequestFlow();
               }
             }}
           >
@@ -356,16 +340,7 @@ export default function UserChatScreen() {
             <TouchableOpacity
               style={styles.sendButton}
               onPress={() => {
-                // when user shares, cancel every pending Binkey action
                 setChatState({ ...chatState, hasShared: true });
-                timersRef.current.forEach((t) => clearTimeout(t));
-                timersRef.current = [];
-                if (typingIdRef.current) {
-                  setChatData((prev) => prev.filter((m) => m.id !== typingIdRef.current));
-                  typingIdRef.current = null;
-                }
-                setBinkeyState((prev) => ({ ...prev, hasRequested: false }));
-
                 setChatData((prev) => {
                   const newMsgs = [
                     ...prev,
@@ -385,7 +360,7 @@ export default function UserChatScreen() {
                   return newMsgs;
                 });
                 setMessage("");
-                triggerBinkeyResponse("share");
+                startShareFlow();
               }}
             >
               <Text style={styles.sendButtonText}>Share Rezults</Text>
@@ -461,8 +436,12 @@ const styles = StyleSheet.create({
   stopButton: { width: "100%", paddingVertical: 16, borderRadius: 20, backgroundColor: colors.brand.purple1, alignItems: "center" },
   stopButtonText: { ...typography.bodyMedium, color: colors.neutral[0], fontWeight: "600" },
   dateDivider: {
-    alignSelf: "center", backgroundColor: colors.background.surface2,
-    borderRadius: 12, paddingHorizontal: 12, paddingVertical: 4, marginVertical: 8,
+    alignSelf: "center",
+    backgroundColor: colors.background.surface2,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    marginVertical: 8,
   },
   dateText: { ...typography.captionSmallRegular, color: colors.foreground.muted },
 });
