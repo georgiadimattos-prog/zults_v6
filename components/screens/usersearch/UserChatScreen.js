@@ -24,7 +24,7 @@ import fallbackAvatar from "../../../assets/images/melany.png";
 const TomasAvatar = require("../../../assets/images/tomas.png");
 const BinkeyAvatar = require("../../../assets/images/melany.png");
 
-// ✅ exported so ActivitiesScreen can import the live cache
+// ✅ export chatCache so Activities can import it
 export const chatCache = {};
 
 function TypingDots() {
@@ -77,7 +77,7 @@ export default function UserChatScreen() {
   const requestTimers = useRef([]);
   const shareTimers = useRef([]);
 
-  // live refs to use inside timers
+  // live refs for timers
   const chatStateRef = useRef(chatState);
   const binkeyStateRef = useRef(binkeyState);
   useEffect(() => { chatStateRef.current = chatState; }, [chatState]);
@@ -94,7 +94,7 @@ export default function UserChatScreen() {
     }
   }, []);
 
-  // persist to cache (✅ also saving user for Activities list)
+  // persist to cache
   useEffect(() => {
     const key = user.name || "default";
     chatCache[key] = {
@@ -152,12 +152,11 @@ export default function UserChatScreen() {
     }
   };
 
-  // --- FLOWS ---
+  // simplified flows (from v12)
   const startRequestFlow = () => {
     requestTimers.current.forEach((t) => clearTimeout(t));
     requestTimers.current = [];
 
-    // typing then request
     requestTimers.current.push(setTimeout(() => addTyping(), 3000));
     requestTimers.current.push(setTimeout(() => {
       if (chatStateRef.current.hasShared) { removeTyping(); return; }
@@ -169,7 +168,6 @@ export default function UserChatScreen() {
       ]);
     }, 5000));
 
-    // then share if Tomas still hasn't shared
     requestTimers.current.push(setTimeout(() => {
       if (chatStateRef.current.hasShared) { removeTyping(); return; }
       addTyping();
@@ -181,7 +179,6 @@ export default function UserChatScreen() {
           ...prev,
           { id: Date.now().toString(), type: "share", direction: "from-other", username: "Binkey", avatar: BinkeyAvatar, timestamp: "10:12AM" },
         ]);
-        // stop after 15s
         requestTimers.current.push(setTimeout(() => {
           setBinkeyState({ hasShared: false, hasRequested: false });
           setChatState({ hasShared: chatStateRef.current.hasShared, hasRequested: false });
@@ -206,7 +203,6 @@ export default function UserChatScreen() {
         ...prev,
         { id: Date.now().toString(), type: "share", direction: "from-other", username: "Binkey", avatar: BinkeyAvatar, timestamp: "10:12AM" },
       ]);
-      // stop after 15s
       shareTimers.current.push(setTimeout(() => {
         setBinkeyState({ hasShared: false, hasRequested: false });
         setChatState({ hasShared: chatStateRef.current.hasShared, hasRequested: false });
@@ -218,7 +214,6 @@ export default function UserChatScreen() {
     }, 10000));
   };
 
-  // --- UI ---
   const renderMessage = ({ item }) => {
     if (item.type === "typing") {
       return <View style={styles.typingBubble}><TypingDots /></View>;
@@ -240,17 +235,25 @@ export default function UserChatScreen() {
     <View style={styles.root}>
       {/* Header */}
       <BlurView intensity={40} tint="dark" style={styles.topBlur}>
+        {/* Row 1 → 3 dots */}
         <View style={styles.topRow}>
-          <TouchableOpacity onPress={() => navigation.goBack()}><Image source={arrowLeft} style={styles.backIcon} /></TouchableOpacity>
-          <TouchableOpacity><Image source={moreIcon} style={styles.moreIcon} /></TouchableOpacity>
+          <View style={{ flex: 1 }} />
+          <TouchableOpacity>
+            <Image source={moreIcon} style={styles.moreIcon} />
+          </TouchableOpacity>
         </View>
+
+        {/* Row 2 → back arrow + avatar + username + Rezults button */}
         <View style={styles.userRow}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Image source={arrowLeft} style={styles.backIcon} />
+          </TouchableOpacity>
           <Image source={user.image || fallbackAvatar} style={styles.avatar} />
           <Text style={styles.username}>{user.name}</Text>
           <TouchableOpacity
             style={[
               styles.rezultsButton,
-              (chatState.hasRequested || binkeyState.hasShared) && styles.rezultsButtonActive,
+              chatState.hasShared && styles.rezultsButtonActive,
             ]}
             disabled={chatState.hasRequested && !binkeyState.hasShared}
             onPress={() => {
@@ -271,7 +274,7 @@ export default function UserChatScreen() {
             <Text
               style={[
                 styles.rezultsButtonText,
-                (chatState.hasRequested || binkeyState.hasShared) && styles.rezultsButtonTextActive,
+                chatState.hasShared && styles.rezultsButtonTextActive,
               ]}
             >
               {binkeyState.hasShared
@@ -294,17 +297,9 @@ export default function UserChatScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingHorizontal: 8,
-          paddingTop: 180,           // ✅ baseline
-          paddingBottom: 140 + keyboardHeight, // ✅ baseline + keyboard lift
+          paddingTop: 180,
+          paddingBottom: 140 + keyboardHeight,
         }}
-        onContentSizeChange={(w, h) => {
-          flatListRef.current?.scrollToOffset({ offset: h + 50, animated: true }); // ✅ baseline auto-scroll
-        }}
-        ListHeaderComponent={
-          <View style={styles.dateDivider}>
-            <Text style={styles.dateText}>Today</Text>
-          </View>
-        }
       />
 
       {/* Footer */}
@@ -342,24 +337,10 @@ export default function UserChatScreen() {
               style={styles.sendButton}
               onPress={() => {
                 setChatState({ ...chatState, hasShared: true });
-                setChatData((prev) => {
-                  const newMsgs = [
-                    ...prev,
-                    { id: Date.now().toString(), type: "share", direction: "from-user", username: currentUser.name, avatar: currentUser.avatar, timestamp: "10:05AM" }
-                  ];
-                  if (message.trim()) {
-                    newMsgs.push({
-                      id: (Date.now() + 1).toString(),
-                      type: "note",
-                      direction: "from-user",
-                      username: currentUser.name,
-                      avatar: currentUser.avatar,
-                      text: message.trim(),
-                      timestamp: "10:05AM",
-                    });
-                  }
-                  return newMsgs;
-                });
+                setChatData((prev) => [
+                  ...prev,
+                  { id: Date.now().toString(), type: "share", direction: "from-user", username: currentUser.name, avatar: currentUser.avatar, timestamp: "10:05AM" }
+                ]);
                 setMessage("");
                 startShareFlow();
               }}
@@ -390,18 +371,30 @@ const styles = StyleSheet.create({
     paddingTop: Platform.OS === "ios" ? 72 : 56,
     paddingBottom: 20,
     paddingHorizontal: 16,
-    position: "absolute", top: 0, left: 0, right: 0, zIndex: 10,
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 10,
     backgroundColor: "transparent",
   },
-  topRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 12 },
-  backIcon: { width: 28, height: 28, tintColor: colors.foreground.default },
+  topRow: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    marginBottom: 12,
+  },
   moreIcon: { width: 24, height: 24, tintColor: colors.foreground.default },
-  userRow: { flexDirection: "row", alignItems: "center" },
-  avatar: { width: 40, height: 40, borderRadius: 20, marginRight: 12 },
+  userRow: { flexDirection: "row", alignItems: "center", gap: 12 },
+  backIcon: { width: 28, height: 28, tintColor: colors.foreground.default },
+  avatar: { width: 40, height: 40, borderRadius: 20 },
   username: { ...typography.bodyMedium, color: colors.foreground.default, flex: 1 },
   rezultsButton: {
-    paddingHorizontal: 14, paddingVertical: 6, borderRadius: 20,
-    borderWidth: 1, borderColor: colors.foreground.default,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: colors.foreground.default,
     backgroundColor: colors.background.surface1,
   },
   rezultsButtonActive: { backgroundColor: colors.brand.purple1, borderColor: colors.brand.purple1 },
@@ -409,13 +402,17 @@ const styles = StyleSheet.create({
   rezultsButtonTextActive: { color: colors.neutral[0], fontWeight: "600" },
   typingBubble: {
     backgroundColor: colors.background.surface2,
-    borderRadius: 16, paddingHorizontal: 12, paddingVertical: 6,
-    alignSelf: "flex-start", margin: 8,
+    borderRadius: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    alignSelf: "flex-start",
+    margin: 8,
   },
   footerBlur: {
     position: "absolute",
     left: 0,
     right: 0,
+    bottom: 0,
     paddingHorizontal: 20,
     paddingTop: 16,
     paddingBottom: 40,
@@ -426,19 +423,39 @@ const styles = StyleSheet.create({
   footer: { flexDirection: "row", alignItems: "center" },
   emojiToggle: { fontSize: 24, marginHorizontal: 6 },
   input: {
-    flex: 1, height: 44, borderRadius: 22,
-    borderWidth: 1, borderColor: colors.foreground.muted,
-    paddingHorizontal: 14, marginRight: 8,
-    ...typography.bodyRegular, color: colors.foreground.default,
+    flex: 1,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: colors.foreground.muted,
+    paddingHorizontal: 14,
+    marginRight: 8,
+    ...typography.bodyRegular,
+    color: colors.foreground.default,
     backgroundColor: colors.background.surface1,
   },
-  sendButton: { backgroundColor: colors.brand.purple1, borderRadius: 20, paddingHorizontal: 14, paddingVertical: 10 },
+  sendButton: {
+    backgroundColor: colors.brand.purple1,
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
   sendButtonText: { ...typography.bodyMedium, color: colors.neutral[0], fontWeight: "600" },
-  stopButton: { width: "100%", paddingVertical: 16, borderRadius: 20, backgroundColor: colors.brand.purple1, alignItems: "center" },
+  stopButton: {
+    width: "100%",
+    paddingVertical: 16,
+    borderRadius: 20,
+    backgroundColor: colors.brand.purple1,
+    alignItems: "center",
+  },
   stopButtonText: { ...typography.bodyMedium, color: colors.neutral[0], fontWeight: "600" },
   dateDivider: {
-    alignSelf: "center", backgroundColor: colors.background.surface2,
-    borderRadius: 12, paddingHorizontal: 12, paddingVertical: 4, marginVertical: 8,
+    alignSelf: "center",
+    backgroundColor: colors.background.surface2,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    marginVertical: 8,
   },
   dateText: { ...typography.captionSmallRegular, color: colors.foreground.muted },
 });
