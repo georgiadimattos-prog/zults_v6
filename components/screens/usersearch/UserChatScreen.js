@@ -73,6 +73,12 @@ export default function UserChatScreen() {
   const typingIdRef = useRef(null);
   const timersRef = useRef([]);
 
+  // live refs to use inside timers
+  const chatStateRef = useRef(chatState);
+  const binkeyStateRef = useRef(binkeyState);
+  useEffect(() => { chatStateRef.current = chatState; }, [chatState]);
+  useEffect(() => { binkeyStateRef.current = binkeyState; }, [binkeyState]);
+
   // restore cache
   useEffect(() => {
     const key = user.name || "default";
@@ -115,11 +121,31 @@ export default function UserChatScreen() {
     };
   }, []);
 
-  const addTyping = (from = "Binkey") => {
+  // cancel pending Binkey actions if Tomas shares
+  useEffect(() => {
+    if (chatState.hasShared) {
+      timersRef.current.forEach((t) => clearTimeout(t));
+      timersRef.current = [];
+      if (typingIdRef.current) {
+        setChatData((prev) => prev.filter((m) => m.id !== typingIdRef.current));
+        typingIdRef.current = null;
+      }
+      setBinkeyState((prev) => ({ ...prev, hasRequested: false }));
+    }
+  }, [chatState.hasShared]);
+
+  const addTyping = () => {
+    if (chatStateRef.current.hasShared && !binkeyStateRef.current.hasShared) {
+      // still allow typing before Binkey shares back
+    } else if (chatStateRef.current.hasShared && binkeyStateRef.current.hasShared) {
+      return; // already shared, no typing needed
+    } else if (chatStateRef.current.hasShared === false) {
+      // allowed in request flow
+    }
     typingIdRef.current = `typing-${Date.now()}`;
     setChatData((prev) => [
       ...prev,
-      { id: typingIdRef.current, type: "typing", direction: "from-other", username: from, avatar: BinkeyAvatar },
+      { id: typingIdRef.current, type: "typing", direction: "from-other", username: "Binkey", avatar: BinkeyAvatar },
     ]);
   };
 
@@ -138,9 +164,10 @@ export default function UserChatScreen() {
       // typing after 3s
       timersRef.current.push(setTimeout(() => addTyping(), 3000));
 
-      // Binkey requests after 5s
+      // Binkey requests after 5s (only if Tomas not sharing)
       timersRef.current.push(
         setTimeout(() => {
+          if (chatStateRef.current.hasShared) { removeTyping(); return; }
           removeTyping();
           setBinkeyState({ hasRequested: true, hasShared: false });
           setChatData((prev) => [
@@ -150,41 +177,40 @@ export default function UserChatScreen() {
         }, 5000)
       );
 
-      // Binkey shares after 10s if Tomas hasn't shared
+      // Binkey shares after 10s (if Tomas still not sharing)
       timersRef.current.push(
         setTimeout(() => {
-          if (!chatState.hasShared) {
-            addTyping();
-            timersRef.current.push(
-              setTimeout(() => {
-                removeTyping();
-                setBinkeyState({ hasRequested: false, hasShared: true });
-                setChatData((prev) => [
-                  ...prev,
-                  { id: Date.now().toString(), type: "share", direction: "from-other", username: "Binkey", avatar: BinkeyAvatar, timestamp: "10:12AM" },
-                ]);
-                // stop sharing after 15s
-                timersRef.current.push(
-                  setTimeout(() => {
-                    setBinkeyState({ hasShared: false, hasRequested: false });
-                    setChatData((prev) => [
-                      ...prev,
-                      { id: Date.now().toString(), type: "stop-share", direction: "from-other", username: "Binkey", avatar: BinkeyAvatar, timestamp: "10:27AM" },
-                    ]);
-                  }, 15000)
-                );
-              }, 2000) // typing lasts 2s before share
-            );
-          }
+          if (chatStateRef.current.hasShared) { removeTyping(); return; }
+          addTyping();
+          timersRef.current.push(
+            setTimeout(() => {
+              if (chatStateRef.current.hasShared) { removeTyping(); return; }
+              removeTyping();
+              setBinkeyState({ hasRequested: false, hasShared: true });
+              setChatData((prev) => [
+                ...prev,
+                { id: Date.now().toString(), type: "share", direction: "from-other", username: "Binkey", avatar: BinkeyAvatar, timestamp: "10:12AM" },
+              ]);
+              // stop sharing after 15s
+              timersRef.current.push(
+                setTimeout(() => {
+                  setBinkeyState({ hasShared: false, hasRequested: false });
+                  setChatData((prev) => [
+                    ...prev,
+                    { id: Date.now().toString(), type: "stop-share", direction: "from-other", username: "Binkey", avatar: BinkeyAvatar, timestamp: "10:27AM" },
+                  ]);
+                }, 15000)
+              );
+            }, 2000)
+          );
         }, 10000)
       );
     }
 
     if (action === "share") {
-      // typing after 3s
+      // Tomas shares first → Binkey shares back
       timersRef.current.push(setTimeout(() => addTyping(), 3000));
 
-      // Binkey shares after 10s
       timersRef.current.push(
         setTimeout(() => {
           removeTyping();
@@ -237,8 +263,16 @@ export default function UserChatScreen() {
           <Image source={user.image || fallbackAvatar} style={styles.avatar} />
           <Text style={styles.username}>{user.name}</Text>
           <TouchableOpacity
-            style={[styles.rezultsButton, chatState.hasShared && styles.rezultsButtonActive]}
+            style={[
+              styles.rezultsButton,
+              (chatState.hasRequested || binkeyState.hasShared) && styles.rezultsButtonActive,
+            ]}
+            disabled={chatState.hasRequested && !binkeyState.hasShared}
             onPress={() => {
+              if (binkeyState.hasShared) {
+                navigation.navigate("Rezults");
+                return;
+              }
               if (!chatState.hasRequested) {
                 setChatState({ ...chatState, hasRequested: true });
                 setChatData((prev) => [
@@ -246,16 +280,15 @@ export default function UserChatScreen() {
                   { id: Date.now().toString(), type: "request", direction: "from-user", username: currentUser.name, avatar: currentUser.avatar, timestamp: "10:02AM" }
                 ]);
                 triggerBinkeyResponse("request");
-              } else {
-                setChatState({ ...chatState, hasRequested: false });
-                setChatData((prev) => [
-                  ...prev,
-                  { id: Date.now().toString(), type: "cancel-request", direction: "from-user", username: currentUser.name, avatar: currentUser.avatar, timestamp: "10:03AM" }
-                ]);
               }
             }}
           >
-            <Text style={[styles.rezultsButtonText, chatState.hasShared && styles.rezultsButtonTextActive]}>
+            <Text
+              style={[
+                styles.rezultsButtonText,
+                (chatState.hasRequested || binkeyState.hasShared) && styles.rezultsButtonTextActive,
+              ]}
+            >
               {binkeyState.hasShared
                 ? "View Rezults"
                 : chatState.hasRequested
@@ -323,7 +356,16 @@ export default function UserChatScreen() {
             <TouchableOpacity
               style={styles.sendButton}
               onPress={() => {
+                // when user shares, cancel every pending Binkey action
                 setChatState({ ...chatState, hasShared: true });
+                timersRef.current.forEach((t) => clearTimeout(t));
+                timersRef.current = [];
+                if (typingIdRef.current) {
+                  setChatData((prev) => prev.filter((m) => m.id !== typingIdRef.current));
+                  typingIdRef.current = null;
+                }
+                setBinkeyState((prev) => ({ ...prev, hasRequested: false }));
+
                 setChatData((prev) => {
                   const newMsgs = [
                     ...prev,
