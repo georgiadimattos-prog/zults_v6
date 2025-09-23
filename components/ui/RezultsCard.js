@@ -4,6 +4,8 @@ import {
   Text,
   StyleSheet,
   TouchableWithoutFeedback,
+  Dimensions,
+  Image,
 } from "react-native";
 import { Video } from "expo-av";
 import Animated, {
@@ -14,8 +16,12 @@ import Animated, {
 } from "react-native-reanimated";
 import { colors, typography } from "../../theme";
 
-const CARD_WIDTH = 343;
-const CARD_HEIGHT = 216;
+import logoIcon from "../../assets/images/rezults-icon.png"; // ✅ Zults logo
+
+// ✅ dynamic sizing (same as placeholder)
+const screenWidth = Dimensions.get("window").width;
+const CARD_WIDTH = screenWidth - 32;
+const CARD_HEIGHT = CARD_WIDTH / 1.586;
 
 export default function RezultsCard({
   userName = "John Doe",
@@ -33,12 +39,16 @@ export default function RezultsCard({
   };
 
   const frontAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{ rotateY: `${interpolate(rotate.value, [0, 180], [0, 180])}deg` }],
+    transform: [
+      { rotateY: `${interpolate(rotate.value, [0, 180], [0, 180])}deg` },
+    ],
     opacity: interpolate(rotate.value, [0, 90, 180], [1, 0, 0]),
   }));
 
   const backAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{ rotateY: `${interpolate(rotate.value, [0, 180], [180, 360])}deg` }],
+    transform: [
+      { rotateY: `${interpolate(rotate.value, [0, 180], [180, 360])}deg` },
+    ],
     opacity: interpolate(rotate.value, [0, 90, 180], [0, 0, 1]),
   }));
 
@@ -56,6 +66,10 @@ export default function RezultsCard({
             resizeMode="cover"
           />
 
+          {/* ✅ Zults logo top-right */}
+          <Image source={logoIcon} style={styles.logo} resizeMode="contain" />
+
+          {/* Text overlay */}
           <View style={styles.overlay}>
             <View>
               <Text style={styles.name}>{userName}</Text>
@@ -112,12 +126,20 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: CARD_WIDTH,
     height: CARD_HEIGHT,
-    borderRadius: 13,
+    borderRadius: 20,
     overflow: "hidden",
   },
   videoCard: {
     width: "100%",
     height: "100%",
+  },
+  logo: {
+    position: "absolute",
+    top: CARD_HEIGHT * 0.06, // ~6% from top
+    right: CARD_WIDTH * 0.04, // ~4% from right
+    width: CARD_WIDTH * 0.1, // ~10% of card width
+    height: CARD_WIDTH * 0.1,
+    opacity: 0.7, // ✅ subtle transparency for glow
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
@@ -147,12 +169,12 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: CARD_WIDTH,
     height: CARD_HEIGHT,
-    borderRadius: 13,
+    borderRadius: 20,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.2)", // ✅ lighter border
+    borderColor: "rgba(255,255,255,0.2)",
     backgroundColor: colors.background.surface1,
     padding: 16,
-    justifyContent: "space-between", // ✅ space test date top / pills bottom
+    justifyContent: "space-between",
   },
   backHeader: {
     alignItems: "flex-start",
