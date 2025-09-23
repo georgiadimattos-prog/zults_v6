@@ -18,6 +18,7 @@ import { colors, typography } from "../../theme";
 
 import logoIcon from "../../assets/images/rezults-icon.png";
 import expandIcon from "../../assets/images/expandIcon.png";
+import collapseIcon from "../../assets/images/collapseIcon.png";
 
 const screenWidth = Dimensions.get("window").width;
 const CARD_WIDTH = screenWidth - 32;
@@ -32,8 +33,10 @@ export default function RezultsCard({
   onExpand, // ✅ parent callback (state setter from RezultsScreen)
 }) {
   const [showBack, setShowBack] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   const rotate = useSharedValue(0);
+  const iconRotate = useSharedValue(0); // ✅ for expand/collapse animation
 
   const flipCard = () => {
     rotate.value = withTiming(showBack ? 0 : 180, { duration: 400 });
@@ -45,6 +48,15 @@ export default function RezultsCard({
     }
   };
 
+  const toggleExpand = () => {
+    const next = !expanded;
+    setExpanded(next);
+    if (onExpand) {
+      onExpand(next);
+    }
+    iconRotate.value = withTiming(next ? 180 : 0, { duration: 300 });
+  };
+
   const frontAnimatedStyle = useAnimatedStyle(() => ({
     transform: [{ rotateY: `${interpolate(rotate.value, [0, 180], [0, 180])}deg` }],
     opacity: interpolate(rotate.value, [0, 90, 180], [1, 0, 0]),
@@ -53,6 +65,10 @@ export default function RezultsCard({
   const backAnimatedStyle = useAnimatedStyle(() => ({
     transform: [{ rotateY: `${interpolate(rotate.value, [0, 180], [180, 360])}deg` }],
     opacity: interpolate(rotate.value, [0, 90, 180], [0, 0, 1]),
+  }));
+
+  const iconAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${iconRotate.value}deg` }],
   }));
 
   return (
@@ -88,11 +104,11 @@ export default function RezultsCard({
             </Text>
 
             {showExpand && (
-              <TouchableWithoutFeedback onPress={() => onExpand(prev => !prev)}>
+              <TouchableWithoutFeedback onPress={toggleExpand}>
                 <View style={styles.expandButton}>
-                  <Image
-                    source={expandIcon}
-                    style={{ width: 16, height: 16 }}
+                  <Animated.Image
+                    source={expanded ? collapseIcon : expandIcon}
+                    style={[{ width: 16, height: 16, tintColor: "#FFF" }, iconAnimatedStyle]}
                     resizeMode="contain"
                   />
                 </View>
