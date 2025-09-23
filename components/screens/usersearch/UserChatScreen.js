@@ -107,6 +107,7 @@ export default function UserChatScreen() {
 
     const key = user.name || "default";
     chatCache[key] = {
+      ...chatCache[key], // ✅ keep existing props (like favorite)
       chatData,
       chatState,
       binkeyState,
@@ -464,15 +465,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 10,
   },
-  sendButtonText: { ...typography.bodyMedium, color: colors.neutral[0], fontWeight: "600" },
-  stopButton: {
-    width: "100%",
-    paddingVertical: 16,
-    borderRadius: 20,
-    backgroundColor: colors.brand.purple1,
-    alignItems: "center",
+  stopButtonText: { 
+    ...typography.bodyMedium, 
+    color: colors.neutral[0], 
+    fontWeight: "600" 
   },
-  stopButtonText: { ...typography.bodyMedium, color: colors.neutral[0], fontWeight: "600" },
   dateDivider: {
     alignSelf: "center",
     backgroundColor: colors.background.surface2,
