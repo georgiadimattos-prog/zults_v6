@@ -254,7 +254,22 @@ export default function UserChatScreen() {
 
         {/* Row 2 → back arrow + avatar + username + Rezults button */}
         <View style={styles.userRow}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
+          <TouchableOpacity
+            onPress={() => {
+              const hasAction = chatData.some(
+                (msg) =>
+                  msg.type === "request" ||
+                  msg.type === "share" ||
+                  msg.type === "stop-share"
+              );
+
+              if (hasAction) {
+                navigation.navigate("Activities"); // go to Activities if action fired
+              } else {
+                navigation.goBack(); // back to UserSearch if no action
+              }
+            }}
+          >
             <Image source={arrowLeft} style={styles.backIcon} />
           </TouchableOpacity>
           <Image source={user.image || fallbackAvatar} style={styles.avatar} />
