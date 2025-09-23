@@ -8,6 +8,8 @@ import { Text, View } from 'react-native';
 // Main Screens
 import MainScreen from './components/screens/mainscreen/MainScreen';
 import SettingsScreen from './components/screens/settings/SettingsScreen';
+
+// ✅ NEW: Activities (separate screen, WhatsApp-style list)
 import ActivitiesScreen from './components/screens/activities/ActivitiesScreen';
 
 // Get Rezults Screens
@@ -26,8 +28,9 @@ import LinkScreenShareSheet from './components/screens/share/link/LinkScreen_Sha
 import LinkScreenSuccess from './components/screens/share/link/LinkScreen_Success';
 import LinkScreenOffline from './components/screens/share/link/LinkScreen_Offline';
 
-// ✅ NEW: UserChatScreen
+// Chat + Rezults
 import UserChatScreen from './components/screens/usersearch/UserChatScreen';
+import RezultsScreen from './components/screens/RezultsScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -51,25 +54,38 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="MainScreen" screenOptions={{ headerShown: false }}>
+      <Stack.Navigator
+        initialRouteName="MainScreen"     // ✅ Default entry = your baseline main
+        screenOptions={{ headerShown: false }}
+      >
+        {/* Main entry */}
         <Stack.Screen name="MainScreen" component={MainScreen} />
-        <Stack.Screen name="Share" component={ShareScreen} />
+
+        {/* Settings */}
         <Stack.Screen name="Settings" component={SettingsScreen} />
+
+        {/* Activities (full screen) */}
+        <Stack.Screen name="Activities" component={ActivitiesScreen} />
+
+        {/* Get Rezults flow (all routes restored) */}
         <Stack.Screen name="GetRezults" component={GetRezultsScreen} />
         <Stack.Screen name="GetRezultsProvider" component={GetRezults_SelectProviderScreen} />
         <Stack.Screen name="GetRezultsLinkInput" component={GetRezults_PasteLinkScreen} />
         <Stack.Screen name="GetRezultsLoading" component={GetRezults_LoadingScreen} />
         <Stack.Screen name="GetRezultsConfirm" component={GetRezults_ConfirmScreen} />
         <Stack.Screen name="GetRezultsHowToFindLink" component={GetRezults_HowToFindLinkScreen} />
+
+        {/* Share flow (all routes restored) */}
+        <Stack.Screen name="Share" component={ShareScreen} />
         <Stack.Screen name="SMSRequestSent" component={SMSRequestSent} />
         <Stack.Screen name="ReviewSMS" component={ReviewSMSRequest} />
         <Stack.Screen name="LinkShareSheet" component={LinkScreenShareSheet} />
         <Stack.Screen name="LinkSuccess" component={LinkScreenSuccess} />
         <Stack.Screen name="LinkOffline" component={LinkScreenOffline} />
-        <Stack.Screen name="Activities" component={ActivitiesScreen} />
-        
-        {/* ✅ NEWLY ADDED */}
+
+        {/* Chat + Rezults */}
         <Stack.Screen name="UserChat" component={UserChatScreen} />
+        <Stack.Screen name="Rezults" component={RezultsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
