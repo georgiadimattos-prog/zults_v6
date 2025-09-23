@@ -24,6 +24,9 @@ import { rezultsCache } from "../../../../cache/rezultsCache";
 // ✅ Expire container
 import ExpireContainer from "../../../ui/ExpireContainer";
 
+// ✅ Header container
+import RezultsHeaderContainer from "../../../ui/RezultsHeaderContainer";
+
 export default function MainUnverifiedWithRezults() {
   const navigation = useNavigation();
   const [recentUsers, setRecentUsers] = useState([]);
@@ -78,6 +81,18 @@ export default function MainUnverifiedWithRezults() {
     );
   };
 
+  const handleAddRezults = () => {
+    console.log("Add new Rezults tapped");
+    // later -> navigation.navigate("GetRezultsProvider");
+  };
+
+  const handleDeleteRezults = () => {
+    console.log("Delete Rezults tapped");
+    rezultsCache.hasRezults = false;
+    rezultsCache.card = null;
+    navigation.navigate("MainScreen"); // back to no Rezults variant
+  };
+
   return (
     <ScreenWrapper>
       <StatusBar
@@ -87,6 +102,12 @@ export default function MainUnverifiedWithRezults() {
       <UserProfileHeader hideVerification />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
+        {/* ✅ Header with title + actions */}
+        <RezultsHeaderContainer
+          onAdd={handleAddRezults}
+          onDelete={handleDeleteRezults}
+        />
+
         {/* ✅ Rezults card */}
         <RezultsCard
           userName={rezultsCache.card?.userName || "Unknown User"}
@@ -95,7 +116,7 @@ export default function MainUnverifiedWithRezults() {
         />
 
         {/* ✅ Expiry container just below card */}
-        <ExpireContainer expiryDate="15 Aug 2026" daysLeft={90} />
+        <ExpireContainer expiryDate="29 Sep 2025" daysLeft={43} />
 
         {/* Share button */}
         <ZultsButton
