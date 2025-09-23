@@ -388,14 +388,34 @@ export default function UserChatScreen() {
             <TouchableOpacity
               style={styles.sendButton}
               onPress={() => {
-                setChatState({ ...chatState, hasShared: true });
-                setChatData((prev) => [
-                  ...prev,
-                  { id: Date.now().toString(), type: "share", direction: "from-user", username: currentUser.name, avatar: currentUser.avatar, timestamp: "10:05AM" }
-                ]);
-                setMessage("");
-                startShareFlow();
-              }}
+  setChatState({ ...chatState, hasShared: true });
+  setChatData((prev) => [
+    ...prev,
+    {
+      id: Date.now().toString(),
+      type: "share",
+      direction: "from-user",
+      username: currentUser.name,
+      avatar: currentUser.avatar,
+      timestamp: "10:05AM",
+    },
+    ...(message
+      ? [
+          {
+            id: Date.now().toString() + "-note",
+            type: "text",
+            direction: "from-user",
+            username: currentUser.name,
+            avatar: currentUser.avatar,
+            text: message,
+            timestamp: "10:05AM",
+          },
+        ]
+      : []),
+  ]);
+  setMessage("");
+  startShareFlow();
+}}
             >
               <Text style={styles.sendButtonText}>Share Rezults</Text>
             </TouchableOpacity>

@@ -48,7 +48,7 @@ export default function RezultActionBubble(props) {
   }
 
   // --- Note bubble ---
-  if (type === 'note') {
+  if (type === 'note' || type === 'text') {
     return (
       <View style={[styles.container, isFromUser && styles.rightAlign, isFromOther && styles.leftAlign]}>
         {isFromOther && <Image source={avatar || fallbackAvatar} style={styles.avatar} />}
