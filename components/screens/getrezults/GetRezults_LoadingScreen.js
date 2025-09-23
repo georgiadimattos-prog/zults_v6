@@ -14,10 +14,11 @@ export default function GetRezults_LoadingScreen() {
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      navigation.navigate('GetRezultsConfirm', { providerId, resultsLink });
+      // ✅ go to new AddRezultsCardScreen instead of old Confirm
+      navigation.navigate('AddRezultsCard', { providerId, resultsLink });
     }, 3000);
     return () => clearTimeout(timeout);
-  }, []);
+  }, [navigation, providerId, resultsLink]);
 
   return (
     <ScreenWrapper horizontalPadding={0} topPadding={0}>

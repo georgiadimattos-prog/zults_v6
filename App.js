@@ -19,6 +19,8 @@ import GetRezults_PasteLinkScreen from './components/screens/getrezults/GetRezul
 import GetRezults_LoadingScreen from './components/screens/getrezults/GetRezults_LoadingScreen';
 import GetRezults_ConfirmScreen from './components/screens/getrezults/GetRezults_ConfirmScreen';
 import GetRezults_HowToFindLinkScreen from './components/screens/getrezults/GetRezults_HowToFindLinkScreen';
+import AddRezultsCardScreen from './components/screens/getrezults/AddRezultsCardScreen';
+
 
 // Share Screens
 import ShareScreen from './components/screens/share/ShareScreen';
@@ -72,6 +74,7 @@ export default function App() {
         <Stack.Screen name="LinkOffline" component={LinkScreenOffline} />
         <Stack.Screen name="UserChat" component={UserChatScreen} />
         <Stack.Screen name="Rezults" component={RezultsScreen} />
+        <Stack.Screen name="AddRezultsCard" component={AddRezultsCardScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
