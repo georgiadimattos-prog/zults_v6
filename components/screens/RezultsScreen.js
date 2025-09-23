@@ -53,7 +53,7 @@ function RezultsScreen() {
         providerName={providerName || "Sexual Health London"}
         testDate={testDate || "12 Dec 2025"}
         showExpand={showExpand}
-        onExpand={() => setExpanded(true)} // ✅ expand details when tapped
+        onExpand={setExpanded} // ✅ now toggles true/false
       />
 
       {/* Expanded info box */}

@@ -18,7 +18,6 @@ import { colors, typography } from "../../theme";
 
 import logoIcon from "../../assets/images/rezults-icon.png";
 import expandIcon from "../../assets/images/expandIcon.png";
-import collapseIcon from "../../assets/images/collapseIcon.png";
 
 const screenWidth = Dimensions.get("window").width;
 const CARD_WIDTH = screenWidth - 32;
@@ -29,34 +28,30 @@ export default function RezultsCard({
   providerName = "Sexual Health London",
   testDate = "12 Dec 2025",
   videoSource = require("../../assets/videos/Card_All_GlowingBorder_25sec.mp4"),
-  showExpand = false, // ✅ new prop
-  onExpand, // ✅ new callback from parent
+  showExpand = false, // ✅ prop to control expand button visibility
+  onExpand, // ✅ parent callback (state setter from RezultsScreen)
 }) {
   const [showBack, setShowBack] = useState(false);
-  const [expanded, setExpanded] = useState(false);
 
   const rotate = useSharedValue(0);
 
   const flipCard = () => {
     rotate.value = withTiming(showBack ? 0 : 180, { duration: 400 });
     setShowBack(!showBack);
-  };
 
-  const toggleExpand = () => {
-    setExpanded(!expanded);
+    // ✅ reset expanded when flipping
+    if (onExpand) {
+      onExpand(false);
+    }
   };
 
   const frontAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { rotateY: `${interpolate(rotate.value, [0, 180], [0, 180])}deg` },
-    ],
+    transform: [{ rotateY: `${interpolate(rotate.value, [0, 180], [0, 180])}deg` }],
     opacity: interpolate(rotate.value, [0, 90, 180], [1, 0, 0]),
   }));
 
   const backAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { rotateY: `${interpolate(rotate.value, [0, 180], [180, 360])}deg` },
-    ],
+    transform: [{ rotateY: `${interpolate(rotate.value, [0, 180], [180, 360])}deg` }],
     opacity: interpolate(rotate.value, [0, 90, 180], [0, 0, 1]),
   }));
 
@@ -87,44 +82,44 @@ export default function RezultsCard({
 
         {/* Back */}
         <Animated.View style={[styles.cardBack, backAnimatedStyle]}>
-  <View style={styles.backHeader}>
-    <Text style={styles.testedOn}>
-      Tested on <Text style={styles.testedDate}>{testDate}</Text>
-    </Text>
+          <View style={styles.backHeader}>
+            <Text style={styles.testedOn}>
+              Tested on <Text style={styles.testedDate}>{testDate}</Text>
+            </Text>
 
-    {showExpand && (
-      <TouchableWithoutFeedback onPress={onExpand}>
-        <View style={styles.expandButton}>
-          <Image
-            source={expandIcon}
-            style={{ width: 16, height: 16 }}
-            resizeMode="contain"
-          />
-        </View>
-      </TouchableWithoutFeedback>
-    )}
-  </View>
+            {showExpand && (
+              <TouchableWithoutFeedback onPress={() => onExpand(prev => !prev)}>
+                <View style={styles.expandButton}>
+                  <Image
+                    source={expandIcon}
+                    style={{ width: 16, height: 16 }}
+                    resizeMode="contain"
+                  />
+                </View>
+              </TouchableWithoutFeedback>
+            )}
+          </View>
 
-  <View style={styles.pillsBottom}>
-    {[
-      "Tested negative:",
-      "Gonorrhea",
-      "HIV",
-      "Syphilis",
-      "Chlamydia",
-      "Hepatitis B",
-      "Hepatitis C",
-      "Gardnerella",
-      "Trichomoniasis",
-      "Ureaplasma",
-      "Mycoplasma",
-    ].map((label, idx) => (
-      <View key={idx} style={styles.pill}>
-        <Text style={styles.pillText}>{label}</Text>
-      </View>
-    ))}
-  </View>
-</Animated.View>
+          <View style={styles.pillsBottom}>
+            {[
+              "Tested negative:",
+              "Gonorrhoea",
+              "HIV",
+              "Syphilis",
+              "Chlamydia",
+              "Hepatitis B",
+              "Hepatitis C",
+              "Gardnerella",
+              "Trichomoniasis",
+              "Ureaplasma",
+              "Mycoplasma",
+            ].map((label, idx) => (
+              <View key={idx} style={styles.pill}>
+                <Text style={styles.pillText}>{label}</Text>
+              </View>
+            ))}
+          </View>
+        </Animated.View>
       </View>
     </TouchableWithoutFeedback>
   );
