@@ -64,12 +64,14 @@ export default function UserChatScreen() {
 
   const [message, setMessage] = useState("");
   const [chatState, setChatState] = useState({ hasShared: false, hasRequested: false });
+  const [binkeyState, setBinkeyState] = useState({ hasShared: false, hasRequested: false });
   const [chatData, setChatData] = useState([]);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-
   const [keyboardHeight, setKeyboardHeight] = useState(0);
 
   const flatListRef = useRef(null);
+  const typingIdRef = useRef(null);
+  const timersRef = useRef([]);
 
   // restore cache
   useEffect(() => {
@@ -83,7 +85,7 @@ export default function UserChatScreen() {
     chatCache[key] = chatData;
   }, [chatData]);
 
-  // keyboard listeners (moves footer + adds extra bottom space)
+  // keyboard listeners
   useEffect(() => {
     const showEvt = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
     const hideEvt = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
@@ -91,7 +93,6 @@ export default function UserChatScreen() {
     const onShow = (e) => {
       const h = e?.endCoordinates?.height ?? 0;
       setKeyboardHeight(h);
-      // keep latest visible when keyboard opens
       requestAnimationFrame(() => {
         flatListRef.current?.scrollToEnd({ animated: true });
       });
@@ -106,6 +107,107 @@ export default function UserChatScreen() {
     };
   }, []);
 
+  // clear timers on unmount
+  useEffect(() => {
+    return () => {
+      timersRef.current.forEach((t) => clearTimeout(t));
+      timersRef.current = [];
+    };
+  }, []);
+
+  const addTyping = (from = "Binkey") => {
+    typingIdRef.current = `typing-${Date.now()}`;
+    setChatData((prev) => [
+      ...prev,
+      { id: typingIdRef.current, type: "typing", direction: "from-other", username: from, avatar: BinkeyAvatar },
+    ]);
+  };
+
+  const removeTyping = () => {
+    if (typingIdRef.current) {
+      setChatData((prev) => prev.filter((m) => m.id !== typingIdRef.current));
+      typingIdRef.current = null;
+    }
+  };
+
+  const triggerBinkeyResponse = (action) => {
+    timersRef.current.forEach((t) => clearTimeout(t));
+    timersRef.current = [];
+
+    if (action === "request") {
+      // typing after 3s
+      timersRef.current.push(setTimeout(() => addTyping(), 3000));
+
+      // Binkey requests after 5s
+      timersRef.current.push(
+        setTimeout(() => {
+          removeTyping();
+          setBinkeyState({ hasRequested: true, hasShared: false });
+          setChatData((prev) => [
+            ...prev,
+            { id: Date.now().toString(), type: "request", direction: "from-other", username: "Binkey", avatar: BinkeyAvatar, timestamp: "10:07AM" },
+          ]);
+        }, 5000)
+      );
+
+      // Binkey shares after 10s if Tomas hasn't shared
+      timersRef.current.push(
+        setTimeout(() => {
+          if (!chatState.hasShared) {
+            addTyping();
+            timersRef.current.push(
+              setTimeout(() => {
+                removeTyping();
+                setBinkeyState({ hasRequested: false, hasShared: true });
+                setChatData((prev) => [
+                  ...prev,
+                  { id: Date.now().toString(), type: "share", direction: "from-other", username: "Binkey", avatar: BinkeyAvatar, timestamp: "10:12AM" },
+                ]);
+                // stop sharing after 15s
+                timersRef.current.push(
+                  setTimeout(() => {
+                    setBinkeyState({ hasShared: false, hasRequested: false });
+                    setChatData((prev) => [
+                      ...prev,
+                      { id: Date.now().toString(), type: "stop-share", direction: "from-other", username: "Binkey", avatar: BinkeyAvatar, timestamp: "10:27AM" },
+                    ]);
+                  }, 15000)
+                );
+              }, 2000) // typing lasts 2s before share
+            );
+          }
+        }, 10000)
+      );
+    }
+
+    if (action === "share") {
+      // typing after 3s
+      timersRef.current.push(setTimeout(() => addTyping(), 3000));
+
+      // Binkey shares after 10s
+      timersRef.current.push(
+        setTimeout(() => {
+          removeTyping();
+          setBinkeyState({ hasRequested: false, hasShared: true });
+          setChatData((prev) => [
+            ...prev,
+            { id: Date.now().toString(), type: "share", direction: "from-other", username: "Binkey", avatar: BinkeyAvatar, timestamp: "10:12AM" },
+          ]);
+          // stop sharing after 15s
+          timersRef.current.push(
+            setTimeout(() => {
+              setBinkeyState({ hasShared: false, hasRequested: false });
+              setChatData((prev) => [
+                ...prev,
+                { id: Date.now().toString(), type: "stop-share", direction: "from-other", username: "Binkey", avatar: BinkeyAvatar, timestamp: "10:27AM" },
+              ]);
+            }, 15000)
+          );
+        }, 10000)
+      );
+    }
+  };
+
   const renderMessage = ({ item }) => {
     if (item.type === "typing") {
       return <View style={styles.typingBubble}><TypingDots /></View>;
@@ -118,6 +220,7 @@ export default function UserChatScreen() {
         avatar={item.avatar}
         timestamp={item.timestamp}
         text={item.text || ""}
+        liked={item.liked}
       />
     );
   };
@@ -142,6 +245,7 @@ export default function UserChatScreen() {
                   ...prev,
                   { id: Date.now().toString(), type: "request", direction: "from-user", username: currentUser.name, avatar: currentUser.avatar, timestamp: "10:02AM" }
                 ]);
+                triggerBinkeyResponse("request");
               } else {
                 setChatState({ ...chatState, hasRequested: false });
                 setChatData((prev) => [
@@ -152,7 +256,11 @@ export default function UserChatScreen() {
             }}
           >
             <Text style={[styles.rezultsButtonText, chatState.hasShared && styles.rezultsButtonTextActive]}>
-              {chatState.hasRequested ? "Rezults Requested" : "Request Rezults"}
+              {binkeyState.hasShared
+                ? "View Rezults"
+                : chatState.hasRequested
+                ? "Rezults Requested"
+                : "Request Rezults"}
             </Text>
           </TouchableOpacity>
         </View>
@@ -168,11 +276,11 @@ export default function UserChatScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingHorizontal: 8,
-          paddingTop: 180,               // ✅ baseline
-          paddingBottom: 140 + keyboardHeight, // ✅ baseline + keyboard lift
+          paddingTop: 180,
+          paddingBottom: 140 + keyboardHeight,
         }}
         onContentSizeChange={(w, h) => {
-          flatListRef.current?.scrollToOffset({ offset: h + 50, animated: true }); // ✅ baseline auto-scroll
+          flatListRef.current?.scrollToOffset({ offset: h + 50, animated: true });
         }}
         ListHeaderComponent={
           <View style={styles.dateDivider}>
@@ -181,7 +289,7 @@ export default function UserChatScreen() {
         }
       />
 
-      {/* Footer (rides above keyboard) */}
+      {/* Footer */}
       <BlurView
         intensity={40}
         tint="dark"
@@ -216,11 +324,26 @@ export default function UserChatScreen() {
               style={styles.sendButton}
               onPress={() => {
                 setChatState({ ...chatState, hasShared: true });
-                setChatData((prev) => [
-                  ...prev,
-                  { id: Date.now().toString(), type: "share", direction: "from-user", username: currentUser.name, avatar: currentUser.avatar, timestamp: "10:05AM" }
-                ]);
+                setChatData((prev) => {
+                  const newMsgs = [
+                    ...prev,
+                    { id: Date.now().toString(), type: "share", direction: "from-user", username: currentUser.name, avatar: currentUser.avatar, timestamp: "10:05AM" }
+                  ];
+                  if (message.trim()) {
+                    newMsgs.push({
+                      id: (Date.now() + 1).toString(),
+                      type: "note",
+                      direction: "from-user",
+                      username: currentUser.name,
+                      avatar: currentUser.avatar,
+                      text: message.trim(),
+                      timestamp: "10:05AM",
+                    });
+                  }
+                  return newMsgs;
+                });
                 setMessage("");
+                triggerBinkeyResponse("share");
               }}
             >
               <Text style={styles.sendButtonText}>Share Rezults</Text>
@@ -245,14 +368,11 @@ export default function UserChatScreen() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.background.surface1 },
-
   topBlur: {
     paddingTop: Platform.OS === "ios" ? 72 : 56,
     paddingBottom: 20,
     paddingHorizontal: 16,
-    position: "absolute",
-    top: 0, left: 0, right: 0,
-    zIndex: 10,
+    position: "absolute", top: 0, left: 0, right: 0, zIndex: 10,
     backgroundColor: "transparent",
   },
   topRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 12 },
@@ -261,7 +381,6 @@ const styles = StyleSheet.create({
   userRow: { flexDirection: "row", alignItems: "center" },
   avatar: { width: 40, height: 40, borderRadius: 20, marginRight: 12 },
   username: { ...typography.bodyMedium, color: colors.foreground.default, flex: 1 },
-
   rezultsButton: {
     paddingHorizontal: 14, paddingVertical: 6, borderRadius: 20,
     borderWidth: 1, borderColor: colors.foreground.default,
@@ -270,27 +389,24 @@ const styles = StyleSheet.create({
   rezultsButtonActive: { backgroundColor: colors.brand.purple1, borderColor: colors.brand.purple1 },
   rezultsButtonText: { ...typography.bodyMedium, color: colors.foreground.default },
   rezultsButtonTextActive: { color: colors.neutral[0], fontWeight: "600" },
-
   typingBubble: {
     backgroundColor: colors.background.surface2,
     borderRadius: 16, paddingHorizontal: 12, paddingVertical: 6,
     alignSelf: "flex-start", margin: 8,
   },
-
   footerBlur: {
     position: "absolute",
-    left: 0, right: 0,
-    // bottom will be controlled dynamically
+    left: 0,
+    right: 0,
     paddingHorizontal: 20,
     paddingTop: 16,
-    paddingBottom: 40, // ✅ baseline
+    paddingBottom: 40,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     backgroundColor: "transparent",
   },
   footer: { flexDirection: "row", alignItems: "center" },
   emojiToggle: { fontSize: 24, marginHorizontal: 6 },
-
   input: {
     flex: 1, height: 44, borderRadius: 22,
     borderWidth: 1, borderColor: colors.foreground.muted,
@@ -298,19 +414,13 @@ const styles = StyleSheet.create({
     ...typography.bodyRegular, color: colors.foreground.default,
     backgroundColor: colors.background.surface1,
   },
-
   sendButton: { backgroundColor: colors.brand.purple1, borderRadius: 20, paddingHorizontal: 14, paddingVertical: 10 },
   sendButtonText: { ...typography.bodyMedium, color: colors.neutral[0], fontWeight: "600" },
-
   stopButton: { width: "100%", paddingVertical: 16, borderRadius: 20, backgroundColor: colors.brand.purple1, alignItems: "center" },
   stopButtonText: { ...typography.bodyMedium, color: colors.neutral[0], fontWeight: "600" },
-
   dateDivider: {
-    alignSelf: "center",
-    backgroundColor: colors.background.surface2,
-    borderRadius: 12,
-    paddingHorizontal: 12, paddingVertical: 4,
-    marginVertical: 8,
+    alignSelf: "center", backgroundColor: colors.background.surface2,
+    borderRadius: 12, paddingHorizontal: 12, paddingVertical: 4, marginVertical: 8,
   },
   dateText: { ...typography.captionSmallRegular, color: colors.foreground.muted },
 });
