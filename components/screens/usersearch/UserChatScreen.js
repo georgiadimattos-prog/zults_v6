@@ -8,7 +8,7 @@ import {
   FlatList,
   TouchableOpacity,
   Platform,
-  KeyboardAvoidingView,
+  Keyboard,
   Animated,
   Easing,
 } from "react-native";
@@ -67,17 +67,44 @@ export default function UserChatScreen() {
   const [chatData, setChatData] = useState([]);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+
   const flatListRef = useRef(null);
 
+  // restore cache
   useEffect(() => {
     const key = user.name || "default";
     if (chatCache[key]) setChatData(chatCache[key]);
   }, []);
 
+  // persist cache
   useEffect(() => {
     const key = user.name || "default";
     chatCache[key] = chatData;
   }, [chatData]);
+
+  // keyboard listeners (moves footer + adds extra bottom space)
+  useEffect(() => {
+    const showEvt = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
+    const hideEvt = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
+
+    const onShow = (e) => {
+      const h = e?.endCoordinates?.height ?? 0;
+      setKeyboardHeight(h);
+      // keep latest visible when keyboard opens
+      requestAnimationFrame(() => {
+        flatListRef.current?.scrollToEnd({ animated: true });
+      });
+    };
+    const onHide = () => setKeyboardHeight(0);
+
+    const subShow = Keyboard.addListener(showEvt, onShow);
+    const subHide = Keyboard.addListener(hideEvt, onHide);
+    return () => {
+      subShow.remove();
+      subHide.remove();
+    };
+  }, []);
 
   const renderMessage = ({ item }) => {
     if (item.type === "typing") {
@@ -96,7 +123,7 @@ export default function UserChatScreen() {
   };
 
   return (
-    <KeyboardAvoidingView style={styles.root} behavior={Platform.OS === "ios" ? "padding" : undefined} keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}>
+    <View style={styles.root}>
       {/* Header */}
       <BlurView intensity={40} tint="dark" style={styles.topBlur}>
         <View style={styles.topRow}>
@@ -141,11 +168,11 @@ export default function UserChatScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingHorizontal: 8,
-          paddingTop: 180,
-          paddingBottom: 140, // ✅ from reference
+          paddingTop: 180,               // ✅ baseline
+          paddingBottom: 140 + keyboardHeight, // ✅ baseline + keyboard lift
         }}
         onContentSizeChange={(w, h) => {
-          flatListRef.current?.scrollToOffset({ offset: h + 50, animated: true }); // ✅ from reference
+          flatListRef.current?.scrollToOffset({ offset: h + 50, animated: true }); // ✅ baseline auto-scroll
         }}
         ListHeaderComponent={
           <View style={styles.dateDivider}>
@@ -154,8 +181,12 @@ export default function UserChatScreen() {
         }
       />
 
-      {/* Footer */}
-      <BlurView intensity={40} tint="dark" style={styles.footerBlur}>
+      {/* Footer (rides above keyboard) */}
+      <BlurView
+        intensity={40}
+        tint="dark"
+        style={[styles.footerBlur, { bottom: keyboardHeight }]}
+      >
         {chatState.hasShared ? (
           <TouchableOpacity
             style={styles.stopButton}
@@ -208,17 +239,20 @@ export default function UserChatScreen() {
           </View>
         )}
       </BlurView>
-    </KeyboardAvoidingView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.background.surface1 },
+
   topBlur: {
     paddingTop: Platform.OS === "ios" ? 72 : 56,
     paddingBottom: 20,
     paddingHorizontal: 16,
-    position: "absolute", top: 0, left: 0, right: 0, zIndex: 10,
+    position: "absolute",
+    top: 0, left: 0, right: 0,
+    zIndex: 10,
     backgroundColor: "transparent",
   },
   topRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 12 },
@@ -227,6 +261,7 @@ const styles = StyleSheet.create({
   userRow: { flexDirection: "row", alignItems: "center" },
   avatar: { width: 40, height: 40, borderRadius: 20, marginRight: 12 },
   username: { ...typography.bodyMedium, color: colors.foreground.default, flex: 1 },
+
   rezultsButton: {
     paddingHorizontal: 14, paddingVertical: 6, borderRadius: 20,
     borderWidth: 1, borderColor: colors.foreground.default,
@@ -235,21 +270,27 @@ const styles = StyleSheet.create({
   rezultsButtonActive: { backgroundColor: colors.brand.purple1, borderColor: colors.brand.purple1 },
   rezultsButtonText: { ...typography.bodyMedium, color: colors.foreground.default },
   rezultsButtonTextActive: { color: colors.neutral[0], fontWeight: "600" },
+
   typingBubble: {
     backgroundColor: colors.background.surface2,
     borderRadius: 16, paddingHorizontal: 12, paddingVertical: 6,
     alignSelf: "flex-start", margin: 8,
   },
+
   footerBlur: {
-    position: "absolute", left: 0, right: 0, bottom: 0,
+    position: "absolute",
+    left: 0, right: 0,
+    // bottom will be controlled dynamically
     paddingHorizontal: 20,
     paddingTop: 16,
-    paddingBottom: 40, // ✅ from reference
+    paddingBottom: 40, // ✅ baseline
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
     backgroundColor: "transparent",
-    borderTopLeftRadius: 24, borderTopRightRadius: 24,
   },
   footer: { flexDirection: "row", alignItems: "center" },
   emojiToggle: { fontSize: 24, marginHorizontal: 6 },
+
   input: {
     flex: 1, height: 44, borderRadius: 22,
     borderWidth: 1, borderColor: colors.foreground.muted,
@@ -257,13 +298,19 @@ const styles = StyleSheet.create({
     ...typography.bodyRegular, color: colors.foreground.default,
     backgroundColor: colors.background.surface1,
   },
+
   sendButton: { backgroundColor: colors.brand.purple1, borderRadius: 20, paddingHorizontal: 14, paddingVertical: 10 },
   sendButtonText: { ...typography.bodyMedium, color: colors.neutral[0], fontWeight: "600" },
+
   stopButton: { width: "100%", paddingVertical: 16, borderRadius: 20, backgroundColor: colors.brand.purple1, alignItems: "center" },
   stopButtonText: { ...typography.bodyMedium, color: colors.neutral[0], fontWeight: "600" },
+
   dateDivider: {
-    alignSelf: "center", backgroundColor: colors.background.surface2,
-    borderRadius: 12, paddingHorizontal: 12, paddingVertical: 4, marginVertical: 8,
+    alignSelf: "center",
+    backgroundColor: colors.background.surface2,
+    borderRadius: 12,
+    paddingHorizontal: 12, paddingVertical: 4,
+    marginVertical: 8,
   },
   dateText: { ...typography.captionSmallRegular, color: colors.foreground.muted },
 });
