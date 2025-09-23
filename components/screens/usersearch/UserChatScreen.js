@@ -1,6 +1,6 @@
 /* components/screens/usersearch/UserChatScreen.js
    Baseline-v21 + block/unblock integrated (Baseline-v22)
-   ONLY block/unblock additions were made; everything else kept as in Baseline-v21.
+   Updated: removed hardcoded Binkey, now uses dynamic user props.
 */
 
 import React, { useState, useRef, useEffect } from "react";
@@ -28,7 +28,6 @@ import moreIcon from "../../../assets/images/navbar-dots.png";
 import fallbackAvatar from "../../../assets/images/melany.png";
 
 const TomasAvatar = require("../../../assets/images/tomas.png");
-const BinkeyAvatar = require("../../../assets/images/melany.png");
 
 // export chatCache so Activities can import it
 export const chatCache = {};
@@ -65,51 +64,42 @@ function TypingDots() {
 export default function UserChatScreen() {
   const navigation = useNavigation();
   const route = useRoute();
-  
-  const realNames = {
-    binkey: "Melany J Rabideau",
-
-  };
 
   const currentUser = { name: "TomasB.", avatar: TomasAvatar };
-  const user = route.params?.user || { name: "Binkey", image: BinkeyAvatar };
+  const user = route.params?.user || { name: "Unknown", image: fallbackAvatar };
 
   const [message, setMessage] = useState("");
   const [chatState, setChatState] = useState({ hasShared: false, hasRequested: false });
-  const [binkeyState, setBinkeyState] = useState({ hasShared: false, hasRequested: false });
+  const [otherUserState, setOtherUserState] = useState({ hasShared: false, hasRequested: false });
   const [chatData, setChatData] = useState([]);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [showActionsModal, setShowActionsModal] = useState(false);
 
-  // Block state (new)
   const [isBlocked, setIsBlocked] = useState(false);
 
   const flatListRef = useRef(null);
   const typingIdRef = useRef(null);
 
-  // separate timer refs
   const requestTimers = useRef([]);
   const shareTimers = useRef([]);
 
-  // live refs for timers
   const chatStateRef = useRef(chatState);
-  const binkeyStateRef = useRef(binkeyState);
+  const otherUserStateRef = useRef(otherUserState);
   useEffect(() => { chatStateRef.current = chatState; }, [chatState]);
-  useEffect(() => { binkeyStateRef.current = binkeyState; }, [binkeyState]);
+  useEffect(() => { otherUserStateRef.current = otherUserState; }, [otherUserState]);
 
-  // restore from cache (now restores blocked too)
+  // restore from cache
   useEffect(() => {
     const key = user.name || "default";
     if (chatCache[key]) {
       const saved = chatCache[key];
       setChatData(saved.chatData || []);
       setChatState(saved.chatState || { hasShared: false, hasRequested: false });
-      setBinkeyState(saved.binkeyState || { hasShared: false, hasRequested: false });
+      setOtherUserState(saved.otherUserState || { hasShared: false, hasRequested: false });
       if (saved.blocked) setIsBlocked(true);
     }
 
-    // preload demo chat if it's the demo user
     if (user.id === "zults-demo") {
       setChatData([
         {
@@ -131,11 +121,11 @@ export default function UserChatScreen() {
           timestamp: "Now",
         },
       ]);
-      setBinkeyState({ hasShared: true, hasRequested: false });
+      setOtherUserState({ hasShared: true, hasRequested: false });
     }
   }, []);
 
-  // persist to cache (also store blocked)
+  // persist to cache
   useEffect(() => {
     const hasAction = chatData.some(
       (msg) =>
@@ -144,7 +134,6 @@ export default function UserChatScreen() {
         msg.type === "stop-share"
     );
 
-    // Save if there are actions OR if the chat is blocked (so block persists)
     if (!hasAction && !isBlocked) return;
 
     const key = user.name || "default";
@@ -152,11 +141,11 @@ export default function UserChatScreen() {
       ...chatCache[key],
       chatData,
       chatState,
-      binkeyState,
+      otherUserState,
       user,
       blocked: isBlocked,
     };
-  }, [chatData, chatState, binkeyState, user, isBlocked]);
+  }, [chatData, chatState, otherUserState, user, isBlocked]);
 
   // keyboard listeners
   useEffect(() => {
@@ -180,7 +169,6 @@ export default function UserChatScreen() {
     };
   }, []);
 
-  // cleanup timers on unmount
   useEffect(() => {
     return () => {
       [...requestTimers.current, ...shareTimers.current].forEach((t) => clearTimeout(t));
@@ -189,7 +177,6 @@ export default function UserChatScreen() {
     };
   }, []);
 
-  // auto-scroll when messages added
   useEffect(() => {
     if (chatData.length > 0) {
       flatListRef.current?.scrollToOffset({
@@ -205,7 +192,13 @@ export default function UserChatScreen() {
     typingIdRef.current = `typing-${Date.now()}`;
     setChatData((prev) => [
       ...prev,
-      { id: typingIdRef.current, type: "typing", direction: "from-other", username: "Binkey", avatar: BinkeyAvatar },
+      {
+        id: typingIdRef.current,
+        type: "typing",
+        direction: "from-other",
+        username: user.name,
+        avatar: user.image || fallbackAvatar,
+      },
     ]);
   };
 
@@ -216,7 +209,7 @@ export default function UserChatScreen() {
     }
   };
 
-  // simplified flows (kept intact from Baseline-v21)
+  // flows
   const startRequestFlow = () => {
     requestTimers.current.forEach((t) => clearTimeout(t));
     requestTimers.current = [];
@@ -225,10 +218,10 @@ export default function UserChatScreen() {
     requestTimers.current.push(setTimeout(() => {
       if (chatStateRef.current.hasShared) { removeTyping(); return; }
       removeTyping();
-      setBinkeyState({ hasRequested: true, hasShared: false });
+      setOtherUserState({ hasRequested: true, hasShared: false });
       setChatData((prev) => [
         ...prev,
-        { id: Date.now().toString(), type: "request", direction: "from-other", username: "Binkey", avatar: BinkeyAvatar, timestamp: "10:07AM" },
+        { id: Date.now().toString(), type: "request", direction: "from-other", username: user.name, avatar: user.image || fallbackAvatar, timestamp: "10:07AM" },
       ]);
     }, 5000));
 
@@ -238,17 +231,17 @@ export default function UserChatScreen() {
       requestTimers.current.push(setTimeout(() => {
         if (chatStateRef.current.hasShared) { removeTyping(); return; }
         removeTyping();
-        setBinkeyState({ hasRequested: false, hasShared: true });
+        setOtherUserState({ hasRequested: false, hasShared: true });
         setChatData((prev) => [
           ...prev,
-          { id: Date.now().toString(), type: "share", direction: "from-other", username: "Binkey", avatar: BinkeyAvatar, timestamp: "10:12AM" },
+          { id: Date.now().toString(), type: "share", direction: "from-other", username: user.name, avatar: user.image || fallbackAvatar, timestamp: "10:12AM" },
         ]);
         requestTimers.current.push(setTimeout(() => {
-          setBinkeyState({ hasShared: false, hasRequested: false });
+          setOtherUserState({ hasShared: false, hasRequested: false });
           setChatState({ hasShared: chatStateRef.current.hasShared, hasRequested: false });
           setChatData((prev) => [
             ...prev,
-            { id: Date.now().toString(), type: "stop-share", direction: "from-other", username: "Binkey", avatar: BinkeyAvatar, timestamp: "10:27AM" },
+            { id: Date.now().toString(), type: "stop-share", direction: "from-other", username: user.name, avatar: user.image || fallbackAvatar, timestamp: "10:27AM" },
           ]);
         }, 15000));
       }, 2000));
@@ -262,13 +255,13 @@ export default function UserChatScreen() {
     shareTimers.current.push(setTimeout(() => addTyping(), 3000));
     shareTimers.current.push(setTimeout(() => {
       removeTyping();
-      setBinkeyState({ hasRequested: false, hasShared: true });
+      setOtherUserState({ hasRequested: false, hasShared: true });
       setChatData((prev) => [
         ...prev,
         { id: Date.now().toString(), type: "share", direction: "from-other", username: user.name, avatar: user.image || fallbackAvatar, timestamp: "10:12AM" },
       ]);
       shareTimers.current.push(setTimeout(() => {
-        setBinkeyState({ hasShared: false, hasRequested: false });
+        setOtherUserState({ hasShared: false, hasRequested: false });
         setChatState({ hasShared: chatStateRef.current.hasShared, hasRequested: false });
         setChatData((prev) => [
           ...prev,
@@ -278,7 +271,6 @@ export default function UserChatScreen() {
     }, 10000));
   };
 
-  // renderMessage (was accidentally removed earlier) — restored unchanged
   const renderMessage = ({ item }) => {
     if (item.type === "typing") {
       return <View style={styles.typingBubble}><TypingDots /></View>;
@@ -335,11 +327,10 @@ export default function UserChatScreen() {
             <TouchableOpacity
               style={styles.rezultsButton}
               onPress={() => {
-                // unblock via header (same reset as modal)
                 setIsBlocked(false);
                 setChatData([]);
                 setChatState({ hasShared: false, hasRequested: false });
-                setBinkeyState({ hasShared: false, hasRequested: false });
+                setOtherUserState({ hasShared: false, hasRequested: false });
               }}
             >
               <Text style={styles.rezultsButtonText}>Unblock User</Text>
@@ -350,36 +341,33 @@ export default function UserChatScreen() {
                 styles.rezultsButton,
                 chatState.hasShared && styles.rezultsButtonActive,
               ]}
-              disabled={chatState.hasRequested && !binkeyState.hasShared}
-onPress={() => {
-  if (binkeyState.hasShared) {
-    navigation.navigate("Rezults", {
-      username: user.name,
-      avatar: user.image || fallbackAvatar,
-      realName:
-        user.name && user.name.toLowerCase() === "binkey"
-          ? "Melany J Rabideau" // ✅ mapped real name
-          : undefined,           // fallback → will show username
-      providerName: "Sexual Health London",
-      testDate: "12 Dec 2025",
-      showExpand: true, // ✅ incoming Rezults should show expand button
-    });
-    return;
-  }
-  if (!chatState.hasRequested) {
-    setChatState({ ...chatState, hasRequested: true });
-    setChatData((prev) => [
-      ...prev,
-      {
-        id: Date.now().toString(),
-        type: "request",
-        direction: "from-user",
-        username: currentUser.name,
-        avatar: currentUser.avatar,
-        timestamp: "10:02AM",
-      },
-    ]);
-    startRequestFlow();
+              disabled={chatState.hasRequested && !otherUserState.hasShared}
+              onPress={() => {
+                if (otherUserState.hasShared) {
+                  navigation.navigate("Rezults", {
+                    username: user.name,
+                    avatar: user.image || fallbackAvatar,
+                    realName: user.name,
+                    providerName: "Sexual Health London",
+                    testDate: "12 Dec 2025",
+                    showExpand: true,
+                  });
+                  return;
+                }
+                if (!chatState.hasRequested) {
+                  setChatState({ ...chatState, hasRequested: true });
+                  setChatData((prev) => [
+                    ...prev,
+                    {
+                      id: Date.now().toString(),
+                      type: "request",
+                      direction: "from-user",
+                      username: currentUser.name,
+                      avatar: currentUser.avatar,
+                      timestamp: "10:02AM",
+                    },
+                  ]);
+                  startRequestFlow();
                 }
               }}
             >
@@ -389,7 +377,7 @@ onPress={() => {
                   chatState.hasShared && styles.rezultsButtonTextActive,
                 ]}
               >
-                {binkeyState.hasShared
+                {otherUserState.hasShared
                   ? "View Rezults"
                   : chatState.hasRequested
                   ? "Rezults Requested"
@@ -503,7 +491,7 @@ onPress={() => {
         </BlurView>
       )}
 
-      {/* Action Modal (Block / Unblock) */}
+      {/* Action Modal */}
       <ActionModal
         visible={showActionsModal}
         onClose={() => setShowActionsModal(false)}
@@ -519,11 +507,11 @@ onPress={() => {
                 setIsBlocked(false);
                 setChatData([]);
                 setChatState({ hasShared: false, hasRequested: false });
-                setBinkeyState({ hasShared: false, hasRequested: false });
+                setOtherUserState({ hasShared: false, hasRequested: false });
               }}
             : { label: "Block", onPress: () => {
                 setIsBlocked(true);
-                setChatData([]); // clear chat & activities
+                setChatData([]);
               }},
         ]}
       />
@@ -606,11 +594,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 10,
   },
-  sendButtonText: { 
-    ...typography.bodyMedium, 
-    color: colors.neutral[0], 
-    fontWeight: "600" 
-  },
+  sendButtonText: { ...typography.bodyMedium, color: colors.neutral[0], fontWeight: "600" },
   stopButton: {
     width: "100%",
     paddingVertical: 16,
@@ -618,11 +602,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.brand.purple1,
     alignItems: "center",
   },
-  stopButtonText: { 
-    ...typography.bodyMedium, 
-    color: colors.neutral[0], 
-    fontWeight: "600" 
-  },
+  stopButtonText: { ...typography.bodyMedium, color: colors.neutral[0], fontWeight: "600" },
   dateDivider: {
     alignSelf: "center",
     backgroundColor: colors.background.surface2,
@@ -631,18 +611,12 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     marginVertical: 8,
   },
-  dateText: { 
-    ...typography.captionSmallRegular, 
-    color: colors.foreground.muted 
-  },
+  dateText: { ...typography.captionSmallRegular, color: colors.foreground.muted },
   blockOverlay: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(0,0,0,0.6)",
   },
-  blockedText: {
-    ...typography.bodyMedium,
-    color: colors.foreground.soft,
-  },
+  blockedText: { ...typography.bodyMedium, color: colors.foreground.soft },
 });
