@@ -15,13 +15,14 @@ import RezultsCard from "../../../ui/RezultsCard";
 import NotificationCard from "../../../ui/NotificationCard";
 import ZultsButton from "../../../ui/ZultsButton";
 import ScreenWrapper from "../../../ui/ScreenWrapper";
-
-// import chatCache to show live recent users
 import { chatCache } from "../../usersearch/UserChatScreen";
 import zultsLogo from "../../../../assets/images/zults.png";
 
-// ✅ import Rezults cache
+// ✅ Rezults cache
 import { rezultsCache } from "../../../../cache/rezultsCache";
+
+// ✅ Expire container
+import ExpireContainer from "../../../ui/ExpireContainer";
 
 export default function MainUnverifiedWithRezults() {
   const navigation = useNavigation();
@@ -83,17 +84,20 @@ export default function MainUnverifiedWithRezults() {
         barStyle="light-content"
         backgroundColor={colors.background.surface1}
       />
-      {/* ✅ Hide verification badge only on this screen */}
       <UserProfileHeader hideVerification />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* ✅ Show RezultsCard using data from cache */}
+        {/* ✅ Rezults card */}
         <RezultsCard
           userName={rezultsCache.card?.userName || "Unknown User"}
           providerName={rezultsCache.card?.providerName || "Unknown Provider"}
           testDate={rezultsCache.card?.testDate || "Unknown Date"}
         />
 
+        {/* ✅ Expiry container just below card */}
+        <ExpireContainer expiryDate="15 Aug 2026" daysLeft={90} />
+
+        {/* Share button */}
         <ZultsButton
           label="Share"
           type="primary"
