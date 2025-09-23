@@ -94,8 +94,17 @@ export default function UserChatScreen() {
     }
   }, []);
 
-  // persist to cache
+  // ✅ persist to cache only if an action happened
   useEffect(() => {
+    const hasAction = chatData.some(
+      (msg) =>
+        msg.type === "request" ||
+        msg.type === "share" ||
+        msg.type === "stop-share"
+    );
+
+    if (!hasAction) return; // 👈 skip saving empty chats
+
     const key = user.name || "default";
     chatCache[key] = {
       chatData,
@@ -457,5 +466,8 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     marginVertical: 8,
   },
-  dateText: { ...typography.captionSmallRegular, color: colors.foreground.muted },
+  dateText: { 
+    ...typography.captionSmallRegular, 
+    color: colors.foreground.muted 
+  },
 });
