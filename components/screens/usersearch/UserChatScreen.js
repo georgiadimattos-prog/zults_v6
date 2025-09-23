@@ -246,14 +246,14 @@ export default function UserChatScreen() {
       setBinkeyState({ hasRequested: false, hasShared: true });
       setChatData((prev) => [
         ...prev,
-        { id: Date.now().toString(), type: "share", direction: "from-other", username: "Binkey", avatar: BinkeyAvatar, timestamp: "10:12AM" },
+        { id: Date.now().toString(), type: "share", direction: "from-other", username: user.name, avatar: user.image || fallbackAvatar, timestamp: "10:12AM" },
       ]);
       shareTimers.current.push(setTimeout(() => {
         setBinkeyState({ hasShared: false, hasRequested: false });
         setChatState({ hasShared: chatStateRef.current.hasShared, hasRequested: false });
         setChatData((prev) => [
           ...prev,
-          { id: Date.now().toString(), type: "stop-share", direction: "from-other", username: "Binkey", avatar: BinkeyAvatar, timestamp: "10:27AM" },
+          { id: Date.now().toString(), type: "stop-share", direction: "from-other", username: user.name, avatar: user.image || fallbackAvatar, timestamp: "10:27AM" },
         ]);
       }, 15000));
     }, 10000));
