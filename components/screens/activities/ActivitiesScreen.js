@@ -30,7 +30,7 @@ export default function ActivitiesScreen() {
       const chat = chatCache[username] || {};
       const lastMsg = chat.chatData?.[chat.chatData.length - 1];
 
-      // 🔑 friendly text mapping
+      // friendly last action text
       let lastText = "No activity yet";
       if (lastMsg) {
         if (lastMsg.type === "request") {
@@ -63,7 +63,13 @@ export default function ActivitiesScreen() {
         favorite: chat.favorite || false,
       };
     });
-    setActivities(data);
+
+    // ✅ always sort by last activity (latest on top)
+    const sorted = data.sort((a, b) =>
+      a.lastTimestamp < b.lastTimestamp ? 1 : -1
+    );
+
+    setActivities(sorted);
   }, [chatCache]);
 
   const toggleFavorite = (id) => {
@@ -95,8 +101,7 @@ export default function ActivitiesScreen() {
       <Image source={item.avatar} style={styles.avatar} />
       <View style={{ flex: 1 }}>
         <Text style={styles.username}>
-          {item.name}{" "}
-          {item.hasUnread && <Text style={styles.unreadDot}>•</Text>}
+          {item.name} {item.hasUnread && <Text style={styles.unreadDot}>•</Text>}
         </Text>
         <Text style={styles.lastText}>{item.lastText}</Text>
       </View>
@@ -106,7 +111,11 @@ export default function ActivitiesScreen() {
           source={item.favorite ? starFilled : star}
           style={[
             styles.starIcon,
-            { tintColor: item.favorite ? colors.brand.purple1 : colors.foreground.muted },
+            {
+              tintColor: item.favorite
+                ? colors.brand.purple1
+                : colors.foreground.muted,
+            },
           ]}
         />
       </TouchableOpacity>
@@ -131,8 +140,12 @@ export default function ActivitiesScreen() {
             style={[styles.tab, filter === tab && styles.tabActive]}
             onPress={() => setFilter(tab)}
           >
-            <Text style={[styles.tabText, filter === tab && styles.tabTextActive]}>
-              {tab === "all" ? "View All" : tab.charAt(0).toUpperCase() + tab.slice(1)}
+            <Text
+              style={[styles.tabText, filter === tab && styles.tabTextActive]}
+            >
+              {tab === "all"
+                ? "View All"
+                : tab.charAt(0).toUpperCase() + tab.slice(1)}
             </Text>
           </TouchableOpacity>
         ))}
@@ -143,7 +156,7 @@ export default function ActivitiesScreen() {
         data={filteredActivities}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
-        contentContainerStyle={{ paddingTop: 20, paddingHorizontal: 16 }}
+        contentContainerStyle={{ paddingTop: 140, paddingHorizontal: 16 }}
         ListEmptyComponent={
           <Text style={styles.empty}>
             {filter === "all"
@@ -174,11 +187,15 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   backIcon: { width: 28, height: 28, tintColor: colors.foreground.default },
-  title: { ...typography.bodyMedium, color: colors.foreground.default, fontWeight: "600" },
+  title: {
+    ...typography.bodyMedium,
+    color: colors.foreground.default,
+    fontWeight: "600",
+  },
   tabs: {
     flexDirection: "row",
     justifyContent: "space-around",
-    marginTop: Platform.OS === "ios" ? 140 : 80, // ✅ sits below nav
+    marginTop: Platform.OS === "ios" ? 100 : 80,
     paddingHorizontal: 16,
   },
   tab: {
@@ -201,7 +218,11 @@ const styles = StyleSheet.create({
   username: { ...typography.bodyMedium, color: colors.foreground.default },
   unreadDot: { color: colors.brand.purple1, fontWeight: "bold" },
   lastText: { ...typography.captionSmallRegular, color: colors.foreground.muted },
-  timestamp: { ...typography.captionSmallRegular, color: colors.foreground.muted, marginRight: 8 },
+  timestamp: {
+    ...typography.captionSmallRegular,
+    color: colors.foreground.muted,
+    marginRight: 8,
+  },
   starIcon: { width: 20, height: 20, marginLeft: 8 },
   empty: {
     textAlign: "center",

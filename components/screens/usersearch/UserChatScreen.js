@@ -35,8 +35,8 @@ function TypingDots() {
   const animate = (dot, delay) => {
     Animated.loop(
       Animated.sequence([
-        Animated.timing(dot, { toValue: 1, duration: 300, delay, useNativeDriver: true, easing: Easing.linear }),
-        Animated.timing(dot, { toValue: 0.3, duration: 300, useNativeDriver: true, easing: Easing.linear }),
+        Animated.timing(dot, { toValue: 1, duration: 300, delay, useNativeDriver: true }),
+        Animated.timing(dot, { toValue: 0.3, duration: 300, useNativeDriver: true }),
       ])
     ).start();
   };
@@ -69,33 +69,13 @@ export default function UserChatScreen() {
   const [chatData, setChatData] = useState([]);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [actionFired, setActionFired] = useState(false); // 👈 NEW FLAG
 
   const flatListRef = useRef(null);
-  const typingIdRef = useRef(null);
 
-  // separate timer refs
-  const requestTimers = useRef([]);
-  const shareTimers = useRef([]);
-
-  // live refs for timers
-  const chatStateRef = useRef(chatState);
-  const binkeyStateRef = useRef(binkeyState);
-  useEffect(() => { chatStateRef.current = chatState; }, [chatState]);
-  useEffect(() => { binkeyStateRef.current = binkeyState; }, [binkeyState]);
-
-  // restore from cache
+  // ✅ only persist to cache if an action was fired
   useEffect(() => {
-    const key = user.name || "default";
-    if (chatCache[key]) {
-      const saved = chatCache[key];
-      setChatData(saved.chatData || []);
-      setChatState(saved.chatState || { hasShared: false, hasRequested: false });
-      setBinkeyState(saved.binkeyState || { hasShared: false, hasRequested: false });
-    }
-  }, []);
-
-  // persist to cache
-  useEffect(() => {
+    if (!actionFired) return;
     const key = user.name || "default";
     chatCache[key] = {
       chatData,
@@ -103,116 +83,7 @@ export default function UserChatScreen() {
       binkeyState,
       user,
     };
-  }, [chatData, chatState, binkeyState, user]);
-
-  // keyboard listeners
-  useEffect(() => {
-    const showEvt = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
-    const hideEvt = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
-
-    const onShow = (e) => {
-      const h = e?.endCoordinates?.height ?? 0;
-      setKeyboardHeight(h);
-      requestAnimationFrame(() => {
-        flatListRef.current?.scrollToEnd({ animated: true });
-      });
-    };
-    const onHide = () => setKeyboardHeight(0);
-
-    const subShow = Keyboard.addListener(showEvt, onShow);
-    const subHide = Keyboard.addListener(hideEvt, onHide);
-    return () => {
-      subShow.remove();
-      subHide.remove();
-    };
-  }, []);
-
-  // cleanup timers
-  useEffect(() => {
-    return () => {
-      [...requestTimers.current, ...shareTimers.current].forEach((t) => clearTimeout(t));
-      requestTimers.current = [];
-      shareTimers.current = [];
-    };
-  }, []);
-
-  const addTyping = () => {
-    if (typingIdRef.current) return;
-    typingIdRef.current = `typing-${Date.now()}`;
-    setChatData((prev) => [
-      ...prev,
-      { id: typingIdRef.current, type: "typing", direction: "from-other", username: "Binkey", avatar: BinkeyAvatar },
-    ]);
-  };
-
-  const removeTyping = () => {
-    if (typingIdRef.current) {
-      setChatData((prev) => prev.filter((m) => m.id !== typingIdRef.current));
-      typingIdRef.current = null;
-    }
-  };
-
-  // simplified flows (from v12)
-  const startRequestFlow = () => {
-    requestTimers.current.forEach((t) => clearTimeout(t));
-    requestTimers.current = [];
-
-    requestTimers.current.push(setTimeout(() => addTyping(), 3000));
-    requestTimers.current.push(setTimeout(() => {
-      if (chatStateRef.current.hasShared) { removeTyping(); return; }
-      removeTyping();
-      setBinkeyState({ hasRequested: true, hasShared: false });
-      setChatData((prev) => [
-        ...prev,
-        { id: Date.now().toString(), type: "request", direction: "from-other", username: "Binkey", avatar: BinkeyAvatar, timestamp: "10:07AM" },
-      ]);
-    }, 5000));
-
-    requestTimers.current.push(setTimeout(() => {
-      if (chatStateRef.current.hasShared) { removeTyping(); return; }
-      addTyping();
-      requestTimers.current.push(setTimeout(() => {
-        if (chatStateRef.current.hasShared) { removeTyping(); return; }
-        removeTyping();
-        setBinkeyState({ hasRequested: false, hasShared: true });
-        setChatData((prev) => [
-          ...prev,
-          { id: Date.now().toString(), type: "share", direction: "from-other", username: "Binkey", avatar: BinkeyAvatar, timestamp: "10:12AM" },
-        ]);
-        requestTimers.current.push(setTimeout(() => {
-          setBinkeyState({ hasShared: false, hasRequested: false });
-          setChatState({ hasShared: chatStateRef.current.hasShared, hasRequested: false });
-          setChatData((prev) => [
-            ...prev,
-            { id: Date.now().toString(), type: "stop-share", direction: "from-other", username: "Binkey", avatar: BinkeyAvatar, timestamp: "10:27AM" },
-          ]);
-        }, 15000));
-      }, 2000));
-    }, 10000));
-  };
-
-  const startShareFlow = () => {
-    shareTimers.current.forEach((t) => clearTimeout(t));
-    shareTimers.current = [];
-
-    shareTimers.current.push(setTimeout(() => addTyping(), 3000));
-    shareTimers.current.push(setTimeout(() => {
-      removeTyping();
-      setBinkeyState({ hasRequested: false, hasShared: true });
-      setChatData((prev) => [
-        ...prev,
-        { id: Date.now().toString(), type: "share", direction: "from-other", username: "Binkey", avatar: BinkeyAvatar, timestamp: "10:12AM" },
-      ]);
-      shareTimers.current.push(setTimeout(() => {
-        setBinkeyState({ hasShared: false, hasRequested: false });
-        setChatState({ hasShared: chatStateRef.current.hasShared, hasRequested: false });
-        setChatData((prev) => [
-          ...prev,
-          { id: Date.now().toString(), type: "stop-share", direction: "from-other", username: "Binkey", avatar: BinkeyAvatar, timestamp: "10:27AM" },
-        ]);
-      }, 15000));
-    }, 10000));
-  };
+  }, [chatData, chatState, binkeyState, user, actionFired]);
 
   const renderMessage = ({ item }) => {
     if (item.type === "typing") {
@@ -245,7 +116,15 @@ export default function UserChatScreen() {
 
         {/* Row 2 → back arrow + avatar + username + Rezults button */}
         <View style={styles.userRow}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
+          <TouchableOpacity
+            onPress={() => {
+              if (actionFired) {
+                navigation.navigate("Activities"); // go to Activities if action fired
+              } else {
+                navigation.goBack(); // else back to UserSearch
+              }
+            }}
+          >
             <Image source={arrowLeft} style={styles.backIcon} />
           </TouchableOpacity>
           <Image source={user.image || fallbackAvatar} style={styles.avatar} />
@@ -265,9 +144,16 @@ export default function UserChatScreen() {
                 setChatState({ ...chatState, hasRequested: true });
                 setChatData((prev) => [
                   ...prev,
-                  { id: Date.now().toString(), type: "request", direction: "from-user", username: currentUser.name, avatar: currentUser.avatar, timestamp: "10:02AM" }
+                  {
+                    id: Date.now().toString(),
+                    type: "request",
+                    direction: "from-user",
+                    username: currentUser.name,
+                    avatar: currentUser.avatar,
+                    timestamp: "10:02AM",
+                  },
                 ]);
-                startRequestFlow();
+                setActionFired(true); // 👈 mark that an action was fired
               }
             }}
           >
@@ -315,8 +201,16 @@ export default function UserChatScreen() {
               setChatState({ ...chatState, hasShared: false });
               setChatData((prev) => [
                 ...prev,
-                { id: Date.now().toString(), type: "stop-share", direction: "from-user", username: currentUser.name, avatar: currentUser.avatar, timestamp: "10:06AM" }
+                {
+                  id: Date.now().toString(),
+                  type: "stop-share",
+                  direction: "from-user",
+                  username: currentUser.name,
+                  avatar: currentUser.avatar,
+                  timestamp: "10:06AM",
+                },
               ]);
+              setActionFired(true); // 👈 mark as action
             }}
           >
             <Text style={styles.stopButtonText}>Stop Sharing Rezults</Text>
@@ -339,10 +233,17 @@ export default function UserChatScreen() {
                 setChatState({ ...chatState, hasShared: true });
                 setChatData((prev) => [
                   ...prev,
-                  { id: Date.now().toString(), type: "share", direction: "from-user", username: currentUser.name, avatar: currentUser.avatar, timestamp: "10:05AM" }
+                  {
+                    id: Date.now().toString(),
+                    type: "share",
+                    direction: "from-user",
+                    username: currentUser.name,
+                    avatar: currentUser.avatar,
+                    timestamp: "10:05AM",
+                  },
                 ]);
                 setMessage("");
-                startShareFlow();
+                setActionFired(true); // 👈 mark as action
               }}
             >
               <Text style={styles.sendButtonText}>Share Rezults</Text>
