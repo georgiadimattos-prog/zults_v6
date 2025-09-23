@@ -158,7 +158,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   expandedBox: {
-    backgroundColor: colors.background.surface2,
     borderRadius: 16,
     marginHorizontal: 16,
     marginTop: 16,
