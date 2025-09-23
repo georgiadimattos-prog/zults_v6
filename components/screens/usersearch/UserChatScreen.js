@@ -65,6 +65,11 @@ function TypingDots() {
 export default function UserChatScreen() {
   const navigation = useNavigation();
   const route = useRoute();
+  
+  const realNames = {
+    binkey: "Melany J Rabideau",
+
+  };
 
   const currentUser = { name: "TomasB.", avatar: TomasAvatar };
   const user = route.params?.user || { name: "Binkey", image: BinkeyAvatar };
@@ -347,17 +352,33 @@ export default function UserChatScreen() {
               ]}
               disabled={chatState.hasRequested && !binkeyState.hasShared}
               onPress={() => {
-                if (binkeyState.hasShared) {
-                  navigation.navigate("Rezults");
-                  return;
-                }
-                if (!chatState.hasRequested) {
-                  setChatState({ ...chatState, hasRequested: true });
-                  setChatData((prev) => [
-                    ...prev,
-                    { id: Date.now().toString(), type: "request", direction: "from-user", username: currentUser.name, avatar: currentUser.avatar, timestamp: "10:02AM" }
-                  ]);
-                  startRequestFlow();
+  if (binkeyState.hasShared) {
+    navigation.navigate("Rezults", {
+      username: user.name,
+      avatar: user.image || fallbackAvatar,
+      realName:
+        user.name && user.name.toLowerCase() === "binkey"
+          ? "Melany J Rabideau" // ✅ mapped real name
+          : undefined,           // ✅ fallback → will show username
+      providerName: "Sexual Health London",
+      testDate: "12 Dec 2025",
+    });
+    return;
+  }
+  if (!chatState.hasRequested) {
+    setChatState({ ...chatState, hasRequested: true });
+    setChatData((prev) => [
+      ...prev,
+      {
+        id: Date.now().toString(),
+        type: "request",
+        direction: "from-user",
+        username: currentUser.name,
+        avatar: currentUser.avatar,
+        timestamp: "10:02AM",
+      },
+    ]);
+    startRequestFlow();
                 }
               }}
             >
