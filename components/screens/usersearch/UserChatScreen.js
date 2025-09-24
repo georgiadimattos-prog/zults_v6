@@ -1,6 +1,5 @@
 /* components/screens/usersearch/UserChatScreen.js
-   Baseline-v21 + block/unblock integrated (Baseline-v22)
-   Updated: removed hardcoded Binkey, now uses dynamic user props.
+   Baseline-v40 + NoRezultsModal integration (full code)
 */
 
 import React, { useState, useRef, useEffect } from "react";
@@ -23,14 +22,17 @@ import EmojiSelector from "react-native-emoji-selector";
 import { colors, typography } from "../../../theme";
 import RezultActionBubble from "../../ui/RezultActionBubble";
 import ActionModal from "../../ui/ActionModal";
+import NoRezultsModal from "../../ui/NoRezultsModal";
 import arrowLeft from "../../../assets/images/navbar-arrow.png";
 import moreIcon from "../../../assets/images/navbar-dots.png";
 import fallbackAvatar from "../../../assets/images/melany.png";
+import { rezultsCache } from "../../../cache/rezultsCache";
 
 const TomasAvatar = require("../../../assets/images/tomas.png");
 
 // export chatCache so Activities can import it
 export const chatCache = {};
+// simple cache for Rezults
 
 function TypingDots() {
   const dot1 = useRef(new Animated.Value(0.3)).current;
@@ -75,6 +77,7 @@ export default function UserChatScreen() {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [showActionsModal, setShowActionsModal] = useState(false);
+  const [showNoRezultsModal, setShowNoRezultsModal] = useState(false);
 
   const [isBlocked, setIsBlocked] = useState(false);
 
@@ -292,7 +295,6 @@ export default function UserChatScreen() {
     <View style={styles.root}>
       {/* Header */}
       <BlurView intensity={40} tint="dark" style={styles.topBlur}>
-        {/* Row 1 → 3 dots */}
         <View style={styles.topRow}>
           <View style={{ flex: 1 }} />
           <TouchableOpacity onPress={() => setShowActionsModal(true)}>
@@ -300,17 +302,12 @@ export default function UserChatScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Row 2 → back arrow + avatar + username + Rezults/Unblock button */}
         <View style={styles.userRow}>
           <TouchableOpacity
             onPress={() => {
               const hasAction = chatData.some(
-                (msg) =>
-                  msg.type === "request" ||
-                  msg.type === "share" ||
-                  msg.type === "stop-share"
+                (msg) => msg.type === "request" || msg.type === "share" || msg.type === "stop-share"
               );
-
               if (hasAction) {
                 navigation.navigate("Activities");
               } else {
@@ -388,7 +385,7 @@ export default function UserChatScreen() {
         </View>
       </BlurView>
 
-      {/* Messages OR Blocked Overlay */}
+      {/* Messages */}
       {isBlocked ? (
         <View style={styles.blockOverlay}>
           <Text style={styles.blockedText}>This chat is blocked</Text>
@@ -434,49 +431,62 @@ export default function UserChatScreen() {
               <TouchableOpacity onPress={() => setShowEmojiPicker((prev) => !prev)}>
                 <Text style={styles.emojiToggle}>😀</Text>
               </TouchableOpacity>
-              <TextInput
-                placeholder="Type a message..."
-                placeholderTextColor={colors.foreground.muted}
-                value={message}
-                onChangeText={setMessage}
-                style={styles.input}
-              />
-              <TouchableOpacity
-                style={styles.sendButton}
-                onPress={() => {
-                  setChatState({ ...chatState, hasShared: true });
-                  setChatData((prev) => [
-                    ...prev,
-                    {
-                      id: Date.now().toString(),
-                      type: "share",
-                      direction: "from-user",
-                      username: currentUser.name,
-                      avatar: currentUser.avatar,
-                      timestamp: "10:05AM",
-                    },
-                    ...(message
-                      ? [
-                          {
-                            id: Date.now().toString() + "-note",
-                            type: "text",
-                            direction: "from-user",
-                            username: currentUser.name,
-                            avatar: currentUser.avatar,
-                            text: message,
-                            timestamp: "10:05AM",
-                          },
-                        ]
-                      : []),
-                  ]);
-                  setMessage("");
-                  startShareFlow();
-                }}
-              >
-                <Text style={styles.sendButtonText}>Share Rezults</Text>
-              </TouchableOpacity>
+
+              {rezultsCache.hasRezults ? (
+                <>
+                  <TextInput
+                    placeholder="Type a message..."
+                    placeholderTextColor={colors.foreground.muted}
+                    value={message}
+                    onChangeText={setMessage}
+                    style={styles.input}
+                  />
+                  <TouchableOpacity
+                    style={styles.sendButton}
+                    onPress={() => {
+                      setChatState({ ...chatState, hasShared: true });
+                      setChatData((prev) => [
+                        ...prev,
+                        {
+                          id: Date.now().toString(),
+                          type: "share",
+                          direction: "from-user",
+                          username: currentUser.name,
+                          avatar: currentUser.avatar,
+                          timestamp: "10:05AM",
+                        },
+                        ...(message
+                          ? [
+                              {
+                                id: Date.now().toString() + "-note",
+                                type: "text",
+                                direction: "from-user",
+                                username: currentUser.name,
+                                avatar: currentUser.avatar,
+                                text: message,
+                                timestamp: "10:05AM",
+                              },
+                            ]
+                          : []),
+                      ]);
+                      setMessage("");
+                      startShareFlow();
+                    }}
+                  >
+                    <Text style={styles.sendButtonText}>Share Rezults</Text>
+                  </TouchableOpacity>
+                </>
+              ) : (
+                <TouchableOpacity
+                  style={styles.sendButton}
+                  onPress={() => setShowNoRezultsModal(true)}
+                >
+                  <Text style={styles.sendButtonText}>Share Rezults</Text>
+                </TouchableOpacity>
+              )}
             </View>
           )}
+
           {showEmojiPicker && (
             <View style={{ height: 250 }}>
               <EmojiSelector
@@ -514,6 +524,12 @@ export default function UserChatScreen() {
                 setChatData([]);
               }},
         ]}
+      />
+
+      {/* No Rezults Modal */}
+      <NoRezultsModal
+        visible={showNoRezultsModal}
+        onClose={() => setShowNoRezultsModal(false)}
       />
     </View>
   );
