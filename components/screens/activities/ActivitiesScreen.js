@@ -161,29 +161,45 @@ export default function ActivitiesScreen() {
   );
 
   return (
-    <View style={styles.root}>
-      {/* Nav bar */}
-      <BlurView intensity={40} tint="dark" style={styles.topBlur}>
+  <View style={styles.root}>
+    {/* Nav bar */}
+    <BlurView intensity={40} tint="dark" style={styles.topBlur}>
+      <View style={{ flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+        {/* Left: Back */}
         <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
           <Image source={arrowLeft} style={styles.backIcon} />
         </TouchableOpacity>
-        <Text style={styles.title}>Activities</Text>
-      </BlurView>
 
-      {/* Filter tabs */}
-      <View style={styles.tabs}>
-        {["all", "unread", "favorites"].map((tab) => (
-          <TouchableOpacity
-            key={tab}
-            style={[styles.tab, filter === tab && styles.tabActive]}
-            onPress={() => setFilter(tab)}
-          >
-            <Text style={[styles.tabText, filter === tab && styles.tabTextActive]}>
-              {tab === "all" ? "View All" : tab.charAt(0).toUpperCase() + tab.slice(1)}
-            </Text>
-          </TouchableOpacity>
-        ))}
+        {/* Middle: Title */}
+        <Text style={styles.title}>Activities</Text>
+
+        {/* Right: Invite */}
+        <TouchableOpacity onPress={() => {}}>
+          <Text style={styles.invite}>Invite</Text>
+        </TouchableOpacity>
       </View>
+    </BlurView>
+
+      {/* Segmented control for filters */}
+<View style={styles.tabsContainer}>
+  {["All", "Unread", "Favorites"].map((tab) => (
+    <TouchableOpacity
+      key={tab}
+      style={filter === tab.toLowerCase() ? styles.tabActive : styles.tabInactive}
+      onPress={() => setFilter(tab.toLowerCase())}
+    >
+      <Text
+        style={
+          filter === tab.toLowerCase()
+            ? styles.tabActiveText
+            : styles.tabInactiveText
+        }
+      >
+        {tab}
+      </Text>
+    </TouchableOpacity>
+  ))}
+</View>
 
       {/* List */}
       <FlatList
@@ -207,6 +223,7 @@ export default function ActivitiesScreen() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.background.surface1 },
+
   topBlur: {
     paddingTop: Platform.OS === "ios" ? 108 : 84,
     paddingBottom: 20,
@@ -220,23 +237,55 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 12,
   },
+
   backIcon: { width: 28, height: 28, tintColor: colors.foreground.default },
-  title: { ...typography.bodyMedium, color: colors.foreground.default, fontWeight: "600" },
-  tabs: {
+
+  title: {
+    ...typography.bodyMedium,
+    color: colors.foreground.default,
+    fontWeight: "600",
+    textAlign: "center",
+    flex: 1,
+  },
+
+  invite: {
+    ...typography.bodyMedium,
+    color: "#0A84FF", // Apple blue (or colors.brand.blue1 if defined)
+    fontWeight: "600",
+  },
+
+  // ✅ New segmented control styles
+  tabsContainer: {
     flexDirection: "row",
-    justifyContent: "space-around",
-    marginTop: Platform.OS === "ios" ? 180 : 84,
-    paddingHorizontal: 12,
-  },
-  tab: {
-    paddingVertical: 6,
-    paddingHorizontal: 14,
-    borderRadius: 20,
     backgroundColor: colors.background.surface2,
+    borderRadius: 18,
+    height: 36,
+    padding: 4,
+    marginTop: Platform.OS === "ios" ? 150 : 110, // 👈 matches ShareScreen
+    marginBottom: 16,
+    marginHorizontal: 16,
   },
-  tabActive: { backgroundColor: colors.brand.purple1 },
-  tabText: { ...typography.captionSmallRegular, color: colors.foreground.muted },
-  tabTextActive: { color: colors.neutral[0], fontWeight: "600" },
+  tabActive: {
+    flex: 1,
+    backgroundColor: colors.foreground.default,
+    borderRadius: 14,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  tabInactive: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  tabActiveText: {
+    ...typography.headlineRegular,
+    color: colors.background.surface1,
+  },
+  tabInactiveText: {
+    ...typography.headlineRegular,
+    color: colors.foreground.soft,
+  },
+
   row: {
     flexDirection: "row",
     alignItems: "center",
@@ -248,7 +297,11 @@ const styles = StyleSheet.create({
   username: { ...typography.bodyMedium, color: colors.foreground.default },
   unreadDot: { color: colors.brand.purple1, fontWeight: "bold" },
   lastText: { ...typography.captionSmallRegular, color: colors.foreground.muted },
-  timestamp: { ...typography.captionSmallRegular, color: colors.foreground.muted, marginRight: 8 },
+  timestamp: {
+    ...typography.captionSmallRegular,
+    color: colors.foreground.muted,
+    marginRight: 8,
+  },
   starIcon: { width: 20, height: 20, marginLeft: 8 },
   empty: {
     textAlign: "center",

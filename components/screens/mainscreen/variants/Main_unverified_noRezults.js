@@ -157,8 +157,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   viewAllText: {
-    ...typography.captionSmallRegular,
-    color: colors.brand.purple1,
-    fontWeight: '600',
+  ...typography.bodyMedium,   // 👈 bump up base style
+  fontSize: 16,               // 👈 explicit font size
+  color: colors.brand.purple1,
+  fontWeight: "600",
   },
 });
