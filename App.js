@@ -34,10 +34,6 @@ import LinkScreenOffline from "./components/screens/share/link/LinkScreen_Offlin
 import UserChatScreen from "./components/screens/usersearch/UserChatScreen";
 import RezultsScreen from "./components/screens/RezultsScreen";
 
-// Variants
-import MainUnverifiedNoRezults from "./components/screens/mainscreen/variants/Main_unverified_noRezults";
-import MainUnverifiedWithRezults from "./components/screens/mainscreen/variants/Main_unverified_withRezults";
-
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -72,19 +68,11 @@ export default function App() {
           initialRouteName="MainScreen"
           screenOptions={{
             headerShown: false,
-            animation: "slide_from_right", // ✅ unified transition
+            animation: "slide_from_right",
           }}
         >
-          {/* Main Screens */}
+          {/* Main Wrapper Screen */}
           <Stack.Screen name="MainScreen" component={MainScreen} />
-          <Stack.Screen
-            name="MainUnverifiedNoRezults"
-            component={MainUnverifiedNoRezults}
-          />
-          <Stack.Screen
-            name="MainUnverifiedWithRezults"
-            component={MainUnverifiedWithRezults}
-          />
           <Stack.Screen name="Settings" component={SettingsScreen} />
 
           {/* Activities */}

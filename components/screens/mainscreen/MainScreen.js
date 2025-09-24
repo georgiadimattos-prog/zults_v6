@@ -10,14 +10,25 @@ import MainVerifiedWithRezults from "./variants/Main_verified_withRezults";
 import { rezultsCache } from "../../../cache/rezultsCache";
 
 export default function MainScreen() {
-  // ✅ Read from cache (demo only for investors)
+  // ✅ Read from cache
   const hasRezults = rezultsCache.hasRezults;
   const isVerified = false; // demo flag for now (later you can hook verification state here)
 
-  if (!isVerified && !hasRezults) return <MainUnverifiedNoRezults />;
-  if (!isVerified && hasRezults) return <MainUnverifiedWithRezults />;
-  if (isVerified && !hasRezults) return <MainVerifiedNoRezults />;
-  if (isVerified && hasRezults) return <MainVerifiedWithRezults />;
+  if (!isVerified && !hasRezults) {
+    return <MainUnverifiedNoRezults />;
+  }
 
-  return null;
+  if (!isVerified && hasRezults) {
+    return <MainUnverifiedWithRezults />;
+  }
+
+  if (isVerified && !hasRezults) {
+    return <MainVerifiedNoRezults />;
+  }
+
+  if (isVerified && hasRezults) {
+    return <MainVerifiedWithRezults />;
+  }
+
+  return null; // ✅ Fallback (should never happen)
 }

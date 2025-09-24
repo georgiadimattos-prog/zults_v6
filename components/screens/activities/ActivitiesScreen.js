@@ -120,22 +120,24 @@ export default function ActivitiesScreen() {
   );
 
   const renderItem = ({ item }) => (
-    <Swipeable renderRightActions={() => renderRightActions(item.id)}>
-      <TouchableOpacity
-        style={styles.row}
-        onPress={() => {
-          if (item.id !== "zults-demo") {
-            if (chatCache[item.id]) chatCache[item.id].hasUnread = false;
-            navigation.navigate("UserChat", {
-              user: { name: item.name, image: item.avatar },
-            });
-          } else {
-            navigation.navigate("UserChat", {
-              user: { id: "zults-demo", name: "Zults (Demo)", image: zultsLogo },
-            });
-          }
-        }}
-      >
+  <Swipeable renderRightActions={() => renderRightActions(item.id)}>
+    <TouchableOpacity
+      style={styles.row}
+      onPress={() => {
+        if (item.id !== "zults-demo") {
+          if (chatCache[item.id]) chatCache[item.id].hasUnread = false;
+          navigation.navigate("UserChat", {
+            user: { name: item.name, image: item.avatar },
+            from: "Activities", // 👈 added here
+          });
+        } else {
+          navigation.navigate("UserChat", {
+            user: { id: "zults-demo", name: "Zults (Demo)", image: zultsLogo },
+            from: "Activities", // 👈 added here too
+          });
+        }
+      }}
+    >
         <Image source={item.avatar} style={styles.avatar} />
         <View style={{ flex: 1 }}>
           <Text style={styles.username}>
@@ -164,7 +166,14 @@ export default function ActivitiesScreen() {
   <View style={styles.root}>
     {/* Nav bar */}
     <BlurView intensity={40} tint="dark" style={styles.topBlur}>
-      <View style={{ flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+      <View
+        style={{
+          flex: 1,
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
         {/* Left: Back */}
         <TouchableOpacity onPress={() => navigation.goBack()}>
   <Image source={arrowLeft} style={styles.backIcon} />

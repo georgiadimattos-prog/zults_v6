@@ -162,7 +162,7 @@ useFocusEffect(
           setShowDeleteModal(false);
           rezultsCache.hasRezults = false;
           rezultsCache.card = null;
-          navigation.navigate("MainUnverifiedNoRezults");
+          navigation.navigate("MainScreen"); // ✅ unified entry
         }}
       />
     </ScreenWrapper>

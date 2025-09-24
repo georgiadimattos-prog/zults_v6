@@ -343,19 +343,23 @@ export default function UserChatScreen() {
 
         <View style={styles.userRow}>
           <TouchableOpacity
-            onPress={() => {
-              const hasAction = chatData.some(
-                (msg) => msg.type === "request" || msg.type === "share" || msg.type === "stop-share"
-              );
-              if (hasAction) {
-                navigation.navigate("Activities");
-              } else {
-                navigation.goBack();
-              }
-            }}
-          >
-            <Image source={arrowLeft} style={styles.backIcon} />
-          </TouchableOpacity>
+  onPress={() => {
+    if (route.params?.from === "Activities") {
+      navigation.goBack(); // 👈 go back to the existing Activities screen
+    } else {
+      const hasAction = chatData.some(
+        (msg) => msg.type === "request" || msg.type === "share" || msg.type === "stop-share"
+      );
+      if (hasAction) {
+        navigation.replace("Activities"); // go back to Activities cleanly, no duplicates, no Main reset
+      } else {
+        navigation.goBack();
+      }
+    }
+  }}
+>
+  <Image source={arrowLeft} style={styles.backIcon} />
+</TouchableOpacity>
           <Image source={user.image || fallbackAvatar} style={styles.avatar} />
           <Text style={styles.username}>{user.name}</Text>
 
