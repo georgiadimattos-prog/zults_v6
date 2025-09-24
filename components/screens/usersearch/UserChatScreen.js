@@ -60,51 +60,51 @@ function TypingDots() {
   );
 }
 
-/** Row with double-tap like + burst animation */
+/** Row with double-tap like + persistent heart badge */
 const MessageRow = memo(function MessageRow({ item, onDoubleLike }) {
-  const scale = useRef(new Animated.Value(0)).current;
-  const opacity = useRef(new Animated.Value(0)).current;
-
-  const burst = () => {
-    scale.setValue(0.5);
-    opacity.setValue(1);
-    Animated.sequence([
-      Animated.spring(scale, { toValue: 1.2, useNativeDriver: true, friction: 5, tension: 80 }),
-      Animated.spring(scale, { toValue: 1, useNativeDriver: true, friction: 6, tension: 60 }),
-      Animated.timing(opacity, { toValue: 0, duration: 250, useNativeDriver: true }),
-    ]).start();
-  };
+  const scale = useRef(new Animated.Value(1)).current;
 
   const handleDouble = () => {
     const didToggle = onDoubleLike?.(item);
-    if (didToggle) burst();
+    if (didToggle) {
+      scale.setValue(0.5);
+      Animated.spring(scale, {
+        toValue: 1,
+        useNativeDriver: true,
+        friction: 5,
+        tension: 80,
+      }).start();
+    }
   };
 
   return (
     <TapGestureHandler numberOfTaps={2} onActivated={handleDouble}>
-      <View style={{ position: "relative" }}>
-        <RezultActionBubble
-          type={item.type}
-          direction={item.direction}
-          username={item.username}
-          avatar={item.avatar}
-          timestamp={item.timestamp}
-          text={item.text || ""}
-          liked={item.liked}
-        />
-        {/* Heart burst overlay */}
-        <Animated.View
-          pointerEvents="none"
-          style={{
-            position: "absolute",
-            top: 0, left: 0, right: 0, bottom: 0,
-            alignItems: "center", justifyContent: "center",
-            opacity,
-            transform: [{ scale }],
-          }}
-        >
-          <Text style={{ fontSize: 30 }}>❤️</Text>
-        </Animated.View>
+      {/* 👇 outer wrapper ensures bubble doesn’t stretch full width */}
+      <View style={{ alignSelf: item.direction === "from-user" ? "flex-end" : "flex-start" }}>
+        <View style={{ position: "relative" }}>
+          <RezultActionBubble
+            type={item.type}
+            direction={item.direction}
+            username={item.username}
+            avatar={item.avatar}
+            timestamp={item.timestamp}
+            text={item.text || ""}
+          />
+
+          {/* 👇 heart badge anchored to bubble */}
+          {item.liked && (
+            <Animated.View
+              style={{
+                position: "absolute",
+                bottom: 27,
+                right: 4, // 👈 closer so it hugs the bubble corner
+                transform: [{ scale }],
+              }}
+            >
+              <Text style={{ fontSize: 14 }}>🔥</Text>
+            </Animated.View>
+          )}
+        </View>
       </View>
     </TapGestureHandler>
   );
@@ -468,7 +468,7 @@ export default function UserChatScreen() {
           ) : (
             <View style={styles.footer}>
               <TextInput
-                placeholder="Type a message..."
+                placeholder="Add note to your Rezults..."
                 placeholderTextColor={colors.foreground.muted}
                 value={message}
                 onChangeText={setMessage}

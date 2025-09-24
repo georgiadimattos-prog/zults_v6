@@ -54,7 +54,7 @@ export default function RezultActionBubble(props) {
         {isFromOther && <Image source={avatar || fallbackAvatar} style={styles.avatar} />}
         <View style={styles.contentBlock}>
           {isFromUser ? (
-            <LinearGradient colors={[colors.brand.purple1, '#9B6D6FF0']} style={[styles.bubble, styles.bubbleRight]}>
+            <LinearGradient colors={[colors.brand.purple1, '#9D8CFF']} style={[styles.bubble, styles.bubbleRight]}>
               <Text style={styles.noteText}>{text}</Text>
             </LinearGradient>
           ) : (
@@ -73,21 +73,18 @@ export default function RezultActionBubble(props) {
   let label = '';
   let subtext = '';
   if (type === 'cancel-request') {
-    label = 'Your request was cancelled.';
+    label = 'Request Cancelled';
   } else if (type === 'request') {
-    label = 'Requested';
-    subtext = 'To view your Rezults';
+    label = 'Rezults Requested';
+    subtext = 'Asking to view your Rezults';
   } else if (type === 'share') {
     label = 'Sharing';
-    subtext = 'Rezults with you';
+    subtext = 'You can view my Rezults now!';
   } else if (type === 'stop-share') {
-    label = 'Stopped Sharing';
+    label = 'Sharing Ended';
   }
 
-  const labelColor =
-    type === 'request' ? '#FF6D6D' :
-    type === 'share' ? '#FFFFFF' :
-    '#888';
+  const labelColor = isFromUser ? '#FFFFFF' : colors.brand.purple1;
 
   return (
     <View style={[styles.container, isSystemMessage && styles.centerAlign, isFromUser && styles.rightAlign, isFromOther && styles.leftAlign]}>
@@ -104,7 +101,7 @@ export default function RezultActionBubble(props) {
 
         {isFromUser ? (
           <LinearGradient
-            colors={[colors.brand.purple1, '#9B6D6FF0']}
+            colors={[colors.brand.purple1, '#9D8CFF']}
             style={[styles.bubble, styles.bubbleRight, isSystemMessage && styles.systemBubble]}
           >
             <Text style={[styles.label, { color: labelColor }]}>{label}</Text>
@@ -147,7 +144,7 @@ const styles = StyleSheet.create({
   },
 
   contentBlock: {
-    maxWidth: '75%',
+    maxWidth: '85%',
     flexShrink: 1,
   },
 
@@ -174,21 +171,21 @@ const styles = StyleSheet.create({
   bubbleLeft: {
     backgroundColor: colors.background.surface2,
     alignSelf: 'flex-start',
-    borderTopLeftRadius: 4,
+    borderTopLeftRadius: 0,
     borderTopRightRadius: 16,
     borderBottomRightRadius: 16,
     borderBottomLeftRadius: 16,
   },
   bubbleRight: {
     alignSelf: 'flex-end',
-    borderTopRightRadius: 4,
+    borderTopRightRadius: 0,
     borderTopLeftRadius: 16,
     borderBottomLeftRadius: 16,
     borderBottomRightRadius: 16,
   },
 
   label: { fontSize: 14, fontWeight: '600', color: '#FFFFFF', marginBottom: 2 },
-  subtext: { ...typography.captionSmallRegular, color: '#ccc' },
+  subtext: { fontSize: 14, color: '#ccc' },
   timestamp: { fontSize: 10, color: '#666', marginTop: 6, textAlign: 'right' },
   noteText: { ...typography.bodyRegular, color: '#fff' },
 
