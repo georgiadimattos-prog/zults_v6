@@ -446,72 +446,90 @@ export default function UserChatScreen() {
       )}
 
       {/* Footer (emoji button removed) */}
-      {!isBlocked && (
-        <BlurView
-          intensity={40}
-          tint="dark"
-          style={[styles.footerBlur, { bottom: keyboardHeight }]}
-        >
-          {chatState.hasShared ? (
-            <TouchableOpacity
-              style={styles.stopButton}
-              onPress={() => {
-                setChatState({ ...chatState, hasShared: false });
-                setChatData((prev) => [
-                  ...prev,
-                  { id: Date.now().toString(), type: "stop-share", direction: "from-user", username: currentUser.name, avatar: currentUser.avatar, timestamp: "10:06AM" }
-                ]);
-              }}
-            >
-              <Text style={styles.stopButtonText}>Stop Sharing Rezults</Text>
-            </TouchableOpacity>
-          ) : (
-            <View style={styles.footer}>
-              <TextInput
-                placeholder="Add note to your Rezults..."
-                placeholderTextColor={colors.foreground.muted}
-                value={message}
-                onChangeText={setMessage}
-                style={styles.input}
-              />
-              <TouchableOpacity
-                style={styles.sendButton}
-                onPress={() => {
-                  setChatState({ ...chatState, hasShared: true });
-                  setChatData((prev) => [
-                    ...prev,
-                    {
-                      id: Date.now().toString(),
-                      type: "share",
-                      direction: "from-user",
-                      username: currentUser.name,
-                      avatar: currentUser.avatar,
-                      timestamp: "10:05AM",
-                    },
-                    ...(message
-                      ? [
-                          {
-                            id: Date.now().toString() + "-note",
-                            type: "text",
-                            direction: "from-user",
-                            username: currentUser.name,
-                            avatar: currentUser.avatar,
-                            text: message,
-                            timestamp: "10:05AM",
-                          },
-                        ]
-                      : []),
-                  ]);
-                  setMessage("");
-                  startShareFlow();
-                }}
-              >
-                <Text style={styles.sendButtonText}>Share Rezults</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        </BlurView>
-      )}
+{!isBlocked && (
+  <BlurView
+    intensity={40}
+    tint="dark"
+    style={[styles.footerBlur, { bottom: keyboardHeight }]}
+  >
+    {chatState.hasShared ? (
+      <TouchableOpacity
+        style={styles.stopButton}
+        onPress={() => {
+          setChatState({ ...chatState, hasShared: false });
+          setChatData((prev) => [
+            ...prev,
+            {
+              id: Date.now().toString(),
+              type: "stop-share",
+              direction: "from-user",
+              username: currentUser.name,
+              avatar: currentUser.avatar,
+              timestamp: "10:06AM",
+            },
+          ]);
+        }}
+      >
+        <Text style={styles.stopButtonText}>Stop Sharing Rezults</Text>
+      </TouchableOpacity>
+    ) : (
+      <View style={styles.footer}>
+        <TextInput
+          placeholder="Add note to your Rezults..."
+          placeholderTextColor={colors.foreground.muted}
+          value={message}
+          onChangeText={setMessage}
+          style={styles.input}
+        />
+
+        {rezultsCache.hasRezults ? (
+          <TouchableOpacity
+            style={styles.sendButton}
+            onPress={() => {
+              setChatState({ ...chatState, hasShared: true });
+              setChatData((prev) => [
+                ...prev,
+                {
+                  id: Date.now().toString(),
+                  type: "share",
+                  direction: "from-user",
+                  username: currentUser.name,
+                  avatar: currentUser.avatar,
+                  timestamp: "10:05AM",
+                },
+                ...(message
+                  ? [
+                      {
+                        id: Date.now().toString() + "-note",
+                        type: "text",
+                        direction: "from-user",
+                        username: currentUser.name,
+                        avatar: currentUser.avatar,
+                        text: message,
+                        timestamp: "10:05AM",
+                      },
+                    ]
+                  : []),
+              ]);
+              setMessage("");
+              startShareFlow();
+            }}
+          >
+            <Text style={styles.sendButtonText}>Share Rezults</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={styles.sendButton}
+            onPress={() => setShowNoRezultsModal(true)}
+          >
+            <Text style={styles.sendButtonText}>Share Rezults</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    )}
+  </BlurView>
+)}
+
 
       {/* Action Modal */}
       <ActionModal
