@@ -53,7 +53,7 @@ function RezultsScreen() {
           <Text style={styles.username}>{realName}</Text>
         ) : (
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Text style={styles.username}>@{username}</Text>
+            <Text style={styles.username}>{username}</Text>
             <Image
               source={require("../../assets/images/verified-icon.png")}
               style={styles.verifiedIcon}

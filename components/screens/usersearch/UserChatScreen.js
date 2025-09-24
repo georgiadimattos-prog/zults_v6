@@ -11,6 +11,8 @@ import {
   TextInput,
   FlatList,
   TouchableOpacity,
+  TouchableWithoutFeedback,
+  Modal,
   Platform,
   Keyboard,
   Animated,
@@ -363,77 +365,66 @@ export default function UserChatScreen() {
           <Image source={user.image || fallbackAvatar} style={styles.avatar} />
           <Text style={styles.username}>{user.name}</Text>
 
-          {isBlocked ? (
-            <TouchableOpacity
-              style={styles.rezultsButton}
-              onPress={() => {
-                setIsBlocked(false);
-                setChatData([]);
-                setChatState({ hasShared: false, hasRequested: false });
-                setOtherUserState({ hasShared: false, hasRequested: false });
-              }}
-            >
-              <Text style={styles.rezultsButtonText}>Unblock User</Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              style={[
-                styles.rezultsButton,
-                chatState.hasShared && styles.rezultsButtonActive,
-              ]}
-              disabled={chatState.hasRequested && !otherUserState.hasShared}
-              onPress={() => {
-  if (otherUserState.hasShared) {
-    navigation.navigate("Rezults", {
-      username: user.name,
-      avatar: user.image || fallbackAvatar,
-      realName: user.realName || user.name,
-      providerName: user.name === "Binkey" 
-        ? "Planned Parenthood" 
-        : "Sexual Health London",
-      testDate: "25 Sep 2025",
-      showExpand: true,
-    });
-    return;
-                }
-                if (!chatState.hasRequested) {
-                  setChatState({ ...chatState, hasRequested: true });
-                  setChatData((prev) => [
-                    ...prev,
-                    {
-                      id: Date.now().toString(),
-                      type: "request",
-                      direction: "from-user",
-                      username: currentUser.name,
-                      avatar: currentUser.avatar,
-                      timestamp: "10:02AM",
-                    },
-                  ]);
-                  startRequestFlow();
-                }
-              }}
-            >
-              <Text
-                style={[
-                  styles.rezultsButtonText,
-                  chatState.hasShared && styles.rezultsButtonTextActive,
-                ]}
-              >
-                {otherUserState.hasShared
-                  ? "View Rezults"
-                  : chatState.hasRequested
-                  ? "Rezults Requested"
-                  : "Request Rezults"}
-              </Text>
-            </TouchableOpacity>
-          )}
+          {!isBlocked && (
+  <TouchableOpacity
+    style={[
+      styles.rezultsButton,
+      chatState.hasShared && styles.rezultsButtonActive,
+    ]}
+    disabled={chatState.hasRequested && !otherUserState.hasShared}
+    onPress={() => {
+      if (otherUserState.hasShared) {
+        navigation.navigate("Rezults", {
+          username: user.name,
+          avatar: user.image || fallbackAvatar,
+          realName: user.realName || user.name,
+          providerName:
+            user.name === "Binkey"
+              ? "Planned Parenthood"
+              : "Sexual Health London",
+          testDate: "25 Sep 2025",
+          showExpand: true,
+        });
+        return;
+      }
+      if (!chatState.hasRequested) {
+        setChatState({ ...chatState, hasRequested: true });
+        setChatData((prev) => [
+          ...prev,
+          {
+            id: Date.now().toString(),
+            type: "request",
+            direction: "from-user",
+            username: currentUser.name,
+            avatar: currentUser.avatar,
+            timestamp: "10:02AM",
+          },
+        ]);
+        startRequestFlow();
+      }
+    }}
+  >
+    <Text
+      style={[
+        styles.rezultsButtonText,
+        chatState.hasShared && styles.rezultsButtonTextActive,
+      ]}
+    >
+      {otherUserState.hasShared
+        ? "View Rezults"
+        : chatState.hasRequested
+        ? "Rezults Requested"
+        : "Request Rezults"}
+    </Text>
+  </TouchableOpacity>
+)}
         </View>
       </BlurView>
 
       {/* Messages */}
       {isBlocked ? (
         <View style={styles.blockOverlay}>
-          <Text style={styles.blockedText}>This chat is blocked</Text>
+          <Text style={styles.blockedText}>This user is blocked</Text>
         </View>
       ) : (
         <FlatList
@@ -537,30 +528,128 @@ export default function UserChatScreen() {
 )}
 
 
-      {/* Action Modal */}
-      <ActionModal
-        visible={showActionsModal}
-        onClose={() => setShowActionsModal(false)}
-        title={isBlocked ? "Unblock user?" : "Block user?"}
-        description={
-          isBlocked
-            ? "Unblock this user to continue chatting and sharing Rezults."
-            : "This user won’t be able to send their Rezults or request to see yours. They won’t be notified if you block them."
-        }
-        actions={[
-          isBlocked
-            ? { label: "Unblock", onPress: () => {
-                setIsBlocked(false);
-                setChatData([]);
-                setChatState({ hasShared: false, hasRequested: false });
-                setOtherUserState({ hasShared: false, hasRequested: false });
-              }}
-            : { label: "Block", onPress: () => {
-                setIsBlocked(true);
-                setChatData([]);
-              }},
-        ]}
+      {/* Block / Unblock Modal */}
+<Modal
+  visible={showActionsModal}
+  transparent
+  animationType="slide"
+  onRequestClose={() => setShowActionsModal(false)}
+>
+  <TouchableWithoutFeedback onPress={() => setShowActionsModal(false)}>
+    <View style={{ flex: 1 }}>
+      {/* Background Blur */}
+      <BlurView
+        intensity={50}
+        tint="dark"
+        style={StyleSheet.absoluteFill}
       />
+      <View style={{ flex: 1, justifyContent: "flex-end" }}>
+        <TouchableWithoutFeedback>
+          <View
+            style={{
+              backgroundColor: colors.background.surface2,
+              borderTopLeftRadius: 32,
+              borderTopRightRadius: 32,
+              paddingTop: 24,
+              paddingHorizontal: 20,
+              paddingBottom: 32,
+            }}
+          >
+            {/* Title */}
+            <Text
+              style={{
+                ...typography.title1Medium,
+                color: colors.foreground.default,
+                marginBottom: 12,
+              }}
+            >
+              {isBlocked ? "Unblock user?" : "Block user?"}
+            </Text>
+
+            {/* Description */}
+            <Text
+              style={{
+                ...typography.bodyRegular,
+                color: colors.foreground.soft,
+                marginBottom: 24,
+              }}
+            >
+              {isBlocked
+                ? "Unblock this user to continue chatting and sharing Rezults."
+                : "This user won’t be able to send their Rezults or request to see yours. They won’t be notified if you block them."}
+            </Text>
+
+            {/* Primary Action */}
+            <TouchableOpacity
+              style={{
+                width: "100%",
+                height: 56,
+                borderRadius: 16,
+                backgroundColor: colors.neutral[0],
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+              onPress={() => {
+                const key = user.name || "default";
+
+                if (isBlocked) {
+                  // ✅ Unblock
+                  setIsBlocked(false);
+                  setChatData([]);
+                  setChatState({ hasShared: false, hasRequested: false });
+                  setOtherUserState({ hasShared: false, hasRequested: false });
+
+                  // persist unblock in chatCache
+                  if (chatCache[key]) chatCache[key].blocked = false;
+                } else {
+                  // ✅ Block
+                  setIsBlocked(true);
+                  setChatData([]);
+
+                  // persist block in chatCache
+                  if (chatCache[key]) chatCache[key].blocked = true;
+                }
+
+                setShowActionsModal(false);
+              }}
+            >
+              <Text
+                style={{
+                  ...typography.buttonLargeRegular,
+                  color: colors.button.activeLabelPrimary,
+                }}
+              >
+                {isBlocked ? "Unblock" : "Block"}
+              </Text>
+            </TouchableOpacity>
+
+            {/* Cancel */}
+            <TouchableOpacity
+              style={{
+                width: "100%",
+                height: 56,
+                borderRadius: 16,
+                alignItems: "center",
+                justifyContent: "center",
+                marginTop: 12,
+              }}
+              onPress={() => setShowActionsModal(false)}
+            >
+              <Text
+                style={{
+                  ...typography.buttonLargeRegular,
+                  color: colors.foreground.default,
+                }}
+              >
+                Cancel
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableWithoutFeedback>
+      </View>
+    </View>
+  </TouchableWithoutFeedback>
+</Modal>
 
       {/* No Rezults Modal */}
       <NoRezultsModal
