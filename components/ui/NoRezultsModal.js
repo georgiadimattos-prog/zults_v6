@@ -1,17 +1,27 @@
 /* components/ui/NoRezultsModal.js */
 
 import React from "react";
-import { Text } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import ActionModal from "./ActionModal";
 
 export default function NoRezultsModal({ visible, onClose }) {
+  const navigation = useNavigation();
+
   return (
     <ActionModal
       visible={visible}
       onClose={onClose}
-      title="No Rezults Yet"
-      description="You don’t have any Rezults yet. Please get tested and add Rezults before sharing."
-      actions={[{ label: "OK", onPress: onClose }]}
+      title="Oopss..."
+      description="To share Rezults, you need to have one first."
+      actions={[
+        {
+          label: "Get Rezults",
+          onPress: () => {
+            onClose(); // close the modal
+            navigation.navigate("GetRezults"); // 👈 jump into Get Rezults flow
+          },
+        },
+      ]}
     />
   );
 }
