@@ -1,103 +1,55 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Clipboard, Alert } from 'react-native';
-import { colors, typography } from '../../../../theme';
-import ScreenWrapper from '../../../ui/ScreenWrapper';
+import React, { useState } from "react";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { colors, typography } from "../../../../theme";
+import LinkUnavailableModal from "./LinkUnavailableModal"; // 👈 unified modal
 
-export default function LinkScreenSuccess() {
-  const link = 'https://myrezults.com/share/jonster/id8765';
-
-  const copyToClipboard = () => {
-    Clipboard.setString(link);
-    Alert.alert('Copied!', 'Link copied to clipboard.');
-  };
+export default function LinkScreen_Success() {
+  const navigation = useNavigation();
+  const [showModal, setShowModal] = useState(false);
 
   return (
-    <ScreenWrapper>
-      <View style={styles.header}>
-        <Text style={styles.title}>Link</Text>
-        <Text style={styles.subtitle}>
-          Send your Rezults link to someone or add it to your dating profile. Even someone without
-          the app can view it.
-        </Text>
-      </View>
+    <View style={styles.container}>
+      <Text style={styles.text}>Link Success Screen</Text>
 
-      <View style={styles.linkCard}>
-        <View style={styles.linkRow}>
-          <Text style={styles.linkLabel}>Share-link</Text>
-          <Text style={styles.linkStatus}>● Online</Text>
-        </View>
+      <TouchableOpacity onPress={() => setShowModal(true)} style={styles.button}>
+        <Text style={styles.buttonText}>Create Another Link</Text>
+      </TouchableOpacity>
 
-        <View style={styles.linkBox}>
-          <Text style={styles.linkText}>.../share/jonster/id8765</Text>
-          <TouchableOpacity onPress={copyToClipboard}>
-            <Text style={styles.copyIcon}>📋</Text>
-          </TouchableOpacity>
-        </View>
-
-        <TouchableOpacity style={styles.stopButton}>
-          <Text style={styles.stopButtonText}>Stop Sharing</Text>
-        </TouchableOpacity>
-      </View>
-    </ScreenWrapper>
+      {showModal && (
+        <LinkUnavailableModal
+          visible={showModal}
+          onClose={() => setShowModal(false)}
+          onGetRezults={() => {
+            setShowModal(false);
+            navigation.navigate("GetRezults");
+          }}
+        />
+      )}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  header: {
-    marginBottom: 24,
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: colors.background.surface1,
   },
-  title: {
-    ...typography.largeTitleMedium,
+  text: {
+    ...typography.bodyMedium,
     color: colors.foreground.default,
-    marginBottom: 4,
-  },
-  subtitle: {
-    ...typography.bodyRegular,
-    color: colors.foreground.soft,
-  },
-  linkCard: {
-    backgroundColor: colors.background.surface2,
-    borderRadius: 20,
-    padding: 20,
-  },
-  linkRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     marginBottom: 16,
   },
-  linkLabel: {
-    ...typography.bodyLarge,
-    color: colors.foreground.default,
-  },
-  linkStatus: {
-    ...typography.caption,
-    color: '#00D775',
-  },
-  linkBox: {
-    backgroundColor: colors.background.surface4,
-    padding: 12,
+  button: {
+    backgroundColor: colors.brand.purple1,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
     borderRadius: 12,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
   },
-  linkText: {
-    ...typography.bodyLarge,
-    color: colors.foreground.default,
-  },
-  copyIcon: {
-    fontSize: 18,
-    color: colors.foreground.default,
-  },
-  stopButton: {
-    backgroundColor: colors.neutral[0],
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  stopButtonText: {
-    ...typography.bodyLarge,
-    color: colors.button.activeLabelPrimary,
+  buttonText: {
+    ...typography.bodyMedium,
+    color: colors.neutral[0],
   },
 });

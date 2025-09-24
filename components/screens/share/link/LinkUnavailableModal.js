@@ -1,90 +1,106 @@
-import React from 'react';
+import React from "react";
 import {
+  Modal,
   View,
   Text,
-  StyleSheet,
+  TouchableOpacity,
   TouchableWithoutFeedback,
-  Image,
-} from 'react-native';
-import { colors, typography } from '../../../../theme';
-import ZultsButton from '../../../ui/ZultsButton';
-import closeCross from '../../../../assets/images/close-cross.png';
+  StyleSheet,
+} from "react-native";
+import { BlurView } from "expo-blur";
+import { colors, typography } from "../../../../theme";
 
-export default function LinkUnavailableModal({ onClose, onGetRezults }) {
+export default function LinkUnavailableModal({ visible, onClose, onGetRezults }) {
   return (
-    <TouchableWithoutFeedback onPress={onClose}>
-      <View style={styles.overlay}>
-        <View style={styles.modal}>
-          <View style={styles.header}>
-            <Text style={styles.title}>Oops…</Text>
-            <Image source={closeCross} style={styles.closeIcon} />
-          </View>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="slide"
+      onRequestClose={onClose}
+    >
+      <TouchableWithoutFeedback onPress={onClose}>
+        <BlurView intensity={40} tint="dark" style={styles.overlay}>
+          <TouchableWithoutFeedback>
+            <View style={styles.container}>
+              {/* Title */}
+              <Text style={styles.title}>Link Unavailable</Text>
 
-          <Text style={styles.bodyText}>
-            You need a Rezults to be able to create a link.
-          </Text>
+              {/* Description */}
+              <Text style={styles.description}>
+                You need a Rezults to create a link. Please add your Rezults
+                before sharing.
+              </Text>
 
-          <ZultsButton
-            label="Get Rezults"
-            type="primary"
-            size="large"
-            onPress={onGetRezults}
-          />
+              {/* Primary button → Get Rezults */}
+              <TouchableOpacity
+                style={styles.primaryButton}
+                onPress={() => {
+                  onGetRezults?.();
+                  onClose?.();
+                }}
+              >
+                <Text style={styles.primaryText}>Get Rezults</Text>
+              </TouchableOpacity>
 
-          <View style={{ height: 12 }} />
-
-          <ZultsButton
-            label="Maybe Later"
-            type="secondary"
-            size="large"
-            onPress={onClose}
-          />
-        </View>
-      </View>
-    </TouchableWithoutFeedback>
+              {/* Secondary button → Maybe Later */}
+              <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
+                <Text style={styles.cancelText}>Maybe Later</Text>
+              </TouchableOpacity>
+            </View>
+          </TouchableWithoutFeedback>
+        </BlurView>
+      </TouchableWithoutFeedback>
+    </Modal>
   );
 }
 
 const styles = StyleSheet.create({
   overlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: '#000000B2',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingBottom: 34,
+    flex: 1,
+    justifyContent: "flex-end",
   },
-  modal: {
-    width: '100%',
+  container: {
     backgroundColor: colors.background.surface2,
-    borderRadius: 32,
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
     paddingTop: 24,
+    paddingHorizontal: 20,
     paddingBottom: 20,
-    paddingHorizontal: 16, // ✅ match grid inside modal
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
   },
   title: {
-    ...typography.largeTitleMedium,
+    ...typography.title1Medium,
     color: colors.foreground.default,
+    marginBottom: 16,
   },
-  closeIcon: {
-    width: 16,
-    height: 16,
-    tintColor: colors.foreground.soft,
-  },
-  bodyText: {
+  description: {
     ...typography.bodyRegular,
     color: colors.foreground.soft,
-    lineHeight: 22,
     marginBottom: 24,
+  },
+  primaryButton: {
+    width: "100%",
+    height: 56,
+    borderRadius: 12,
+    backgroundColor: colors.neutral[0],
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 12,
+  },
+  primaryText: {
+    ...typography.buttonLargeRegular,
+    color: colors.button.activeLabelPrimary,
+  },
+  cancelButton: {
+    width: "100%",
+    height: 56,
+    borderRadius: 12,
+    backgroundColor: "transparent",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 16,
+  },
+  cancelText: {
+    ...typography.buttonLargeRegular,
+    color: colors.foreground.default,
   },
 });

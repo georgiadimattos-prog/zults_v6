@@ -1,164 +1,58 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  ScrollView,
-  Modal,
-} from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { colors, typography } from '../../../../theme';
-import ScreenWrapper from '../../../ui/ScreenWrapper';
+} from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { colors, typography } from "../../../../theme";
+import LinkUnavailableModal from "./LinkUnavailableModal"; // 👈 import new modal
 
 export default function LinkShare() {
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
-  const [hasRezults, setHasRezults] = useState(false); // simulate state
-
-  const handleGenerateLink = () => {
-    if (hasRezults) {
-      // TODO: Logic to generate link
-    } else {
-      setModalVisible(true);
-    }
-  };
 
   return (
-    <ScreenWrapper>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <Text style={styles.title}>Link</Text>
-        <Text style={styles.subtitle}>
-          Send your Rezults link to someone or add it to your dating profile.
-          Even someone without the app can view it.
-        </Text>
+    <View style={styles.container}>
+      {/* Your existing LinkShare UI goes here */}
 
-        <View style={styles.linkBox}>
-          <View style={styles.linkRow}>
-            <Text style={styles.linkLabel}>Share-link</Text>
-            <Text style={styles.linkStatus}>● Offline</Text>
-          </View>
+      {/* Unified Modal */}
+      {modalVisible && (
+        <LinkUnavailableModal
+          visible={modalVisible}
+          onClose={() => setModalVisible(false)}
+          onGetRezults={() => {
+            setModalVisible(false);
+            navigation.navigate("GetRezults");
+          }}
+        />
+      )}
 
-          <TouchableOpacity style={styles.linkButton} onPress={handleGenerateLink}>
-            <Text style={styles.linkButtonText}>Generate New Link</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-
-      <Modal visible={modalVisible} transparent animationType="fade">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Oops...</Text>
-            <Text style={styles.modalSubtitle}>
-              You need a Rezults to be able to create a link.
-            </Text>
-
-            <TouchableOpacity
-              style={styles.modalButtonPrimary}
-              onPress={() => {
-                setModalVisible(false);
-                navigation.navigate('GetRezults');
-              }}
-            >
-              <Text style={styles.modalButtonTextPrimary}>Get Rezults</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.modalButtonSecondary}
-              onPress={() => setModalVisible(false)}
-            >
-              <Text style={styles.modalButtonTextSecondary}>Maybe Later</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-    </ScreenWrapper>
+      {/* Example trigger button (replace with your real trigger) */}
+      <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.testButton}>
+        <Text style={styles.testButtonText}>Try to create link</Text>
+      </TouchableOpacity>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  scrollContent: {
-    paddingBottom: 40,
-  },
-  title: {
-    ...typography.largeTitleMedium,
-    color: colors.foreground.default,
-    marginTop: 32,
-  },
-  subtitle: {
-    ...typography.bodyRegular,
-    color: colors.foreground.soft,
-    marginTop: 4,
-    marginBottom: 24,
-  },
-  linkBox: {
-    backgroundColor: colors.background.surface2,
-    borderRadius: 20,
-    padding: 20,
-  },
-  linkRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 16,
-  },
-  linkLabel: {
-    ...typography.bodyLarge,
-    color: colors.foreground.default,
-  },
-  linkStatus: {
-    ...typography.caption,
-    color: '#FA5F21',
-  },
-  linkButton: {
-    backgroundColor: colors.neutral[0],
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  linkButtonText: {
-    ...typography.bodyLarge,
-    color: colors.button.activeLabelPrimary,
-  },
-  modalOverlay: {
+  container: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    justifyContent: 'flex-end',
-  },
-  modalContainer: {
     backgroundColor: colors.background.surface1,
-    padding: 24,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    justifyContent: "center",
+    alignItems: "center",
   },
-  modalTitle: {
-    ...typography.largeTitleMedium,
-    color: colors.foreground.default,
-    marginBottom: 8,
-  },
-  modalSubtitle: {
-    ...typography.bodyRegular,
-    color: colors.foreground.soft,
-    marginBottom: 24,
-  },
-  modalButtonPrimary: {
-    backgroundColor: colors.neutral[0],
-    paddingVertical: 16,
+  testButton: {
+    marginTop: 20,
+    backgroundColor: colors.brand.purple1,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
     borderRadius: 12,
-    alignItems: 'center',
-    marginBottom: 12,
   },
-  modalButtonTextPrimary: {
-    ...typography.bodyLarge,
-    color: colors.button.activeLabelPrimary,
-  },
-  modalButtonSecondary: {
-    backgroundColor: colors.background.surface2,
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  modalButtonTextSecondary: {
-    ...typography.bodyLarge,
-    color: colors.foreground.default,
+  testButtonText: {
+    ...typography.bodyMedium,
+    color: colors.neutral[0],
   },
 });

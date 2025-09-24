@@ -1,57 +1,56 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Share } from 'react-native';
-import { colors, typography } from '../../../../theme';
-import ScreenWrapper from '../../../ui/ScreenWrapper';
+import React, { useState } from "react";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { colors, typography } from "../../../../theme";
+import LinkUnavailableModal from "./LinkUnavailableModal"; // 👈 unified modal
 
-export default function LinkScreenShareSheet() {
-  const link = 'https://myrezults.com/share/myrezults/binkey';
-
-  const handleShare = async () => {
-    try {
-      await Share.share({
-        message: `Check out my Rezults link: ${link}`,
-        url: link,
-        title: 'My Rezults',
-      });
-    } catch (error) {
-      console.log('Error sharing:', error);
-    }
-  };
+export default function LinkScreen_ShareSheet() {
+  const navigation = useNavigation();
+  const [showModal, setShowModal] = useState(false);
 
   return (
-    <ScreenWrapper>
-      <Text style={styles.title}>Link</Text>
-      <Text style={styles.subtitle}>
-        You can send your Rezults link to someone or add it to your dating profile.
-        Even someone without the app can view it.
-      </Text>
+    <View style={styles.container}>
+      <Text style={styles.text}>Link Share Sheet</Text>
 
-      <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
-        <Text style={styles.shareButtonText}>Share Link</Text>
+      {/* Example trigger for testing (replace with your actual logic) */}
+      <TouchableOpacity onPress={() => setShowModal(true)} style={styles.button}>
+        <Text style={styles.buttonText}>Generate Link</Text>
       </TouchableOpacity>
-    </ScreenWrapper>
+
+      {showModal && (
+        <LinkUnavailableModal
+          visible={showModal}
+          onClose={() => setShowModal(false)}
+          onGetRezults={() => {
+            setShowModal(false);
+            navigation.navigate("GetRezults");
+          }}
+        />
+      )}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  title: {
-    ...typography.largeTitleMedium,
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: colors.background.surface1,
+  },
+  text: {
+    ...typography.bodyMedium,
     color: colors.foreground.default,
-    marginBottom: 8,
+    marginBottom: 16,
   },
-  subtitle: {
-    ...typography.bodyRegular,
-    color: colors.foreground.soft,
-    marginBottom: 32,
-  },
-  shareButton: {
-    backgroundColor: colors.neutral[0],
+  button: {
+    backgroundColor: colors.brand.purple1,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
     borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: 'center',
   },
-  shareButtonText: {
-    ...typography.bodyLarge,
-    color: colors.button.activeLabelPrimary,
+  buttonText: {
+    ...typography.bodyMedium,
+    color: colors.neutral[0],
   },
 });

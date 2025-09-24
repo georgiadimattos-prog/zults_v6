@@ -1,16 +1,32 @@
-import React from 'react';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
-import Svg, { Rect, Defs, LinearGradient, Stop } from 'react-native-svg';
-import { useNavigation } from '@react-navigation/native';
-import { colors, typography } from '../../theme';
-import ZultsButton from './ZultsButton';
+import React, { useEffect, useRef } from "react";
+import { View, Text, StyleSheet, Dimensions, Animated } from "react-native";
+import Svg, { Defs, LinearGradient, Stop, Rect } from "react-native-svg";
+import { useNavigation } from "@react-navigation/native";
+import { colors, typography } from "../../theme";
+import ZultsButton from "./ZultsButton";
 
-const screenWidth = Dimensions.get('window').width;
-const cardWidth = screenWidth - 32; // 16px padding on each side
-const cardHeight = cardWidth / 1.586; // classic credit card ratio
+// 👇 Wrap Rect to make it animatable
+const AnimatedRect = Animated.createAnimatedComponent(Rect);
+
+const screenWidth = Dimensions.get("window").width;
+const cardWidth = screenWidth - 32; // 16px margin each side
+const cardHeight = cardWidth / 1.586; // credit card ratio
 
 export default function RezultsCardPlaceholder() {
   const navigation = useNavigation();
+
+  // Animated value for marching ants
+  const dashOffset = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.timing(dashOffset, {
+        toValue: 20, // dash movement
+        duration: 1200,
+        useNativeDriver: false, // must be false for SVG
+      })
+    ).start();
+  }, [dashOffset]);
 
   return (
     <View style={[styles.wrapper, { width: cardWidth, height: cardHeight }]}>
@@ -24,7 +40,8 @@ export default function RezultsCardPlaceholder() {
             <Stop offset="77%" stopColor="#FA5F21" />
           </LinearGradient>
         </Defs>
-        <Rect
+
+        <AnimatedRect
           x="1"
           y="1"
           rx="20"
@@ -35,6 +52,7 @@ export default function RezultsCardPlaceholder() {
           stroke="url(#gradient)"
           strokeWidth="2"
           strokeDasharray="10,10"
+          strokeDashoffset={dashOffset} // 👈 animates!
         />
       </Svg>
 
@@ -47,7 +65,7 @@ export default function RezultsCardPlaceholder() {
           type="primary"
           size="medium"
           fullWidth={false}
-          onPress={() => navigation.navigate('GetRezultsProvider')}
+          onPress={() => navigation.navigate("GetRezultsProvider")}
         />
       </View>
     </View>
@@ -57,23 +75,27 @@ export default function RezultsCardPlaceholder() {
 const styles = StyleSheet.create({
   wrapper: {
     borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 24,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   content: {
     paddingHorizontal: 24,
-    alignItems: 'center',
+    alignItems: "center",
     gap: 12,
   },
   title: {
     ...typography.bodyMedium,
     color: colors.foreground.default,
+    marginBottom: -5, // tighter spacing with subtitle
   },
   subtitle: {
-    ...typography.captionSmallRegular,
-    color: colors.foreground.soft,
-    textAlign: 'center',
+    ...typography.bodyRegular,
+    fontSize: 14,
+    fontWeight: "500",
+    color: colors.foreground.soft, // lighter than title
+    textAlign: "center",
+    marginTop: 0,
   },
 });
