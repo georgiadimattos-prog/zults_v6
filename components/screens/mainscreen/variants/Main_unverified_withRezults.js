@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   ScrollView,
@@ -8,14 +8,14 @@ import {
   Text,
   Image,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native"; // 👈 useFocusEffect
 import { colors, typography } from "../../../../theme";
 import UserProfileHeader from "../../../ui/UserProfileHeader";
 import RezultsCard from "../../../ui/RezultsCard";
 import NotificationCard from "../../../ui/NotificationCard";
 import ZultsButton from "../../../ui/ZultsButton";
 import ScreenWrapper from "../../../ui/ScreenWrapper";
-import { chatCache } from "../../usersearch/UserChatScreen";
+import { chatCache, hasSeededDemo, markDemoSeeded } from '../../../../cache/chatCache';
 import zultsLogo from "../../../../assets/images/zults.png";
 
 // ✅ Rezults cache
@@ -27,10 +27,10 @@ import ExpireContainer from "../../../ui/ExpireContainer";
 // ✅ Header container
 import RezultsHeaderContainer from "../../../ui/RezultsHeaderContainer";
 
-// ✅ Confirm modal (for Add Rezults)
+// ✅ Confirm modal
 import ConfirmModal from "../../../ui/ConfirmModal";
 
-// ✅ Delete modal (for Delete Rezults)
+// ✅ Delete modal
 import DeleteModal from "../../../ui/DeleteModal";
 
 export default function MainUnverifiedWithRezults() {
@@ -39,7 +39,9 @@ export default function MainUnverifiedWithRezults() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  useEffect(() => {
+  // 🔄 refresh whenever screen is focused
+useFocusEffect(
+  React.useCallback(() => {
     let users = Object.keys(chatCache)
       .map((username) => {
         const chat = chatCache[username] || {};
@@ -48,24 +50,28 @@ export default function MainUnverifiedWithRezults() {
           id: username,
           name: username,
           avatar: chat.user?.image || zultsLogo,
-          lastTimestamp: lastMsg ? lastMsg.timestamp : "",
+          lastTimestamp: lastMsg ? lastMsg.timestamp : '',
         };
       })
       .sort((a, b) => (a.lastTimestamp < b.lastTimestamp ? 1 : -1));
 
-    if (users.length === 0) {
+    // ✅ only seed demo once
+    if (users.length === 0 && !hasSeededDemo()) {
       users = [
         {
-          id: "zults-demo",
-          name: "Zults (Demo)",
+          id: 'zults-demo',
+          name: 'Zults (Demo)',
           avatar: zultsLogo,
-          lastTimestamp: "Now",
+          lastTimestamp: 'Now',
         },
       ];
+      markDemoSeeded(); // 👈 sets the flag so we don’t reseed again
     }
 
+    console.log("🔄 [MainUnverifiedNoRezults] Rebuilt from chatCache:", chatCache);
     setRecentUsers(users);
-  }, [chatCache]);
+  }, [])
+);
 
   const renderAvatars = () => {
     const display = recentUsers.slice(0, 4);
@@ -89,13 +95,8 @@ export default function MainUnverifiedWithRezults() {
     );
   };
 
-  const handleAddRezults = () => {
-    setShowAddModal(true);
-  };
-
-  const handleDeleteRezults = () => {
-    setShowDeleteModal(true);
-  };
+  const handleAddRezults = () => setShowAddModal(true);
+  const handleDeleteRezults = () => setShowDeleteModal(true);
 
   return (
     <ScreenWrapper>
@@ -106,23 +107,19 @@ export default function MainUnverifiedWithRezults() {
       <UserProfileHeader hideVerification />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* ✅ Header with title + actions */}
         <RezultsHeaderContainer
           onAdd={handleAddRezults}
           onDelete={handleDeleteRezults}
         />
 
-        {/* ✅ Rezults card */}
         <RezultsCard
           userName={rezultsCache.card?.userName || "Unknown User"}
           providerName={rezultsCache.card?.providerName || "Unknown Provider"}
           testDate={rezultsCache.card?.testDate || "Unknown Date"}
         />
 
-        {/* ✅ Expiry container just below card */}
         <ExpireContainer expiryDate="29 Sep 2025" daysLeft={43} />
 
-        {/* Share button */}
         <ZultsButton
           label="Share"
           type="primary"
@@ -144,7 +141,7 @@ export default function MainUnverifiedWithRezults() {
         <NotificationCard />
       </ScrollView>
 
-      {/* ✅ Confirm Modal for Add Rezults */}
+      {/* ✅ Confirm Modal */}
       <ConfirmModal
         visible={showAddModal}
         onClose={() => setShowAddModal(false)}
@@ -157,7 +154,7 @@ export default function MainUnverifiedWithRezults() {
         }}
       />
 
-      {/* ✅ Delete Modal for Delete Rezults */}
+      {/* ✅ Delete Modal */}
       <DeleteModal
         visible={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
@@ -165,7 +162,7 @@ export default function MainUnverifiedWithRezults() {
           setShowDeleteModal(false);
           rezultsCache.hasRezults = false;
           rezultsCache.card = null;
-          navigation.navigate("MainUnverifiedNoRezults"); // shows MainUnverifiedNoRezults
+          navigation.navigate("MainUnverifiedNoRezults");
         }}
       />
     </ScreenWrapper>

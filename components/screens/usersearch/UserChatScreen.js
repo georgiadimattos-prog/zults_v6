@@ -1,8 +1,8 @@
 /* components/screens/usersearch/UserChatScreen.js
-   Baseline-v40 + NoRezultsModal integration (full code)
+   Baseline-v40 + NoRezultsModal + Double-Tap Like (❤️) animation; emoji picker removed
 */
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, memo } from "react";
 import {
   View,
   Text,
@@ -18,7 +18,7 @@ import {
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { BlurView } from "expo-blur";
-import EmojiSelector from "react-native-emoji-selector";
+import { TapGestureHandler } from "react-native-gesture-handler"; // 👈 double-tap
 import { colors, typography } from "../../../theme";
 import RezultActionBubble from "../../ui/RezultActionBubble";
 import ActionModal from "../../ui/ActionModal";
@@ -27,12 +27,9 @@ import arrowLeft from "../../../assets/images/navbar-arrow.png";
 import moreIcon from "../../../assets/images/navbar-dots.png";
 import fallbackAvatar from "../../../assets/images/melany.png";
 import { rezultsCache } from "../../../cache/rezultsCache";
+import { chatCache } from "../../../cache/chatCache";
 
 const TomasAvatar = require("../../../assets/images/tomas.png");
-
-// export chatCache so Activities can import it
-export const chatCache = {};
-// simple cache for Rezults
 
 function TypingDots() {
   const dot1 = useRef(new Animated.Value(0.3)).current;
@@ -63,6 +60,56 @@ function TypingDots() {
   );
 }
 
+/** Row with double-tap like + burst animation */
+const MessageRow = memo(function MessageRow({ item, onDoubleLike }) {
+  const scale = useRef(new Animated.Value(0)).current;
+  const opacity = useRef(new Animated.Value(0)).current;
+
+  const burst = () => {
+    scale.setValue(0.5);
+    opacity.setValue(1);
+    Animated.sequence([
+      Animated.spring(scale, { toValue: 1.2, useNativeDriver: true, friction: 5, tension: 80 }),
+      Animated.spring(scale, { toValue: 1, useNativeDriver: true, friction: 6, tension: 60 }),
+      Animated.timing(opacity, { toValue: 0, duration: 250, useNativeDriver: true }),
+    ]).start();
+  };
+
+  const handleDouble = () => {
+    const didToggle = onDoubleLike?.(item);
+    if (didToggle) burst();
+  };
+
+  return (
+    <TapGestureHandler numberOfTaps={2} onActivated={handleDouble}>
+      <View style={{ position: "relative" }}>
+        <RezultActionBubble
+          type={item.type}
+          direction={item.direction}
+          username={item.username}
+          avatar={item.avatar}
+          timestamp={item.timestamp}
+          text={item.text || ""}
+          liked={item.liked}
+        />
+        {/* Heart burst overlay */}
+        <Animated.View
+          pointerEvents="none"
+          style={{
+            position: "absolute",
+            top: 0, left: 0, right: 0, bottom: 0,
+            alignItems: "center", justifyContent: "center",
+            opacity,
+            transform: [{ scale }],
+          }}
+        >
+          <Text style={{ fontSize: 30 }}>❤️</Text>
+        </Animated.View>
+      </View>
+    </TapGestureHandler>
+  );
+});
+
 export default function UserChatScreen() {
   const navigation = useNavigation();
   const route = useRoute();
@@ -74,16 +121,13 @@ export default function UserChatScreen() {
   const [chatState, setChatState] = useState({ hasShared: false, hasRequested: false });
   const [otherUserState, setOtherUserState] = useState({ hasShared: false, hasRequested: false });
   const [chatData, setChatData] = useState([]);
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [showActionsModal, setShowActionsModal] = useState(false);
   const [showNoRezultsModal, setShowNoRezultsModal] = useState(false);
-
   const [isBlocked, setIsBlocked] = useState(false);
 
   const flatListRef = useRef(null);
   const typingIdRef = useRef(null);
-
   const requestTimers = useRef([]);
   const shareTimers = useRef([]);
 
@@ -131,12 +175,8 @@ export default function UserChatScreen() {
   // persist to cache
   useEffect(() => {
     const hasAction = chatData.some(
-      (msg) =>
-        msg.type === "request" ||
-        msg.type === "share" ||
-        msg.type === "stop-share"
+      (msg) => msg.type === "request" || msg.type === "share" || msg.type === "stop-share"
     );
-
     if (!hasAction && !isBlocked) return;
 
     const key = user.name || "default";
@@ -274,22 +314,21 @@ export default function UserChatScreen() {
     }, 10000));
   };
 
-  const renderMessage = ({ item }) => {
-    if (item.type === "typing") {
-      return <View style={styles.typingBubble}><TypingDots /></View>;
-    }
-    return (
-      <RezultActionBubble
-        type={item.type}
-        direction={item.direction}
-        username={item.username}
-        avatar={item.avatar}
-        timestamp={item.timestamp}
-        text={item.text || ""}
-        liked={item.liked}
-      />
+  /** Toggle like on allowed messages and return true if toggled (to trigger burst) */
+  const handleDoubleLike = (item) => {
+    const allowed = (item.direction === "from-other") && (item.type === "share" || item.type === "request");
+    if (!allowed) return false;
+    setChatData((prev) =>
+      prev.map((m) => (m.id === item.id ? { ...m, liked: !m.liked } : m))
     );
+    return true;
   };
+
+  const renderMessage = ({ item }) => (
+    item.type === "typing"
+      ? <View style={styles.typingBubble}><TypingDots /></View>
+      : <MessageRow item={item} onDoubleLike={handleDoubleLike} />
+  );
 
   return (
     <View style={styles.root}>
@@ -406,7 +445,7 @@ export default function UserChatScreen() {
         />
       )}
 
-      {/* Footer */}
+      {/* Footer (emoji button removed) */}
       {!isBlocked && (
         <BlurView
           intensity={40}
@@ -428,74 +467,47 @@ export default function UserChatScreen() {
             </TouchableOpacity>
           ) : (
             <View style={styles.footer}>
-              <TouchableOpacity onPress={() => setShowEmojiPicker((prev) => !prev)}>
-                <Text style={styles.emojiToggle}>😀</Text>
-              </TouchableOpacity>
-
-              {rezultsCache.hasRezults ? (
-                <>
-                  <TextInput
-                    placeholder="Type a message..."
-                    placeholderTextColor={colors.foreground.muted}
-                    value={message}
-                    onChangeText={setMessage}
-                    style={styles.input}
-                  />
-                  <TouchableOpacity
-                    style={styles.sendButton}
-                    onPress={() => {
-                      setChatState({ ...chatState, hasShared: true });
-                      setChatData((prev) => [
-                        ...prev,
-                        {
-                          id: Date.now().toString(),
-                          type: "share",
-                          direction: "from-user",
-                          username: currentUser.name,
-                          avatar: currentUser.avatar,
-                          timestamp: "10:05AM",
-                        },
-                        ...(message
-                          ? [
-                              {
-                                id: Date.now().toString() + "-note",
-                                type: "text",
-                                direction: "from-user",
-                                username: currentUser.name,
-                                avatar: currentUser.avatar,
-                                text: message,
-                                timestamp: "10:05AM",
-                              },
-                            ]
-                          : []),
-                      ]);
-                      setMessage("");
-                      startShareFlow();
-                    }}
-                  >
-                    <Text style={styles.sendButtonText}>Share Rezults</Text>
-                  </TouchableOpacity>
-                </>
-              ) : (
-                <TouchableOpacity
-                  style={styles.sendButton}
-                  onPress={() => setShowNoRezultsModal(true)}
-                >
-                  <Text style={styles.sendButtonText}>Share Rezults</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-          )}
-
-          {showEmojiPicker && (
-            <View style={{ height: 250 }}>
-              <EmojiSelector
-                onEmojiSelected={(emoji) => setMessage((prev) => prev + emoji)}
-                showSearchBar={false}
-                showHistory
-                category="all"
-                columns={8}
+              <TextInput
+                placeholder="Type a message..."
+                placeholderTextColor={colors.foreground.muted}
+                value={message}
+                onChangeText={setMessage}
+                style={styles.input}
               />
+              <TouchableOpacity
+                style={styles.sendButton}
+                onPress={() => {
+                  setChatState({ ...chatState, hasShared: true });
+                  setChatData((prev) => [
+                    ...prev,
+                    {
+                      id: Date.now().toString(),
+                      type: "share",
+                      direction: "from-user",
+                      username: currentUser.name,
+                      avatar: currentUser.avatar,
+                      timestamp: "10:05AM",
+                    },
+                    ...(message
+                      ? [
+                          {
+                            id: Date.now().toString() + "-note",
+                            type: "text",
+                            direction: "from-user",
+                            username: currentUser.name,
+                            avatar: currentUser.avatar,
+                            text: message,
+                            timestamp: "10:05AM",
+                          },
+                        ]
+                      : []),
+                  ]);
+                  setMessage("");
+                  startShareFlow();
+                }}
+              >
+                <Text style={styles.sendButtonText}>Share Rezults</Text>
+              </TouchableOpacity>
             </View>
           )}
         </BlurView>
@@ -591,7 +603,6 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
   },
   footer: { flexDirection: "row", alignItems: "center" },
-  emojiToggle: { fontSize: 24, marginHorizontal: 6 },
   input: {
     flex: 1,
     height: 44,

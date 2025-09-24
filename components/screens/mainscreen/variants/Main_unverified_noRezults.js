@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   ScrollView,
@@ -8,7 +8,7 @@ import {
   Text,
   Image,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native'; // 👈 useFocusEffect
 import { colors, typography } from '../../../../theme';
 import UserProfileHeader from '../../../ui/UserProfileHeader';
 import RezultsCardPlaceholder from '../../../ui/RezultsCardPlaceholder';
@@ -17,14 +17,16 @@ import ZultsButton from '../../../ui/ZultsButton';
 import ScreenWrapper from '../../../ui/ScreenWrapper';
 
 // import chatCache to show live recent users
-import { chatCache } from '../../usersearch/UserChatScreen';
-import zultsLogo from '../../../../assets/images/zults.png'; // ✅ use Zults logo avatar
+import { chatCache, hasSeededDemo, markDemoSeeded } from '../../../../cache/chatCache';
+import zultsLogo from '../../../../assets/images/zults.png';
 
 export default function MainUnverifiedNoRezults() {
   const navigation = useNavigation();
   const [recentUsers, setRecentUsers] = useState([]);
 
-  useEffect(() => {
+  // 🔄 refresh whenever screen is focused
+useFocusEffect(
+  React.useCallback(() => {
     let users = Object.keys(chatCache)
       .map((username) => {
         const chat = chatCache[username] || {};
@@ -36,10 +38,10 @@ export default function MainUnverifiedNoRezults() {
           lastTimestamp: lastMsg ? lastMsg.timestamp : '',
         };
       })
-      .sort((a, b) => (a.lastTimestamp < b.lastTimestamp ? 1 : -1)); // latest first
+      .sort((a, b) => (a.lastTimestamp < b.lastTimestamp ? 1 : -1));
 
-    // ✅ If no users, inject demo entry
-    if (users.length === 0) {
+    // ✅ only seed demo once
+    if (users.length === 0 && !hasSeededDemo()) {
       users = [
         {
           id: 'zults-demo',
@@ -48,13 +50,16 @@ export default function MainUnverifiedNoRezults() {
           lastTimestamp: 'Now',
         },
       ];
+      markDemoSeeded(); // 👈 sets the flag so we don’t reseed again
     }
 
+    console.log("🔄 [MainUnverifiedNoRezults] Rebuilt from chatCache:", chatCache);
     setRecentUsers(users);
-  }, [chatCache]);
+  }, [])
+);
 
   const renderAvatars = () => {
-    const display = recentUsers.slice(0, 4); // show up to 4 avatars
+    const display = recentUsers.slice(0, 4);
     const extra = recentUsers.length - display.length;
 
     return (
@@ -81,7 +86,6 @@ export default function MainUnverifiedNoRezults() {
         barStyle="light-content"
         backgroundColor={colors.background.surface1}
       />
-      {/* ✅ Hide verification badge only on this screen */}
       <UserProfileHeader hideVerification />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>

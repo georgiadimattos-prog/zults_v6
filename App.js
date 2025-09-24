@@ -4,6 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useFonts } from 'expo-font';
 import { Text, View } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler'; // 👈 add this
 
 // Main Screens
 import MainScreen from './components/screens/mainscreen/MainScreen';
@@ -33,7 +34,7 @@ import LinkScreenOffline from './components/screens/share/link/LinkScreen_Offlin
 import UserChatScreen from './components/screens/usersearch/UserChatScreen';
 import RezultsScreen from './components/screens/RezultsScreen';
 
-// Variants (explicit routes for demo flow)
+// Variants
 import MainUnverifiedNoRezults from './components/screens/mainscreen/variants/Main_unverified_noRezults';
 import MainUnverifiedWithRezults from './components/screens/mainscreen/variants/Main_unverified_withRezults';
 
@@ -58,38 +59,40 @@ export default function App() {
   }
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="MainScreen" screenOptions={{ headerShown: false }}>
-        {/* Main Screens */}
-        <Stack.Screen name="MainScreen" component={MainScreen} />
-        <Stack.Screen name="MainUnverifiedNoRezults" component={MainUnverifiedNoRezults} />
-        <Stack.Screen name="MainUnverifiedWithRezults" component={MainUnverifiedWithRezults} />
-        <Stack.Screen name="Settings" component={SettingsScreen} />
+    <GestureHandlerRootView style={{ flex: 1 }}>   {/* 👈 wrap everything */}
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="MainScreen" screenOptions={{ headerShown: false }}>
+          {/* Main Screens */}
+          <Stack.Screen name="MainScreen" component={MainScreen} />
+          <Stack.Screen name="MainUnverifiedNoRezults" component={MainUnverifiedNoRezults} />
+          <Stack.Screen name="MainUnverifiedWithRezults" component={MainUnverifiedWithRezults} />
+          <Stack.Screen name="Settings" component={SettingsScreen} />
 
-        {/* Activities */}
-        <Stack.Screen name="Activities" component={ActivitiesScreen} />
+          {/* Activities */}
+          <Stack.Screen name="Activities" component={ActivitiesScreen} />
 
-        {/* Get Rezults Flow */}
-        <Stack.Screen name="GetRezults" component={GetRezultsScreen} />
-        <Stack.Screen name="GetRezultsProvider" component={GetRezults_SelectProviderScreen} />
-        <Stack.Screen name="GetRezultsLinkInput" component={GetRezults_PasteLinkScreen} />
-        <Stack.Screen name="GetRezultsLoading" component={GetRezults_LoadingScreen} />
-        <Stack.Screen name="GetRezultsConfirm" component={GetRezults_ConfirmScreen} />
-        <Stack.Screen name="GetRezultsHowToFindLink" component={GetRezults_HowToFindLinkScreen} />
-        <Stack.Screen name="AddRezultsCard" component={AddRezultsCardScreen} />
+          {/* Get Rezults Flow */}
+          <Stack.Screen name="GetRezults" component={GetRezultsScreen} />
+          <Stack.Screen name="GetRezultsProvider" component={GetRezults_SelectProviderScreen} />
+          <Stack.Screen name="GetRezultsLinkInput" component={GetRezults_PasteLinkScreen} />
+          <Stack.Screen name="GetRezultsLoading" component={GetRezults_LoadingScreen} />
+          <Stack.Screen name="GetRezultsConfirm" component={GetRezults_ConfirmScreen} />
+          <Stack.Screen name="GetRezultsHowToFindLink" component={GetRezults_HowToFindLinkScreen} />
+          <Stack.Screen name="AddRezultsCard" component={AddRezultsCardScreen} />
 
-        {/* Share Screens */}
-        <Stack.Screen name="Share" component={ShareScreen} />
-        <Stack.Screen name="SMSRequestSent" component={SMSRequestSent} />
-        <Stack.Screen name="ReviewSMS" component={ReviewSMSRequest} />
-        <Stack.Screen name="LinkShareSheet" component={LinkScreenShareSheet} />
-        <Stack.Screen name="LinkSuccess" component={LinkScreenSuccess} />
-        <Stack.Screen name="LinkOffline" component={LinkScreenOffline} />
+          {/* Share Screens */}
+          <Stack.Screen name="Share" component={ShareScreen} />
+          <Stack.Screen name="SMSRequestSent" component={SMSRequestSent} />
+          <Stack.Screen name="ReviewSMS" component={ReviewSMSRequest} />
+          <Stack.Screen name="LinkShareSheet" component={LinkScreenShareSheet} />
+          <Stack.Screen name="LinkSuccess" component={LinkScreenSuccess} />
+          <Stack.Screen name="LinkOffline" component={LinkScreenOffline} />
 
-        {/* Chat + Rezults */}
-        <Stack.Screen name="UserChat" component={UserChatScreen} />
-        <Stack.Screen name="Rezults" component={RezultsScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
+          {/* Chat + Rezults */}
+          <Stack.Screen name="UserChat" component={UserChatScreen} />
+          <Stack.Screen name="Rezults" component={RezultsScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </GestureHandlerRootView>
   );
 }

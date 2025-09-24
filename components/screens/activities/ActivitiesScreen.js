@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -9,29 +9,36 @@ import {
   Platform,
 } from "react-native";
 import { BlurView } from "expo-blur";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import { Swipeable } from "react-native-gesture-handler";
 import { colors, typography } from "../../../theme";
 
-import { chatCache } from "../usersearch/UserChatScreen";
+import { chatCache, hasSeededDemo, markDemoSeeded } from "../../../cache/chatCache";
 import fallbackAvatar from "../../../assets/images/melany.png";
 import arrowLeft from "../../../assets/images/navbar-arrow.png";
 
-// ⭐ icons from assets
+// ⭐ icons
 import star from "../../../assets/images/star.png";
 import starFilled from "../../../assets/images/star-filled.png";
-import zultsLogo from "../../../assets/images/zults.png"; // ✅ new logo avatar
+import zultsLogo from "../../../assets/images/zults.png";
 
 export default function ActivitiesScreen() {
   const navigation = useNavigation();
   const [activities, setActivities] = useState([]);
-  const [filter, setFilter] = useState("all"); // all | unread | favorites
+  const [filter, setFilter] = useState("all");
 
-  useEffect(() => {
+  // 🔄 reload activities every time screen is focused
+  useFocusEffect(
+    React.useCallback(() => {
+      buildActivities();
+    }, [])
+  );
+
+  const buildActivities = () => {
     const data = Object.keys(chatCache).map((username) => {
       const chat = chatCache[username] || {};
       const lastMsg = chat.chatData?.[chat.chatData.length - 1];
 
-      // 🔑 friendly text mapping
       let lastText = "No activity yet";
       if (lastMsg) {
         if (lastMsg.type === "request") {
@@ -65,12 +72,12 @@ export default function ActivitiesScreen() {
       };
     });
 
-    // ✅ If no activities, inject demo entry
+    // inject demo if nothing left
     if (data.length === 0) {
       data.push({
         id: "zults-demo",
         name: "Zults (Demo)",
-        avatar: zultsLogo, // ✅ use Zults logo
+        avatar: zultsLogo,
         lastText:
           "Hi there, this is a demo Rezults so you can see how they appear in the app. 💜 We hope you enjoy using Zults and make the most of it to stay safe, healthy, and confident! ✨",
         lastTimestamp: "Now",
@@ -80,7 +87,7 @@ export default function ActivitiesScreen() {
     }
 
     setActivities(data);
-  }, [chatCache]);
+  };
 
   const toggleFavorite = (id) => {
     const updated = activities.map((item) =>
@@ -92,50 +99,65 @@ export default function ActivitiesScreen() {
     }
   };
 
+  const handleDelete = (id) => {
+    setActivities((prev) => prev.filter((item) => item.id !== id));
+    delete chatCache[id]; // ✅ remove from cache so it won’t reappear
+  };
+
   const filteredActivities = activities.filter((item) => {
     if (filter === "unread") return item.hasUnread;
     if (filter === "favorites") return item.favorite;
     return true;
   });
 
-  const renderItem = ({ item }) => (
+  const renderRightActions = (id) => (
     <TouchableOpacity
-      style={styles.row}
-      onPress={() => {
-        if (item.id !== "zults-demo") {
-          if (chatCache[item.id]) chatCache[item.id].hasUnread = false;
-          navigation.navigate("UserChat", {
-            user: { name: item.name, image: item.avatar },
-          });
-        } else {
-          // ✅ demo chat should also open UserChat
-          navigation.navigate("UserChat", {
-            user: { id: "zults-demo", name: "Zults (Demo)", image: zultsLogo },
-          });
-        }
-      }}
+      style={styles.deleteButton}
+      onPress={() => handleDelete(id)}
     >
-      <Image source={item.avatar} style={styles.avatar} />
-      <View style={{ flex: 1 }}>
-        <Text style={styles.username}>
-          {item.name}{" "}
-          {item.hasUnread && <Text style={styles.unreadDot}>•</Text>}
-        </Text>
-        <Text style={styles.lastText}>{item.lastText}</Text>
-      </View>
-      <Text style={styles.timestamp}>{item.lastTimestamp}</Text>
-      {item.id !== "zults-demo" && (
-        <TouchableOpacity onPress={() => toggleFavorite(item.id)}>
-          <Image
-            source={item.favorite ? starFilled : star}
-            style={[
-              styles.starIcon,
-              { tintColor: item.favorite ? colors.brand.purple1 : colors.foreground.muted },
-            ]}
-          />
-        </TouchableOpacity>
-      )}
+      <Text style={styles.deleteText}>Delete</Text>
     </TouchableOpacity>
+  );
+
+  const renderItem = ({ item }) => (
+    <Swipeable renderRightActions={() => renderRightActions(item.id)}>
+      <TouchableOpacity
+        style={styles.row}
+        onPress={() => {
+          if (item.id !== "zults-demo") {
+            if (chatCache[item.id]) chatCache[item.id].hasUnread = false;
+            navigation.navigate("UserChat", {
+              user: { name: item.name, image: item.avatar },
+            });
+          } else {
+            navigation.navigate("UserChat", {
+              user: { id: "zults-demo", name: "Zults (Demo)", image: zultsLogo },
+            });
+          }
+        }}
+      >
+        <Image source={item.avatar} style={styles.avatar} />
+        <View style={{ flex: 1 }}>
+          <Text style={styles.username}>
+            {item.name}{" "}
+            {item.hasUnread && <Text style={styles.unreadDot}>•</Text>}
+          </Text>
+          <Text style={styles.lastText}>{item.lastText}</Text>
+        </View>
+        <Text style={styles.timestamp}>{item.lastTimestamp}</Text>
+        {item.id !== "zults-demo" && (
+          <TouchableOpacity onPress={() => toggleFavorite(item.id)}>
+            <Image
+              source={item.favorite ? starFilled : star}
+              style={[
+                styles.starIcon,
+                { tintColor: item.favorite ? colors.brand.purple1 : colors.foreground.muted },
+              ]}
+            />
+          </TouchableOpacity>
+        )}
+      </TouchableOpacity>
+    </Swipeable>
   );
 
   return (
@@ -232,5 +254,16 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 200,
     color: colors.foreground.muted,
+  },
+  deleteButton: {
+    backgroundColor: "red",
+    justifyContent: "center",
+    alignItems: "center",
+    width: 80,
+    height: "100%",
+  },
+  deleteText: {
+    color: "white",
+    fontWeight: "600",
   },
 });
