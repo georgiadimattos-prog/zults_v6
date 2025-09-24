@@ -168,7 +168,7 @@ export default function ActivitiesScreen() {
         data={filteredActivities}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
-        contentContainerStyle={{ paddingTop: 20, paddingHorizontal: 16 }}
+        contentContainerStyle={{ paddingTop: 60, paddingHorizontal: 16, paddingBottom: 100 }}
         ListEmptyComponent={
           <Text style={styles.empty}>
             {filter === "all"
@@ -186,8 +186,8 @@ export default function ActivitiesScreen() {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.background.surface1 },
   topBlur: {
-    paddingTop: Platform.OS === "ios" ? 72 : 56,
-    paddingBottom: 16,
+    paddingTop: Platform.OS === "ios" ? 108 : 84,
+    paddingBottom: 20,
     paddingHorizontal: 16,
     position: "absolute",
     top: 0,
@@ -203,8 +203,8 @@ const styles = StyleSheet.create({
   tabs: {
     flexDirection: "row",
     justifyContent: "space-around",
-    marginTop: Platform.OS === "ios" ? 140 : 80,
-    paddingHorizontal: 16,
+    marginTop: Platform.OS === "ios" ? 180 : 84,
+    paddingHorizontal: 12,
   },
   tab: {
     paddingVertical: 6,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, Image, StyleSheet, Platform  } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { colors, typography } from '../../theme';
 import backArrow from '../../assets/images/navbar-arrow.png';
@@ -56,7 +56,8 @@ export default function ScreenHeader({
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 50,       // space for status bar
+    paddingTop: Platform.OS === "ios" ? 42 : 36,       // space for status bar
+    paddingHorizontal: 20,
     paddingHorizontal: 16,
     marginBottom: 0,
   },
@@ -70,8 +71,8 @@ const styles = StyleSheet.create({
     marginLeft: -4,
   },
   backIcon: {
-    width: 24,
-    height: 24,
+    width: 28,
+    height: 28,
     tintColor: colors.neutral[0],
   },
   rightButton: {
