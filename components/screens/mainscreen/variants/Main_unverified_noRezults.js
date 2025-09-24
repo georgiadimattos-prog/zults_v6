@@ -8,56 +8,55 @@ import {
   Text,
   Image,
 } from 'react-native';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native'; // 👈 useFocusEffect
 import { colors, typography } from '../../../../theme';
 import UserProfileHeader from '../../../ui/UserProfileHeader';
 import RezultsCardPlaceholder from '../../../ui/RezultsCardPlaceholder';
 import NotificationCard from '../../../ui/NotificationCard';
 import ZultsButton from '../../../ui/ZultsButton';
 import ScreenWrapper from '../../../ui/ScreenWrapper';
-import LinkUnavailableModal from '../../share/link/LinkUnavailableModal'; // 👈 unified modal
 
+// import chatCache to show live recent users
 import { chatCache, hasSeededDemo, markDemoSeeded } from '../../../../cache/chatCache';
 import zultsLogo from '../../../../assets/images/zults.png';
 
 export default function MainUnverifiedNoRezults() {
   const navigation = useNavigation();
   const [recentUsers, setRecentUsers] = useState([]);
-  const [showLinkUnavailableModal, setShowLinkUnavailableModal] = useState(false); // 👈 modal state
 
   // 🔄 refresh whenever screen is focused
-  useFocusEffect(
-    React.useCallback(() => {
-      let users = Object.keys(chatCache)
-        .map((username) => {
-          const chat = chatCache[username] || {};
-          const lastMsg = chat.chatData?.[chat.chatData.length - 1];
-          return {
-            id: username,
-            name: username,
-            avatar: chat.user?.image || zultsLogo,
-            lastTimestamp: lastMsg ? lastMsg.timestamp : '',
-          };
-        })
-        .sort((a, b) => (a.lastTimestamp < b.lastTimestamp ? 1 : -1));
+useFocusEffect(
+  React.useCallback(() => {
+    let users = Object.keys(chatCache)
+      .map((username) => {
+        const chat = chatCache[username] || {};
+        const lastMsg = chat.chatData?.[chat.chatData.length - 1];
+        return {
+          id: username,
+          name: username,
+          avatar: chat.user?.image || zultsLogo,
+          lastTimestamp: lastMsg ? lastMsg.timestamp : '',
+        };
+      })
+      .sort((a, b) => (a.lastTimestamp < b.lastTimestamp ? 1 : -1));
 
-      // ✅ only seed demo once
-      if (users.length === 0 && !hasSeededDemo()) {
-        users = [
-          {
-            id: 'zults-demo',
-            name: 'Zults (Demo)',
-            avatar: zultsLogo,
-            lastTimestamp: 'Now',
-          },
-        ];
-        markDemoSeeded();
-      }
+    // ✅ only seed demo once
+    if (users.length === 0 && !hasSeededDemo()) {
+      users = [
+        {
+          id: 'zults-demo',
+          name: 'Zults (Demo)',
+          avatar: zultsLogo,
+          lastTimestamp: 'Now',
+        },
+      ];
+      markDemoSeeded(); // 👈 sets the flag so we don’t reseed again
+    }
 
-      console.log("🔄 [MainUnverifiedNoRezults] Rebuilt from chatCache:", chatCache);
-      setRecentUsers(users);
-    }, [])
-  );
+    console.log("🔄 [MainUnverifiedNoRezults] Rebuilt from chatCache:", chatCache);
+    setRecentUsers(users);
+  }, [])
+);
 
   const renderAvatars = () => {
     const display = recentUsers.slice(0, 4);
@@ -96,7 +95,7 @@ export default function MainUnverifiedNoRezults() {
           label="Share"
           type="primary"
           size="large"
-          onPress={() => setShowLinkUnavailableModal(true)} // 👈 show modal instead of going to Share
+          onPress={() => navigation.navigate('Share')}
         />
 
         {/* Activities Section */}
@@ -112,18 +111,6 @@ export default function MainUnverifiedNoRezults() {
 
         <NotificationCard />
       </ScrollView>
-
-      {/* Unified Modal */}
-      {showLinkUnavailableModal && (
-        <LinkUnavailableModal
-          visible={showLinkUnavailableModal}
-          onClose={() => setShowLinkUnavailableModal(false)}
-          onGetRezults={() => {
-            setShowLinkUnavailableModal(false);
-            navigation.navigate("AddRezultsCard"); // 👈 correct Get Rezults pathway
-          }}
-        />
-      )}
     </ScreenWrapper>
   );
 }
@@ -170,9 +157,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   viewAllText: {
-    ...typography.bodyMedium,
-    fontSize: 16,
-    color: colors.brand.purple1,
-    fontWeight: "600",
+  ...typography.bodyMedium,   // 👈 bump up base style
+  fontSize: 16,               // 👈 explicit font size
+  color: colors.brand.purple1,
+  fontWeight: "600",
   },
 });
