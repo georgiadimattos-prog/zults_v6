@@ -25,9 +25,9 @@ const CARD_WIDTH = screenWidth - 32;
 const CARD_HEIGHT = CARD_WIDTH / 1.586;
 
 export default function RezultsCard({
-  userName = "John Doe",
-  providerName = "Sexual Health London",
-  testDate = "12 Dec 2025",
+  realName = "Melany J Rabideau",
+  providerName = "Planned Parenthood",
+  testDate = "25 Sep 2025",
   videoSource = require("../../assets/videos/Card_All_GlowingBorder_25sec.mp4"),
   showExpand = false, // ✅ prop to control expand button visibility
   onExpand, // ✅ parent callback (state setter from RezultsScreen)
@@ -75,46 +75,52 @@ export default function RezultsCard({
     <TouchableWithoutFeedback onPress={flipCard}>
       <View style={styles.container}>
         {/* Front */}
-        <Animated.View style={[styles.cardFront, frontAnimatedStyle]}>
-          <Video
-            source={videoSource}
-            style={styles.videoCard}
-            isLooping
-            shouldPlay
-            isMuted
-            resizeMode="cover"
-          />
+<Animated.View style={[styles.cardFront, frontAnimatedStyle]}>
+  <Video
+    source={videoSource}
+    style={styles.videoCard}
+    isLooping
+    shouldPlay
+    isMuted
+    resizeMode="cover"
+  />
 
-          <Image source={logoIcon} style={styles.logo} resizeMode="contain" />
+  <Image source={logoIcon} style={styles.logo} resizeMode="contain" />
 
-          <View style={styles.overlay}>
-            <View>
-              <Text style={styles.name}>{userName}</Text>
-              <Text style={styles.provider}>{providerName}</Text>
-            </View>
-            <Text style={styles.link}>Show Rezults</Text>
-          </View>
-        </Animated.View>
+  <View style={styles.overlay}>
+    <View>
+      {realName === "Melany J Rabideau" ? (
+        <Text style={styles.name}>{realName}</Text>
+      ) : (
+        <View style={styles.verifiedBadge}>
+          <Text style={styles.verifiedText}>✔ Verified</Text>
+        </View>
+      )}
+      <Text style={styles.provider}>{providerName}</Text>
+    </View>
+    <Text style={styles.link}>Show Rezults</Text>
+  </View>
+</Animated.View>
 
         {/* Back */}
-        <Animated.View style={[styles.cardBack, backAnimatedStyle]}>
-          <View style={styles.backHeader}>
-            <Text style={styles.testedOn}>
-              Tested on <Text style={styles.testedDate}>{testDate}</Text>
-            </Text>
+<Animated.View style={[styles.cardBack, backAnimatedStyle]}>
+  <View style={styles.backHeader}>
+    <Text style={styles.testedOn}>
+      Tested on <Text style={styles.testedDate}>{testDate}</Text>
+    </Text>
 
-            {showExpand && (
-              <TouchableWithoutFeedback onPress={toggleExpand}>
-                <View style={styles.expandButton}>
-                  <Animated.Image
-                    source={expanded ? collapseIcon : expandIcon}
-                    style={[{ width: 20, height: 20, tintColor: "#FFF" }, iconAnimatedStyle]}
-                    resizeMode="contain"
-                  />
-                </View>
-              </TouchableWithoutFeedback>
-            )}
-          </View>
+    {showExpand && (
+      <TouchableWithoutFeedback onPress={toggleExpand}>
+        <View style={styles.expandButton}>
+          <Animated.Image
+            source={expanded ? collapseIcon : expandIcon}
+            style={[{ width: 20, height: 20, tintColor: "#FFF" }, iconAnimatedStyle]}
+            resizeMode="contain"
+          />
+        </View>
+      </TouchableWithoutFeedback>
+    )}
+  </View>
 
           <View style={styles.pillsBottom}>
             {[
@@ -240,4 +246,31 @@ const styles = StyleSheet.create({
     color: colors.foreground.default,
     fontSize: 12,
   },
+  erifiedBadge: {
+  backgroundColor: colors.brand.purple1,
+  borderRadius: 8,
+  paddingHorizontal: 6,
+  paddingVertical: 2,
+  alignSelf: "flex-start",
+  marginBottom: 4,
+},
+verifiedText: {
+  fontSize: 12,
+  color: colors.neutral[0],
+  fontWeight: "600",
+},
+
+expandedContent: {
+  marginVertical: 12,
+  padding: 12,
+  backgroundColor: "rgba(255,255,255,0.05)",
+  borderRadius: 12,
+},
+
+expandedText: {
+  ...typography.bodyRegular,
+  fontSize: 14,
+  color: colors.foreground.default,
+  textAlign: "center",
+},
 });

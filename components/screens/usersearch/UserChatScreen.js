@@ -383,9 +383,9 @@ export default function UserChatScreen() {
                   navigation.navigate("Rezults", {
                     username: user.name,
                     avatar: user.image || fallbackAvatar,
-                    realName: user.name,
-                    providerName: "Sexual Health London",
-                    testDate: "12 Dec 2025",
+                    realName: user.realName || user.name,
+                    providerName: "Planned Parenthood",
+                    testDate: "25 Sep 2025",
                     showExpand: true,
                   });
                   return;
