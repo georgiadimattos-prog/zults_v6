@@ -122,26 +122,26 @@ export default function RezultsCard({
     )}
   </View>
 
-          <View style={styles.pillsBottom}>
-            {[
-              "Tested negative:",
-              "Gonorrhoea",
-              "HIV",
-              "Syphilis",
-              "Chlamydia",
-              "Hepatitis B",
-              "Hepatitis C",
-              "Gardnerella",
-              "Trichomoniasis",
-              "Ureaplasma",
-              "Mycoplasma",
-            ].map((label, idx) => (
-              <View key={idx} style={styles.pill}>
-                <Text style={styles.pillText}>{label}</Text>
-              </View>
-            ))}
-          </View>
-        </Animated.View>
+  <View style={styles.pillsBottom}>
+    {[
+      "Tested negative:",
+      "Gonorrhoea",
+      "HIV",
+      "Syphilis",
+      "Chlamydia",
+      "Hepatitis B",
+      "Hepatitis C",
+      "Gardnerella",
+      "Trichomoniasis",
+      "Ureaplasma",
+      "Mycoplasma",
+    ].map((label, idx) => (
+      <View key={idx} style={styles.pill}>
+        <Text style={styles.pillText}>{label}</Text>
+      </View>
+    ))}
+  </View>
+</Animated.View>
       </View>
     </TouchableWithoutFeedback>
   );

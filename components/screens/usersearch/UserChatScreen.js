@@ -379,16 +379,18 @@ export default function UserChatScreen() {
               ]}
               disabled={chatState.hasRequested && !otherUserState.hasShared}
               onPress={() => {
-                if (otherUserState.hasShared) {
-                  navigation.navigate("Rezults", {
-                    username: user.name,
-                    avatar: user.image || fallbackAvatar,
-                    realName: user.realName || user.name,
-                    providerName: "Planned Parenthood",
-                    testDate: "25 Sep 2025",
-                    showExpand: true,
-                  });
-                  return;
+  if (otherUserState.hasShared) {
+    navigation.navigate("Rezults", {
+      username: user.name,
+      avatar: user.image || fallbackAvatar,
+      realName: user.realName || user.name,
+      providerName: user.name === "Binkey" 
+        ? "Planned Parenthood" 
+        : "Sexual Health London",
+      testDate: "25 Sep 2025",
+      showExpand: true,
+    });
+    return;
                 }
                 if (!chatState.hasRequested) {
                   setChatState({ ...chatState, hasRequested: true });

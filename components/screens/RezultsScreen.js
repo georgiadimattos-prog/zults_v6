@@ -49,13 +49,13 @@ function RezultsScreen() {
       {/* Chat user info */}
       <View style={styles.userInfo}>
         {avatar && <Image source={avatar} style={styles.avatar} />}
-        {username && <Text style={styles.username}>@{username}</Text>}
+        {username && <Text style={styles.username}>{username}</Text>}
       </View>
 
       {/* RezultsCard → shows realName if available */}
       <RezultsCard
         userName={realName || username || "Unknown User"}
-        providerName={providerName || "Sexual Health London"}
+        providerName={providerName}
         testDate={testDate || "12 Dec 2025"}
         showExpand={showExpand}
         onExpand={setExpanded} // ✅ toggle expand
@@ -63,51 +63,56 @@ function RezultsScreen() {
 
       {/* Expanded info box */}
       {expanded && (
-  <View style={{ flex: 1 }}>
-    <ScrollView
-      style={styles.expandedBox}
-      showsVerticalScrollIndicator={false}
-      contentContainerStyle={{ flexGrow: 1, paddingBottom: 64 }}
-    >
-      <Text style={styles.expandedText}>
-        These Rezults were created from home-tests completed on{" "}
-        <Text
-          style={{
-            color: colors.neutral[0],
-            textDecorationLine: "underline",
-          }}
-        >
-          Sexual Health London (SHL)
-        </Text>
-        .
-      </Text>
+        <View style={{ flex: 1 }}>
+          <ScrollView
+            style={styles.expandedBox}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ flexGrow: 1, paddingBottom: 64 }}
+          >
+            {/* ✅ Provider-specific copy */}
+            <Text style={styles.expandedText}>
+              These Rezults were created from home-tests completed on{" "}
+              {testDate},{" "}
+              using{" "}
+              <Text
+                style={{
+                  color: colors.neutral[0],
+                  textDecorationLine: "underline",
+                }}
+              >
+                {providerName === "Planned Parenthood"
+                  ? "Planned Parenthood"
+                  : "Sexual Health London (SHL)"}
+              </Text>
+              .
+            </Text>
 
-      <Text style={styles.expandedTitle}>Infection Window Periods</Text>
-      <Text style={styles.expandedText}>
-        Some STIs take time to show up in results, meaning a recent
-        infection might not be detected right away.
-      </Text>
-      <Text style={styles.expandedText}>
-        • Chlamydia & Gonorrhoea: ~2 weeks{"\n"}
-        • Syphilis, Hep B & C: 6–12 weeks{"\n"}
-        • HIV: ~6 weeks
-      </Text>
+            <Text style={styles.expandedTitle}>Infection Window Periods</Text>
+            <Text style={styles.expandedText}>
+              Some STIs take time to show up in results, meaning a recent
+              infection might not be detected right away.
+            </Text>
+            <Text style={styles.expandedText}>
+              • Chlamydia & Gonorrhoea: ~2 weeks{"\n"}
+              • Syphilis, Hep B & C: 6–12 weeks{"\n"}
+              • HIV: ~6 weeks
+            </Text>
 
-      <Text style={styles.expandedTitle}>ID Verification</Text>
-      <Text style={styles.expandedText}>
-        These are at-home tests, we can't fully guarantee who took the
-        test. If you see a blue tick next to someone’s profile, it means:{"\n"}
-        • We verified their name matches their test provider’s results{"\n"}
-        • Their photo matches their official ID
-      </Text>
+            <Text style={styles.expandedTitle}>ID Verification</Text>
+            <Text style={styles.expandedText}>
+              These are at-home tests, we can't fully guarantee who took the
+              test. If you see a blue tick next to someone’s profile, it means:{"\n"}
+              • We verified their name matches their test provider’s results{"\n"}
+              • Their photo matches their official ID
+            </Text>
 
-      <Text style={styles.expandedText}>
-        Rezults are a tool for safer dating but they don’t replace other
-        protections. Using condoms is still the most reliable way to protect
-        against STIs.
-      </Text>
-    </ScrollView>
-  </View>
+            <Text style={styles.expandedText}>
+              Rezults are a tool for safer dating but they don’t replace other
+              protections. Using condoms is still the most reliable way to protect
+              against STIs.
+            </Text>
+          </ScrollView>
+        </View>
       )}
     </View>
   );
@@ -164,7 +169,7 @@ const styles = StyleSheet.create({
     marginBottom: 32,
     padding: 16,
     minHeight: 200,
-    maxHeight: SCREEN_HEIGHT * 0.95, // ✅ responsive scroll window (70% of screen height)
+    maxHeight: SCREEN_HEIGHT * 0.95, // ✅ responsive scroll window
   },
   expandedTitle: {
     ...typography.bodyMedium,
@@ -180,5 +185,18 @@ const styles = StyleSheet.create({
     color: colors.foreground.soft,
     marginBottom: 8,
     lineHeight: 18,
+  },
+  verifiedBadge: {
+    backgroundColor: colors.brand.purple1,
+    borderRadius: 8,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    alignSelf: "flex-start",
+    marginLeft: 8,
+  },
+  verifiedText: {
+    fontSize: 12,
+    color: colors.neutral[0],
+    fontWeight: "600",
   },
 });
