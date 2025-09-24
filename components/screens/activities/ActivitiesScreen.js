@@ -166,9 +166,9 @@ export default function ActivitiesScreen() {
     <BlurView intensity={40} tint="dark" style={styles.topBlur}>
       <View style={{ flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
         {/* Left: Back */}
-        <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
-          <Image source={arrowLeft} style={styles.backIcon} />
-        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+  <Image source={arrowLeft} style={styles.backIcon} />
+</TouchableOpacity>
 
         {/* Middle: Title */}
         <Text style={styles.title}>Activities</Text>
