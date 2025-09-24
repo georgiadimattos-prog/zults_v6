@@ -49,16 +49,26 @@ function RezultsScreen() {
       {/* Chat user info */}
       <View style={styles.userInfo}>
         {avatar && <Image source={avatar} style={styles.avatar} />}
-        {username && <Text style={styles.username}>{username}</Text>}
+        {realName === "Melany J Rabideau" ? (
+          <Text style={styles.username}>{realName}</Text>
+        ) : (
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Text style={styles.username}>@{username}</Text>
+            <Image
+              source={require("../../assets/images/verified-icon.png")}
+              style={styles.verifiedIcon}
+            />
+          </View>
+        )}
       </View>
 
-      {/* RezultsCard → shows realName if available */}
+      {/* RezultsCard → Melany shows realName, others show no name */}
       <RezultsCard
-        userName={realName || username || "Unknown User"}
+        realName={realName === "Melany J Rabideau" ? realName : null}
         providerName={providerName}
         testDate={testDate || "12 Dec 2025"}
         showExpand={showExpand}
-        onExpand={setExpanded} // ✅ toggle expand
+        onExpand={setExpanded}
       />
 
       {/* Expanded info box */}
@@ -69,7 +79,6 @@ function RezultsScreen() {
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ flexGrow: 1, paddingBottom: 64 }}
           >
-            {/* ✅ Provider-specific copy */}
             <Text style={styles.expandedText}>
               These Rezults were created from home-tests completed on{" "}
               {testDate},{" "}
@@ -126,7 +135,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.surface1,
   },
   topBlur: {
-    paddingTop: Platform.OS === "ios" ? 110 : 90, // ✅ row 2 alignment (same as chat)
+    paddingTop: Platform.OS === "ios" ? 110 : 90,
     paddingBottom: 20,
     paddingHorizontal: 16,
     position: "absolute",
@@ -149,7 +158,7 @@ const styles = StyleSheet.create({
   userInfo: {
     alignItems: "center",
     marginVertical: 16,
-    marginTop: 190, // ✅ pushes avatar below the header
+    marginTop: 190,
   },
   avatar: {
     width: 64,
@@ -162,6 +171,11 @@ const styles = StyleSheet.create({
     color: colors.foreground.default,
     fontSize: 16,
   },
+  verifiedIcon: {
+    width: 18,
+    height: 18,
+    marginLeft: 6,
+  },
   expandedBox: {
     borderRadius: 16,
     marginHorizontal: 16,
@@ -169,7 +183,7 @@ const styles = StyleSheet.create({
     marginBottom: 32,
     padding: 16,
     minHeight: 200,
-    maxHeight: SCREEN_HEIGHT * 0.95, // ✅ responsive scroll window
+    maxHeight: SCREEN_HEIGHT * 0.95,
   },
   expandedTitle: {
     ...typography.bodyMedium,
@@ -185,18 +199,5 @@ const styles = StyleSheet.create({
     color: colors.foreground.soft,
     marginBottom: 8,
     lineHeight: 18,
-  },
-  verifiedBadge: {
-    backgroundColor: colors.brand.purple1,
-    borderRadius: 8,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    alignSelf: "flex-start",
-    marginLeft: 8,
-  },
-  verifiedText: {
-    fontSize: 12,
-    color: colors.neutral[0],
-    fontWeight: "600",
   },
 });
