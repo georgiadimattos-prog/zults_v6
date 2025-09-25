@@ -40,18 +40,25 @@ export default function GetRezults_HowToFindLinkScreen() {
 
   return (
     <ScreenWrapper topPadding={0}>
-      <Navbar title="How to find your link?" />
+      <Navbar />
+
+      <Text allowFontScaling={false} style={styles.pageTitle}>
+  How to find link
+</Text>
+<Text allowFontScaling={false} style={styles.subtitle}>
+  {steps[0]}   {/* 👈 use the first step as the subtitle */}
+</Text>
 
       <ScrollView
         contentContainerStyle={{ flexGrow: 1, paddingBottom: 120 }}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        {steps.map((s, i) => (
-          <Text key={i} style={[styles.step, i === 0 && { marginTop: 4 }]}>
-            {i + 1}. {s}
-          </Text>
-        ))}
+        {steps.slice(1).map((s, i) => (
+  <Text key={i} style={[styles.step, i === 0 && { marginTop: 4 }]}>
+    {i + 1}. {s}
+  </Text>
+))}
 
       </ScrollView>
 
@@ -100,4 +107,16 @@ const styles = StyleSheet.create({
     ...typography.captionSmallRegular,
     color: colors.foreground.soft,
   },
+  pageTitle: {
+  ...typography.largeTitleMedium,
+  color: colors.foreground.default,
+  marginTop: 24,
+  marginBottom: 8,
+},
+subtitle: {
+  ...typography.bodyRegular,
+  color: colors.foreground.soft,
+  marginBottom: 24,
+},
+
 });

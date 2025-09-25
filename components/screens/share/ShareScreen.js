@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     height: 36,
     padding: 4,
-    marginTop: 24,
+    marginTop: 8,
     marginBottom: 24,
     alignSelf: 'stretch',
   },

@@ -8,14 +8,14 @@ import {
   Image,
   Platform,
 } from "react-native";
-import { BlurView } from "expo-blur";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { Swipeable } from "react-native-gesture-handler";
 import { colors, typography } from "../../../theme";
+import { NavbarBackRightText } from "../../ui/Navbar";   // ✅ consistent Navbar
+import ScreenWrapper from "../../ui/ScreenWrapper";
 
 import { chatCache, hasSeededDemo, markDemoSeeded } from "../../../cache/chatCache";
 import fallbackAvatar from "../../../assets/images/melany.png";
-import arrowLeft from "../../../assets/images/navbar-arrow.png";
 
 // ⭐ icons
 import star from "../../../assets/images/star.png";
@@ -120,24 +120,24 @@ export default function ActivitiesScreen() {
   );
 
   const renderItem = ({ item }) => (
-  <Swipeable renderRightActions={() => renderRightActions(item.id)}>
-    <TouchableOpacity
-      style={styles.row}
-      onPress={() => {
-        if (item.id !== "zults-demo") {
-          if (chatCache[item.id]) chatCache[item.id].hasUnread = false;
-          navigation.navigate("UserChat", {
-            user: { name: item.name, image: item.avatar },
-            from: "Activities", // 👈 added here
-          });
-        } else {
-          navigation.navigate("UserChat", {
-            user: { id: "zults-demo", name: "Zults (Demo)", image: zultsLogo },
-            from: "Activities", // 👈 added here too
-          });
-        }
-      }}
-    >
+    <Swipeable renderRightActions={() => renderRightActions(item.id)}>
+      <TouchableOpacity
+        style={styles.row}
+        onPress={() => {
+          if (item.id !== "zults-demo") {
+            if (chatCache[item.id]) chatCache[item.id].hasUnread = false;
+            navigation.navigate("UserChat", {
+              user: { name: item.name, image: item.avatar },
+              from: "Activities",
+            });
+          } else {
+            navigation.navigate("UserChat", {
+              user: { id: "zults-demo", name: "Zults (Demo)", image: zultsLogo },
+              from: "Activities",
+            });
+          }
+        }}
+      >
         <Image source={item.avatar} style={styles.avatar} />
         <View style={{ flex: 1 }}>
           <Text style={styles.username}>
@@ -153,7 +153,11 @@ export default function ActivitiesScreen() {
               source={item.favorite ? starFilled : star}
               style={[
                 styles.starIcon,
-                { tintColor: item.favorite ? colors.brand.purple1 : colors.foreground.muted },
+                {
+                  tintColor: item.favorite
+                    ? colors.brand.purple1
+                    : colors.foreground.muted,
+                },
               ]}
             />
           </TouchableOpacity>
@@ -163,59 +167,48 @@ export default function ActivitiesScreen() {
   );
 
   return (
-  <View style={styles.root}>
-    {/* Nav bar */}
-    <BlurView intensity={40} tint="dark" style={styles.topBlur}>
-      <View
-        style={{
-          flex: 1,
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        {/* Left: Back */}
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-  <Image source={arrowLeft} style={styles.backIcon} />
-</TouchableOpacity>
-
-        {/* Middle: Title */}
-        <Text style={styles.title}>Activities</Text>
-
-        {/* Right: Invite */}
-        <TouchableOpacity onPress={() => {}}>
-          <Text style={styles.invite}>Invite</Text>
-        </TouchableOpacity>
-      </View>
-    </BlurView>
+    <ScreenWrapper>
+      {/* ✅ Consistent Navbar (arrow + Invite on the right) */}
+      <NavbarBackRightText
+        rightText="Invite"
+        onRightPress={() => console.log("Invite pressed")}
+      />
 
       {/* Segmented control for filters */}
-<View style={styles.tabsContainer}>
-  {["All", "Unread", "Favorites"].map((tab) => (
-    <TouchableOpacity
-      key={tab}
-      style={filter === tab.toLowerCase() ? styles.tabActive : styles.tabInactive}
-      onPress={() => setFilter(tab.toLowerCase())}
-    >
-      <Text
-        style={
-          filter === tab.toLowerCase()
-            ? styles.tabActiveText
-            : styles.tabInactiveText
-        }
-      >
-        {tab}
-      </Text>
-    </TouchableOpacity>
-  ))}
-</View>
+      <View style={styles.tabsContainer}>
+        {["All", "Unread", "Favorites"].map((tab) => (
+          <TouchableOpacity
+            key={tab}
+            style={
+              filter === tab.toLowerCase()
+                ? styles.tabActive
+                : styles.tabInactive
+            }
+            onPress={() => setFilter(tab.toLowerCase())}
+          >
+            <Text
+              style={
+                filter === tab.toLowerCase()
+                  ? styles.tabActiveText
+                  : styles.tabInactiveText
+              }
+            >
+              {tab}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
 
       {/* List */}
       <FlatList
         data={filteredActivities}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
-        contentContainerStyle={{ paddingTop: 60, paddingHorizontal: 16, paddingBottom: 100 }}
+        contentContainerStyle={{
+          paddingTop: 16,
+          paddingHorizontal: 16,
+          paddingBottom: 100,
+        }}
         ListEmptyComponent={
           <Text style={styles.empty}>
             {filter === "all"
@@ -226,51 +219,21 @@ export default function ActivitiesScreen() {
           </Text>
         }
       />
-    </View>
+    </ScreenWrapper>
   );
 }
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.background.surface1 },
 
-  topBlur: {
-    paddingTop: Platform.OS === "ios" ? 108 : 84,
-    paddingBottom: 20,
-    paddingHorizontal: 16,
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 10,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-
-  backIcon: { width: 28, height: 28, tintColor: colors.foreground.default },
-
-  title: {
-    ...typography.bodyMedium,
-    color: colors.foreground.default,
-    fontWeight: "600",
-    textAlign: "center",
-    flex: 1,
-  },
-
-  invite: {
-    ...typography.bodyMedium,
-    color: "#0A84FF", // Apple blue (or colors.brand.blue1 if defined)
-    fontWeight: "600",
-  },
-
-  // ✅ New segmented control styles
+  // ✅ Segmented control
   tabsContainer: {
     flexDirection: "row",
     backgroundColor: colors.background.surface2,
     borderRadius: 18,
     height: 36,
     padding: 4,
-    marginTop: Platform.OS === "ios" ? 150 : 110, // 👈 matches ShareScreen
+    marginTop: 8,       // 👈 tighter spacing under navbar
     marginBottom: 16,
     marginHorizontal: 16,
   },

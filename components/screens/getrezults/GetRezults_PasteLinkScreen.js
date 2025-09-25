@@ -82,9 +82,6 @@ export default function GetRezults_PasteLinkScreen() {
             <Text allowFontScaling={false} style={styles.paragraph}>
               {paragraph}
             </Text>
-            <Text allowFontScaling={false} style={styles.subtitle}>
-  Example subtitle copy here
-</Text>
 
             {/* Input */}
             <Text allowFontScaling={false} style={styles.label}>
@@ -125,12 +122,12 @@ const styles = StyleSheet.create({
     ...typography.largeTitleMedium,
     color: colors.foreground.default,
     marginTop: 24,
-    marginBottom: 16,
+    marginBottom: 8,
   },
   paragraph: {
     ...typography.bodyRegular,
     color: colors.foreground.soft,
-    marginBottom: 16,
+    marginBottom: 24,
     lineHeight: 20,
   },
   label: {
@@ -149,10 +146,4 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(20,20,20,0.5)',
     marginBottom: 24,
   },
-  subtitle: {
-  ...typography.captionSmallRegular,
-  color: colors.foreground.soft,
-  marginBottom: 24,
-  paddingHorizontal: 16,
-},
 });
