@@ -8,7 +8,7 @@ import {
   Text,
   Image,
 } from 'react-native';
-import { useNavigation, useFocusEffect } from '@react-navigation/native'; // 👈 useFocusEffect
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { colors, typography } from '../../../../theme';
 import UserProfileHeader from '../../../ui/UserProfileHeader';
 import RezultsCardPlaceholder from '../../../ui/RezultsCardPlaceholder';
@@ -20,43 +20,43 @@ import ScreenWrapper from '../../../ui/ScreenWrapper';
 import { chatCache, hasSeededDemo, markDemoSeeded } from '../../../../cache/chatCache';
 import zultsLogo from '../../../../assets/images/zults.png';
 
-export default function MainUnverifiedNoRezults({ onLinkPress }) {
+export default function MainUnverifiedNoRezults({ onLinkPress, onSharePress }) {
   const navigation = useNavigation();
   const [recentUsers, setRecentUsers] = useState([]);
 
   // 🔄 refresh whenever screen is focused
-useFocusEffect(
-  React.useCallback(() => {
-    let users = Object.keys(chatCache)
-      .map((username) => {
-        const chat = chatCache[username] || {};
-        const lastMsg = chat.chatData?.[chat.chatData.length - 1];
-        return {
-          id: username,
-          name: username,
-          avatar: chat.user?.image || zultsLogo,
-          lastTimestamp: lastMsg ? lastMsg.timestamp : '',
-        };
-      })
-      .sort((a, b) => (a.lastTimestamp < b.lastTimestamp ? 1 : -1));
+  useFocusEffect(
+    React.useCallback(() => {
+      let users = Object.keys(chatCache)
+        .map((username) => {
+          const chat = chatCache[username] || {};
+          const lastMsg = chat.chatData?.[chat.chatData.length - 1];
+          return {
+            id: username,
+            name: username,
+            avatar: chat.user?.image || zultsLogo,
+            lastTimestamp: lastMsg ? lastMsg.timestamp : '',
+          };
+        })
+        .sort((a, b) => (a.lastTimestamp < b.lastTimestamp ? 1 : -1));
 
-    // ✅ only seed demo once
-    if (users.length === 0 && !hasSeededDemo()) {
-      users = [
-        {
-          id: 'zults-demo',
-          name: 'Zults (Demo)',
-          avatar: zultsLogo,
-          lastTimestamp: 'Now',
-        },
-      ];
-      markDemoSeeded(); // 👈 sets the flag so we don’t reseed again
-    }
+      // ✅ only seed demo once
+      if (users.length === 0 && !hasSeededDemo()) {
+        users = [
+          {
+            id: 'zults-demo',
+            name: 'Zults (Demo)',
+            avatar: zultsLogo,
+            lastTimestamp: 'Now',
+          },
+        ];
+        markDemoSeeded();
+      }
 
-    console.log("🔄 [MainUnverifiedNoRezults] Rebuilt from chatCache:", chatCache);
-    setRecentUsers(users);
-  }, [])
-);
+      console.log("🔄 [MainUnverifiedNoRezults] Rebuilt from chatCache:", chatCache);
+      setRecentUsers(users);
+    }, [])
+  );
 
   const renderAvatars = () => {
     const display = recentUsers.slice(0, 4);
@@ -92,11 +92,11 @@ useFocusEffect(
         <RezultsCardPlaceholder />
 
         <ZultsButton
-  label="Share"
-  type="primary"
-  size="large"
-  onPress={onLinkPress}
-/>
+          label="Share"
+          type="primary"
+          size="large"
+          onPress={onSharePress}
+        />
 
         {/* Activities Section */}
         <View style={{ marginTop: 15 }}>
@@ -157,9 +157,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   viewAllText: {
-  ...typography.bodyMedium,   // 👈 bump up base style
-  fontSize: 16,               // 👈 explicit font size
-  color: colors.brand.purple1,
-  fontWeight: "600",
+    ...typography.bodyMedium,
+    fontSize: 16,
+    color: colors.brand.purple1,
+    fontWeight: "600",
   },
 });

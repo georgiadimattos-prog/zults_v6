@@ -23,11 +23,6 @@ const styles = StyleSheet.create({
     height: 24,
     tintColor: colors.foreground.default,
   },
-  title: {
-    ...typography.title3Medium,
-    color: colors.foreground.default,
-    marginLeft: 8, // small breathing space after arrow
-  },
   spacer: {
     width: 24,
   },
@@ -38,9 +33,9 @@ const styles = StyleSheet.create({
 });
 
 //
-// Default Navbar: Back arrow + Title
+// Default Navbar: Back arrow only
 //
-export default function Navbar({ title, onBackPress }) {
+export default function Navbar({ onBackPress }) {
   const navigation = useNavigation();
   return (
     <View style={styles.container}>
@@ -51,7 +46,6 @@ export default function Navbar({ title, onBackPress }) {
             style={styles.icon}
           />
         </TouchableOpacity>
-        <Text style={styles.title}>{title}</Text>
       </View>
       <View style={styles.spacer} />
     </View>
@@ -59,9 +53,9 @@ export default function Navbar({ title, onBackPress }) {
 }
 
 //
-// NavbarBackInvite: Back arrow + Title + Invite button
+// NavbarBackInvite: Back arrow + Invite icon
 //
-export function NavbarBackInvite({ title, onBackPress, onInvite }) {
+export function NavbarBackInvite({ onBackPress, onInvite }) {
   const navigation = useNavigation();
   return (
     <View style={styles.container}>
@@ -72,8 +66,8 @@ export function NavbarBackInvite({ title, onBackPress, onInvite }) {
             style={styles.icon}
           />
         </TouchableOpacity>
-        <Text style={styles.title}>{title}</Text>
       </View>
+
       <TouchableOpacity onPress={onInvite}>
         <Ionicons name="person-add" size={24} color={colors.foreground.default} />
       </TouchableOpacity>
@@ -82,14 +76,21 @@ export function NavbarBackInvite({ title, onBackPress, onInvite }) {
 }
 
 //
-// NavbarOptions: Title + Options (3 dots)
+// NavbarOptions: Back arrow + 3 dots menu
 //
-export function NavbarOptions({ title, onOptions }) {
+export function NavbarOptions({ onBackPress, onOptions }) {
+  const navigation = useNavigation();
   return (
     <View style={styles.container}>
       <View style={styles.left}>
-        <Text style={styles.title}>{title}</Text>
+        <TouchableOpacity onPress={onBackPress || navigation.goBack}>
+          <Image
+            source={require('../../assets/images/navbar-arrow.png')}
+            style={styles.icon}
+          />
+        </TouchableOpacity>
       </View>
+
       <TouchableOpacity onPress={onOptions}>
         <Image
           source={require('../../assets/images/navbar-dots.png')}

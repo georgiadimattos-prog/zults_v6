@@ -23,7 +23,7 @@ import RezultsHeaderContainer from "../../../ui/RezultsHeaderContainer";
 import ConfirmModal from "../../../ui/ConfirmModal";
 import DeleteModal from "../../../ui/DeleteModal";
 
-export default function MainUnverifiedWithRezults({ onLinkPress }) {
+export default function MainUnverifiedWithRezults({ onLinkPress, onSharePress }) {
   const navigation = useNavigation();
   const [recentUsers, setRecentUsers] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -104,12 +104,12 @@ export default function MainUnverifiedWithRezults({ onLinkPress }) {
 
         <ExpireContainer expiryDate="29 Sep 2025" daysLeft={43} />
 
-        {/* ✅ Share button now calls parent onLinkPress */}
+        {/* ✅ Share button now calls parent onSharePress */}
         <ZultsButton
           label="Share"
           type="primary"
           size="large"
-          onPress={onLinkPress}
+          onPress={onSharePress}
         />
 
         {/* Activities Section */}
