@@ -140,59 +140,77 @@ export default function UserChatScreen() {
   useEffect(() => { chatStateRef.current = chatState; }, [chatState]);
   useEffect(() => { otherUserStateRef.current = otherUserState; }, [otherUserState]);
 
-  // restore from cache
-  useEffect(() => {
-    const key = user.name || "default";
-    if (chatCache[key]) {
-      const saved = chatCache[key];
-      setChatData(saved.chatData || []);
-      setChatState(saved.chatState || { hasShared: false, hasRequested: false });
-      setOtherUserState(saved.otherUserState || { hasShared: false, hasRequested: false });
-      if (saved.blocked) setIsBlocked(true);
-    }
+// restore from cache
+useEffect(() => {
+  // ✅ use user.id if available so demo is always keyed as "zults-demo"
+  const key = user.id || user.name || "default";
 
-    if (user.id === "zults-demo") {
-      setChatData([
-        {
-          id: "demo-msg-1",
-          type: "share",
-          direction: "from-other",
-          username: "Zults (Demo)",
-          avatar: user.image,
-          timestamp: "Now",
-        },
-        {
-          id: "demo-msg-2",
-          type: "text",
-          direction: "from-other",
-          username: "Zults (Demo)",
-          avatar: user.image,
-          text:
-            "Hi there, this is a demo Rezults so you can see how they appear in the app. 💜 We hope you enjoy using Zults and make the most of it to stay safe, healthy, and confident! ✨",
-          timestamp: "Now",
-        },
-      ]);
-      setOtherUserState({ hasShared: true, hasRequested: false });
-    }
-  }, []);
+  // 1. Restore if we already have chat in cache
+  if (chatCache[key]) {
+    const saved = chatCache[key];
+    setChatData(saved.chatData || []);
+    setChatState(saved.chatState || { hasShared: false, hasRequested: false });
+    setOtherUserState(saved.otherUserState || { hasShared: false, hasRequested: false });
+    if (saved.blocked) setIsBlocked(true);
+    return; // ✅ stop here, no reseeding
+  }
 
-  // persist to cache
-  useEffect(() => {
-    const hasAction = chatData.some(
-      (msg) => msg.type === "request" || msg.type === "share" || msg.type === "stop-share"
-    );
-    if (!hasAction && !isBlocked) return;
+  // 2. Seed demo chat only once if nothing is cached
+  if (user.id === "zults-demo") {
+    const demoMessages = [
+      {
+        id: "demo-msg-1",
+        type: "text",
+        direction: "from-other",
+        username: "Zults AI",
+        avatar: user.image,
+        text: "Hi there, I’m your Rezults Assistant 🤖. Ask me anything about sexual health!",
+        timestamp: "Now",
+      },
+      {
+        id: "demo-msg-2",
+        type: "text",
+        direction: "from-other",
+        username: "Zults (Demo)",
+        avatar: user.image,
+        text:
+          "Hi there, this is a demo Rezults so you can see how they appear in the app. 💜 We hope you enjoy using Zults and make the most of it to stay safe, healthy, and confident! ✨",
+        timestamp: "Now",
+      },
+    ];
 
-    const key = user.name || "default";
+    setChatData(demoMessages);
+    setOtherUserState({ hasShared: false, hasRequested: false });
+
+    // ✅ persist into cache immediately so Activities sees it
     chatCache[key] = {
-      ...chatCache[key],
-      chatData,
-      chatState,
-      otherUserState,
-      user,
-      blocked: isBlocked,
+      user: { id: user.id, name: user.name, image: user.image },
+      chatData: demoMessages,
+      chatState: { hasShared: false, hasRequested: false },
+      otherUserState: { hasShared: false, hasRequested: false },
+      blocked: false,
     };
-  }, [chatData, chatState, otherUserState, user, isBlocked]);
+  }
+}, [user]);
+
+// persist to cache
+useEffect(() => {
+  const key = user.id || user.name || "default";
+
+  // Only persist if there is something meaningful (actions/messages or blocked state)
+  const hasAction = chatData.length > 0;
+  if (!hasAction && !isBlocked) return;
+
+  chatCache[key] = {
+    ...(chatCache[key] || {}),
+    user: { id: user.id, name: user.name, image: user.image },
+    chatData,
+    chatState,
+    otherUserState,
+    blocked: isBlocked,
+  };
+}, [chatData, chatState, otherUserState, user, isBlocked]);
+
 
   // keyboard listeners
   useEffect(() => {
@@ -373,57 +391,77 @@ export default function UserChatScreen() {
           <Text style={styles.username}>{user.name}</Text>
 
           {!isBlocked && (
-  <TouchableOpacity
-    style={[
-      styles.rezultsButton,
-      chatState.hasShared && styles.rezultsButtonActive,
-    ]}
-    disabled={chatState.hasRequested && !otherUserState.hasShared}
-    onPress={() => {
-      if (otherUserState.hasShared) {
+  isDemoChat ? (
+    // Demo chat → always View Rezults
+    <TouchableOpacity
+      style={styles.rezultsButton}
+      onPress={() => {
         navigation.navigate("Rezults", {
           username: user.name,
           avatar: user.image || fallbackAvatar,
           realName: user.realName || user.name,
-          providerName:
-            user.name === "Binkey"
-              ? "Planned Parenthood"
-              : "Sexual Health London",
-          testDate: "25 Sep 2025",
+          providerName: "Sexual Health London", // demo provider
+          testDate: "25 Sep 2025",              // demo date
           showExpand: true,
         });
-        return;
-      }
-      if (!chatState.hasRequested) {
-        setChatState({ ...chatState, hasRequested: true });
-        setChatData((prev) => [
-          ...prev,
-          {
-            id: Date.now().toString(),
-            type: "request",
-            direction: "from-user",
-            username: currentUser.name,
-            avatar: currentUser.avatar,
-            timestamp: "10:02AM",
-          },
-        ]);
-        startRequestFlow();
-      }
-    }}
-  >
-    <Text
-      style={[
-        styles.rezultsButtonText,
-        chatState.hasShared && styles.rezultsButtonTextActive,
-      ]}
+      }}
     >
-      {otherUserState.hasShared
-        ? "View Rezults"
-        : chatState.hasRequested
-        ? "Rezults Requested"
-        : "Request Rezults"}
-    </Text>
-  </TouchableOpacity>
+      <Text style={styles.rezultsButtonText}>View Rezults</Text>
+    </TouchableOpacity>
+  ) : (
+    // Normal users → keep your existing logic
+    <TouchableOpacity
+      style={[
+        styles.rezultsButton,
+        chatState.hasShared && styles.rezultsButtonActive,
+      ]}
+      disabled={chatState.hasRequested && !otherUserState.hasShared}
+      onPress={() => {
+        if (otherUserState.hasShared) {
+          navigation.navigate("Rezults", {
+            username: user.name,
+            avatar: user.image || fallbackAvatar,
+            realName: user.realName || user.name,
+            providerName:
+              user.name === "Binkey"
+                ? "Planned Parenthood"
+                : "Sexual Health London",
+            testDate: "25 Sep 2025",
+            showExpand: true,
+          });
+          return;
+        }
+        if (!chatState.hasRequested) {
+          setChatState({ ...chatState, hasRequested: true });
+          setChatData((prev) => [
+            ...prev,
+            {
+              id: Date.now().toString(),
+              type: "request",
+              direction: "from-user",
+              username: currentUser.name,
+              avatar: currentUser.avatar,
+              timestamp: "10:02AM",
+            },
+          ]);
+          startRequestFlow();
+        }
+      }}
+    >
+      <Text
+        style={[
+          styles.rezultsButtonText,
+          chatState.hasShared && styles.rezultsButtonTextActive,
+        ]}
+      >
+        {otherUserState.hasShared
+          ? "View Rezults"
+          : chatState.hasRequested
+          ? "Rezults Requested"
+          : "Request Rezults"}
+      </Text>
+    </TouchableOpacity>
+  )
 )}
         </View>
       </BlurView>
@@ -450,13 +488,7 @@ export default function UserChatScreen() {
       )}
 
       {/* Footer (emoji button removed) */}
-{!isBlocked && (
-  <BlurView
-    intensity={40}
-    tint="dark"
-    style={[styles.footerBlur, { bottom: keyboardHeight }]}
-  >
-    {isDemoChat ? (
+{isDemoChat ? (
       // Special footer for Zults (Demo) → AI chat
       <View style={styles.footer}>
         <TextInput
@@ -533,11 +565,51 @@ export default function UserChatScreen() {
           onChangeText={setMessage}
           style={styles.input}
         />
-        {/* existing Share Rezults button code stays here */}
+        {rezultsCache.hasRezults ? (
+          <TouchableOpacity
+            style={styles.sendButton}
+            onPress={() => {
+              setChatState({ ...chatState, hasShared: true });
+              setChatData((prev) => [
+                ...prev,
+                {
+                  id: Date.now().toString(),
+                  type: "share",
+                  direction: "from-user",
+                  username: currentUser.name,
+                  avatar: currentUser.avatar,
+                  timestamp: "10:05AM",
+                },
+                ...(message
+                  ? [
+                      {
+                        id: Date.now().toString() + "-note",
+                        type: "text",
+                        direction: "from-user",
+                        username: currentUser.name,
+                        avatar: currentUser.avatar,
+                        text: message,
+                        timestamp: "10:05AM",
+                      },
+                    ]
+                  : []),
+              ]);
+              setMessage("");
+              startShareFlow();
+            }}
+          >
+            <Text style={styles.sendButtonText}>Share Rezults</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={styles.sendButton}
+            onPress={() => setShowNoRezultsModal(true)}
+          >
+            <Text style={styles.sendButtonText}>Share Rezults</Text>
+          </TouchableOpacity>
+        )}
       </View>
     )}
-  </BlurView>
-)}
 
 
       {/* Block / Unblock Modal */}
