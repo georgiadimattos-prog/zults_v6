@@ -1,4 +1,3 @@
-// MainScreen.js
 import React from "react";
 import { useNavigation } from "@react-navigation/native";
 import MainUnverifiedNoRezults from "./variants/Main_unverified_noRezults";
@@ -12,22 +11,47 @@ export default function MainScreen() {
   const hasRezults = rezultsCache.hasRezults;
   const isVerified = false;
 
-  // 👉 Back to original behavior: open Share tabs screen
-  const handleLinkPress = () => {
+  // ✅ Keep Share button behavior unchanged
+  const handleSharePress = () => {
     navigation.navigate("Share");
   };
 
+  // ✅ Updated Link button behavior
+  const handleLinkPress = () => {
+    navigation.navigate("LinkOffline"); // always go here
+  };
+
   if (!isVerified && !hasRezults) {
-    return <MainUnverifiedNoRezults onLinkPress={handleLinkPress} />;
+    return (
+      <MainUnverifiedNoRezults
+        onSharePress={handleSharePress}
+        onLinkPress={handleLinkPress}
+      />
+    );
   }
   if (!isVerified && hasRezults) {
-    return <MainUnverifiedWithRezults onLinkPress={handleLinkPress} />;
+    return (
+      <MainUnverifiedWithRezults
+        onSharePress={handleSharePress}
+        onLinkPress={handleLinkPress}
+      />
+    );
   }
   if (isVerified && !hasRezults) {
-    return <MainVerifiedNoRezults onLinkPress={handleLinkPress} />;
+    return (
+      <MainVerifiedNoRezults
+        onSharePress={handleSharePress}
+        onLinkPress={handleLinkPress}
+      />
+    );
   }
   if (isVerified && hasRezults) {
-    return <MainVerifiedWithRezults onLinkPress={handleLinkPress} />;
+    return (
+      <MainVerifiedWithRezults
+        onSharePress={handleSharePress}
+        onLinkPress={handleLinkPress}
+      />
+    );
   }
   return null;
 }

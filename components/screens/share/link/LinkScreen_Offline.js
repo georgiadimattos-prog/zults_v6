@@ -12,10 +12,21 @@ import { colors, typography } from "../../../../theme";
 import ScreenWrapper from "../../../ui/ScreenWrapper";
 import Navbar from "../../../ui/Navbar";
 import ZultsButton from "../../../ui/ZultsButton";
+import { rezultsCache } from "../../../../cache/rezultsCache"; // ✅ import cache
 
 export default function LinkScreen_Offline() {
   const navigation = useNavigation();
   const [showModal, setShowModal] = useState(false);
+
+  const handleGenerateLink = () => {
+    if (rezultsCache.hasRezults) {
+      // ✅ User has Rezults → go to LinkShareSheet (or LinkSuccess)
+      navigation.navigate("LinkShareSheet");
+    } else {
+      // 🚫 No Rezults → fire modal
+      setShowModal(true);
+    }
+  };
 
   return (
     <ScreenWrapper topPadding={0}>
@@ -26,19 +37,18 @@ export default function LinkScreen_Offline() {
           <Text style={styles.cardTitle}>Share-link</Text>
           <View style={styles.statusPill}>
             <View style={styles.statusDot} />
-            <Text style={styles.statusText}>Offline</Text>
+            <Text style={styles.statusText}>
+              {rezultsCache.hasRezults ? "Online" : "Offline"}
+            </Text>
           </View>
         </View>
 
-        <TouchableOpacity
-          style={styles.generateButton}
-          onPress={() => setShowModal(true)}
-        >
+        <TouchableOpacity style={styles.generateButton} onPress={handleGenerateLink}>
           <Text style={styles.generateButtonText}>Generate New Link</Text>
         </TouchableOpacity>
       </View>
 
-      {/* ✅ Inline modal (DeleteModal style) */}
+      {/* ✅ Inline modal (only fires if no Rezults) */}
       <Modal
         visible={showModal}
         transparent
@@ -60,7 +70,7 @@ export default function LinkScreen_Offline() {
                   size="large"
                   onPress={() => {
                     setShowModal(false);
-                    navigation.navigate("GetRezultsProvider"); // ✅ start of flow
+                    navigation.navigate("GetRezultsProvider");
                   }}
                 />
 
@@ -110,12 +120,12 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: "#FA5F21",
+    backgroundColor: rezultsCache.hasRezults ? "#00D775" : "#FA5F21",
     marginRight: 6,
   },
   statusText: {
     ...typography.captionSmallRegular,
-    color: "#FA5F21",
+    color: rezultsCache.hasRezults ? "#00D775" : "#FA5F21",
   },
   generateButton: {
     backgroundColor: colors.neutral[0],
