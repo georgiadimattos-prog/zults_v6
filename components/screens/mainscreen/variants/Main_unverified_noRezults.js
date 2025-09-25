@@ -20,7 +20,7 @@ import ScreenWrapper from '../../../ui/ScreenWrapper';
 import { chatCache, hasSeededDemo, markDemoSeeded } from '../../../../cache/chatCache';
 import zultsLogo from '../../../../assets/images/zults.png';
 
-export default function MainUnverifiedNoRezults() {
+export default function MainUnverifiedNoRezults({ onLinkPress }) {
   const navigation = useNavigation();
   const [recentUsers, setRecentUsers] = useState([]);
 
@@ -92,11 +92,11 @@ useFocusEffect(
         <RezultsCardPlaceholder />
 
         <ZultsButton
-          label="Share"
-          type="primary"
-          size="large"
-          onPress={() => navigation.navigate('Share')}
-        />
+  label="Share"
+  type="primary"
+  size="large"
+  onPress={onLinkPress}
+/>
 
         {/* Activities Section */}
         <View style={{ marginTop: 15 }}>

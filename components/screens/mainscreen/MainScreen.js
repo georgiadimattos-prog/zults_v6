@@ -1,34 +1,33 @@
+// MainScreen.js
 import React from "react";
-
-// ✅ Import screen variants
+import { useNavigation } from "@react-navigation/native";
 import MainUnverifiedNoRezults from "./variants/Main_unverified_noRezults";
 import MainUnverifiedWithRezults from "./variants/Main_unverified_withRezults";
 import MainVerifiedNoRezults from "./variants/Main_verified_noRezults";
 import MainVerifiedWithRezults from "./variants/Main_verified_withRezults";
-
-// ✅ Import Rezults cache
 import { rezultsCache } from "../../../cache/rezultsCache";
 
 export default function MainScreen() {
-  // ✅ Read from cache
+  const navigation = useNavigation();
   const hasRezults = rezultsCache.hasRezults;
-  const isVerified = false; // demo flag for now (later you can hook verification state here)
+  const isVerified = false;
+
+  // 👉 Back to original behavior: open Share tabs screen
+  const handleLinkPress = () => {
+    navigation.navigate("Share");
+  };
 
   if (!isVerified && !hasRezults) {
-    return <MainUnverifiedNoRezults />;
+    return <MainUnverifiedNoRezults onLinkPress={handleLinkPress} />;
   }
-
   if (!isVerified && hasRezults) {
-    return <MainUnverifiedWithRezults />;
+    return <MainUnverifiedWithRezults onLinkPress={handleLinkPress} />;
   }
-
   if (isVerified && !hasRezults) {
-    return <MainVerifiedNoRezults />;
+    return <MainVerifiedNoRezults onLinkPress={handleLinkPress} />;
   }
-
   if (isVerified && hasRezults) {
-    return <MainVerifiedWithRezults />;
+    return <MainVerifiedWithRezults onLinkPress={handleLinkPress} />;
   }
-
-  return null; // ✅ Fallback (should never happen)
+  return null;
 }

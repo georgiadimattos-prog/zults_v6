@@ -14,7 +14,6 @@ import SettingsScreen from "./components/screens/settings/SettingsScreen";
 import ActivitiesScreen from "./components/screens/activities/ActivitiesScreen";
 
 // Get Rezults Screens
-import GetRezultsScreen from "./components/screens/getrezults/GetRezultsScreen";
 import GetRezults_SelectProviderScreen from "./components/screens/getrezults/GetRezults_SelectProviderScreen";
 import GetRezults_PasteLinkScreen from "./components/screens/getrezults/GetRezults_PasteLinkScreen";
 import GetRezults_LoadingScreen from "./components/screens/getrezults/GetRezults_LoadingScreen";
@@ -79,7 +78,6 @@ export default function App() {
           <Stack.Screen name="Activities" component={ActivitiesScreen} />
 
           {/* Get Rezults Flow */}
-          <Stack.Screen name="GetRezults" component={GetRezultsScreen} />
           <Stack.Screen
             name="GetRezultsProvider"
             component={GetRezults_SelectProviderScreen}
