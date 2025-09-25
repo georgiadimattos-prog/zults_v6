@@ -9,6 +9,7 @@ import {
   Platform,
   TouchableWithoutFeedback,
   Keyboard,
+  ScrollView,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { colors, typography } from '../../../../theme';
@@ -16,6 +17,7 @@ import infoIcon from '../../../../assets/images/info-icon.png';
 import ZultsButton from '../../../ui/ZultsButton';
 import ScreenHeader from '../../../ui/ScreenHeader';
 import ScreenWrapper from '../../../ui/ScreenWrapper';
+import ScreenFooter from '../../../ui/ScreenFooter';
 
 export default function SMSScreen() {
   const [phone, setPhone] = useState('');
@@ -30,37 +32,45 @@ export default function SMSScreen() {
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScreenWrapper>
-          <ScreenHeader
-            title="SMS"
-            subtitle="Send someone an anonymous nudge to get tested"
-          />
-
-          <View style={styles.inputWrapper}>
-            <TextInput
-              style={styles.input}
-              value={phone}
-              onChangeText={setPhone}
-              placeholder="Add phone number"
-              placeholderTextColor={colors.neutralText.subtext}
-              keyboardType="phone-pad"
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            keyboardShouldPersistTaps="handled"
+          >
+            <ScreenHeader
+              title="SMS"
+              subtitle="Send someone an anonymous nudge to get tested"
             />
-          </View>
 
-          <View style={styles.smsInfo}>
-            <Image source={infoIcon} style={styles.infoIcon} />
-            <Text style={styles.infoText}>
-              You have <Text style={styles.infoHighlight}>1 of 1</Text> SMS available this week
-            </Text>
-          </View>
+            <View style={styles.inputWrapper}>
+              <TextInput
+                style={styles.input}
+                value={phone}
+                onChangeText={setPhone}
+                placeholder="Add phone number"
+                placeholderTextColor={colors.neutralText.subtext}
+                keyboardType="phone-pad"
+              />
+            </View>
 
-          <ZultsButton
-            label="Continue"
-            type="primary"
-            size="large"
-            fullWidth
-            disabled={!isValid}
-            onPress={() => navigation.navigate('ReviewSMS', { phone })}
-          />
+            <View style={styles.smsInfo}>
+              <Image source={infoIcon} style={styles.infoIcon} />
+              <Text style={styles.infoText}>
+                You have <Text style={styles.infoHighlight}>1 of 1</Text> SMS available this week
+              </Text>
+            </View>
+          </ScrollView>
+
+          {/* Footer with CTA */}
+          <ScreenFooter>
+            <ZultsButton
+              label="Continue"
+              type="primary"
+              size="large"
+              fullWidth
+              disabled={!isValid}
+              onPress={() => navigation.navigate('ReviewSMS', { phone })}
+            />
+          </ScreenFooter>
         </ScreenWrapper>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
@@ -68,6 +78,9 @@ export default function SMSScreen() {
 }
 
 const styles = StyleSheet.create({
+  scrollContent: {
+    paddingBottom: 32,
+  },
   inputWrapper: {
     borderWidth: 1,
     borderColor: colors.neutral[0],
@@ -87,6 +100,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 12,
     marginBottom: 32,
+    flexWrap: 'wrap',
   },
   infoIcon: {
     width: 16,
@@ -95,6 +109,7 @@ const styles = StyleSheet.create({
     tintColor: '#1DCA7A',
   },
   infoText: {
+    flexShrink: 1,
     ...typography.captionSmallRegular,
     color: colors.neutral[0],
   },

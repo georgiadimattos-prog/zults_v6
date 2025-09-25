@@ -19,7 +19,12 @@ export default function ZultsButton({
   };
 
   const getTextStyle = () => {
-    const textType = size === 'small' ? 'captionSmallRegular' : size === 'medium' ? 'buttonSmallMedium' : 'buttonLargeMedium';
+    const textType =
+      size === 'small'
+        ? 'captionSmallRegular'
+        : size === 'medium'
+        ? 'buttonSmallMedium'
+        : 'buttonLargeMedium';
     return [typography[textType], styles.text, styles[`${type}Text`]];
   };
 
@@ -42,7 +47,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  // Sizes
+  // ✅ Sizes — locked global heights
   large: { height: 56, paddingHorizontal: 24 },
   medium: { height: 48, paddingHorizontal: 20 },
   small: { height: 40, paddingHorizontal: 16 },
@@ -57,5 +62,8 @@ const styles = StyleSheet.create({
   secondaryText: { color: colors.foreground.default },
 
   // State
-  disabled: { opacity: 0.4 },
+  disabled: {
+    opacity: 0.4,
+    minHeight: 56,  // 🔥 ensures same height when disabled
+  },
 });

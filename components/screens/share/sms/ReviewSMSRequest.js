@@ -4,6 +4,10 @@ import {
   Text,
   StyleSheet,
   ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
   TouchableOpacity,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -11,6 +15,7 @@ import { colors, typography } from '../../../../theme';
 import ZultsButton from '../../../ui/ZultsButton';
 import ScreenHeader from '../../../ui/ScreenHeader';
 import ScreenWrapper from '../../../ui/ScreenWrapper';
+import ScreenFooter from '../../../ui/ScreenFooter';
 
 export default function ReviewSMSRequest() {
   const route = useRoute();
@@ -19,57 +24,75 @@ export default function ReviewSMSRequest() {
   const [agreed, setAgreed] = useState(false);
 
   return (
-    <ScreenWrapper>
-      <ScreenHeader
-        title="Review your request"
-        subtitle="Please check the details before sending"
-      />
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <ScreenWrapper>
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            keyboardShouldPersistTaps="handled"
+          >
+            <ScreenHeader
+              title="Review your request"
+              subtitle="Please check the details before sending"
+            />
 
-      <ScrollView contentContainerStyle={styles.container}>
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Add phone number</Text>
-          <View style={styles.inputWrapper}>
-            <Text style={styles.inputText}>{phone}</Text>
-          </View>
-        </View>
-
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Message</Text>
-          <View style={styles.inputWrapper}>
-            <Text style={styles.inputText}>
-              Someone sent you a reminder to consider getting tested for STIs. This may be from a past or potential partner.
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.checkboxRow}>
-          <TouchableOpacity onPress={() => setAgreed(!agreed)} style={styles.checkboxContainer}>
-            <View style={[styles.checkbox, agreed && styles.checkboxChecked]}>
-              {agreed && <Text style={styles.checkmark}>✓</Text>}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Add phone number</Text>
+              <View style={styles.inputWrapper}>
+                <Text style={styles.inputText}>{phone}</Text>
+              </View>
             </View>
-            <Text style={styles.checkboxText}>
-              By using this service you agree its purpose is for a legitimate purpose and you have considered the implications for the recipient.
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
 
-      <ZultsButton
-        label="Send Request"
-        type="primary"
-        size="large"
-        fullWidth
-        disabled={!agreed}
-        onPress={() => navigation.navigate('SMSRequestSent')}
-        style={styles.sendButtonFixed}
-      />
-    </ScreenWrapper>
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Message</Text>
+              <View style={styles.inputWrapper}>
+                <Text style={styles.inputText}>
+                  Someone sent you a reminder to consider getting tested for STIs.
+                  This may be from a past or potential partner.
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.checkboxRow}>
+              <TouchableOpacity
+                onPress={() => setAgreed(!agreed)}
+                style={styles.checkboxContainer}
+                activeOpacity={0.7}
+              >
+                <View style={[styles.checkbox, agreed && styles.checkboxChecked]}>
+                  {agreed && <Text style={styles.checkmark}>✓</Text>}
+                </View>
+                <Text style={styles.checkboxText}>
+                  By using this service you agree its purpose is for a legitimate purpose
+                  and you have considered the implications for the recipient.
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
+
+          {/* Footer with CTA */}
+          <ScreenFooter>
+            <ZultsButton
+              label="Send Request"
+              type="primary"
+              size="large"
+              fullWidth
+              disabled={!agreed}
+              onPress={() => navigation.navigate('SMSRequestSent')}
+            />
+          </ScreenFooter>
+        </ScreenWrapper>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    paddingBottom: 160,
+  scrollContent: {
+    paddingBottom: 32,
   },
   inputGroup: {
     marginBottom: 24,
@@ -98,6 +121,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 10,
     alignItems: 'flex-start',
+    flexWrap: 'wrap',
   },
   checkbox: {
     width: 16,
@@ -123,12 +147,5 @@ const styles = StyleSheet.create({
     ...typography.captionSmallRegular,
     color: colors.foreground.soft,
     lineHeight: 16,
-  },
-  sendButtonFixed: {
-    position: 'absolute',
-    bottom: 52,
-    left: 16,
-    right: 16,
-    zIndex: 100,
   },
 });

@@ -8,13 +8,13 @@ import {
   Keyboard,
   Text,
   ScrollView,
-  View,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { colors, typography } from '../../../theme';
 import ZultsButton from '../../ui/ZultsButton';
 import ScreenHeader from '../../ui/ScreenHeader';
 import ScreenWrapper from '../../ui/ScreenWrapper';
+import ScreenFooter from '../../ui/ScreenFooter';
 
 const PROVIDER_TITLES = {
   shl: 'Sexual Health London',
@@ -60,7 +60,7 @@ export default function GetRezults_PasteLinkScreen() {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScreenWrapper>
           <ScrollView
-            contentContainerStyle={{ flexGrow: 1, paddingBottom: 120 }}
+            contentContainerStyle={{ flexGrow: 1, paddingBottom: 32 }}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
@@ -95,19 +95,21 @@ export default function GetRezults_PasteLinkScreen() {
               keyboardType="url"
               autoCapitalize="none"
               autoCorrect={false}
-              allowFontScaling={false} // prevent iOS font size setting breaking input
+              allowFontScaling={false}
             />
           </ScrollView>
 
-          {/* Continue */}
-          <ZultsButton
-            label="Continue"
-            type="primary"
-            fullWidth
-            fixedBottom
-            onPress={handleContinue}
-            disabled={link.trim().length < 5}
-          />
+          {/* Footer with Continue button */}
+          <ScreenFooter>
+            <ZultsButton
+              label="Continue"
+              type="primary"
+              size="large"
+              fullWidth
+              onPress={handleContinue}
+              disabled={link.trim().length < 5}
+            />
+          </ScreenFooter>
         </ScreenWrapper>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
@@ -142,11 +144,5 @@ const styles = StyleSheet.create({
     color: colors.foreground.default,
     backgroundColor: 'rgba(20,20,20,0.5)',
     marginBottom: 24,
-  },
-  continueButton: {
-    position: 'absolute',
-    bottom: 52,
-    left: 16,
-    right: 16,
   },
 });

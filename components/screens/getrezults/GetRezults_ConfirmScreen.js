@@ -69,21 +69,23 @@ export default function GetRezults_ConfirmScreen() {
         </ScrollView>
 
         {/* Primary on top */}
-<ZultsButton
-  label="Add Rezults"
-  type="primary"
-  fullWidth
-  fixedBottom
-  onPress={handleAddRezults}
-/>
-
-<ZultsButton
-  label="Cancel"
-  type="secondary"
-  fullWidth
-  fixedBottom
-  onPress={() => navigation.goBack()}
-/>
+<ScreenFooter>
+  <ZultsButton
+    label="Add Rezults"
+    type="primary"
+    size="large"
+    fullWidth
+    onPress={handleAddRezults}
+  />
+  <ZultsButton
+    label="Cancel"
+    type="secondary"
+    size="large"
+    fullWidth
+    onPress={() => navigation.goBack()}
+    style={{ marginTop: 12 }}
+  />
+</ScreenFooter>
       </KeyboardAvoidingView>
     </ScreenWrapper>
   );

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { colors, typography } from '../../../theme';
 import ScreenWrapper from '../../ui/ScreenWrapper';
@@ -14,7 +14,6 @@ export default function GetRezults_LoadingScreen() {
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      // ✅ go to new AddRezultsCardScreen instead of old Confirm
       navigation.navigate('AddRezultsCard', { providerId, resultsLink });
     }, 3000);
     return () => clearTimeout(timeout);
@@ -22,18 +21,27 @@ export default function GetRezults_LoadingScreen() {
 
   return (
     <ScreenWrapper horizontalPadding={0} topPadding={0}>
-      <View style={styles.center}>
-        <Image source={transferIcon} style={styles.icon} resizeMode="contain" />
-        <Text style={styles.text}>Transfering…</Text>
-      </View>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.center}>
+          <Image source={transferIcon} style={styles.icon} resizeMode="contain" />
+          <Text style={styles.text}>Transferring…</Text>
+        </View>
+      </ScrollView>
     </ScreenWrapper>
   );
 }
 
 const styles = StyleSheet.create({
-  center: {
-    flex: 1,
+  scrollContent: {
+    flexGrow: 1,
     justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  center: {
     alignItems: 'center',
   },
   icon: {

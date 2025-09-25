@@ -11,13 +11,13 @@ export default function SMSRequestSent() {
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      navigation.popToTop();
+      navigation.navigate('MainScreen'); // ✅ go straight back to MainScreen
     }, 9000);
     return () => clearTimeout(timeout);
-  }, []);
+  }, [navigation]);
 
   return (
-    <ScreenWrapper horizontalPadding={24} topPadding={0}>
+    <ScreenWrapper topPadding={0} horizontalPadding={24}>
       <Video
         source={require('../../../../assets/videos/Sent.mp4')}
         style={StyleSheet.absoluteFill}
@@ -28,14 +28,17 @@ export default function SMSRequestSent() {
       />
 
       <View style={styles.overlay}>
-        <View style={styles.imageWrapper}>
-          <Image source={successImage} style={styles.image} resizeMode="contain" />
+        <View style={styles.centerContent}>
+          <Image
+            source={successImage}
+            style={styles.image}
+            resizeMode="contain"
+          />
+          <Text style={styles.title}>Sent!</Text>
+          <Text style={styles.subtitle}>
+            You’ll be able to send another anonymous SMS in one week.
+          </Text>
         </View>
-
-        <Text style={styles.title}>Sent!</Text>
-        <Text style={styles.subtitle}>
-          You’ll be able to send another anonymous SMS in one week.
-        </Text>
       </View>
     </ScreenWrapper>
   );
@@ -44,28 +47,30 @@ export default function SMSRequestSent() {
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    justifyContent: 'flex-end',
-    alignItems: 'flex-start',
+    justifyContent: 'center',
+    alignItems: 'center',
     paddingBottom: 40,
   },
-  imageWrapper: {
-    width: '100%',
+  centerContent: {
     alignItems: 'center',
-    marginBottom: 240,
+    justifyContent: 'center',
+    paddingHorizontal: 16,
   },
   image: {
-    width: 240,
-    height: 240,
+    width: 200,
+    height: 200,
+    marginBottom: 32,
   },
   title: {
     ...typography.largeTitleMedium,
     color: colors.neutral[0],
-    marginBottom: 4,
+    marginBottom: 8,
+    textAlign: 'center',
   },
   subtitle: {
     ...typography.bodyRegular,
     color: colors.foreground.soft,
-    textAlign: 'left',
+    textAlign: 'center',
     lineHeight: 20,
   },
 });

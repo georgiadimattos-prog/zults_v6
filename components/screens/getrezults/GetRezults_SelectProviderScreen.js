@@ -14,6 +14,7 @@ import { colors, typography } from '../../../theme';
 import ZultsButton from '../../ui/ZultsButton';
 import ScreenHeader from '../../ui/ScreenHeader';
 import ScreenWrapper from '../../ui/ScreenWrapper';
+import ScreenFooter from '../../ui/ScreenFooter';
 
 import shlLogo from '../../../assets/images/SHL.png';
 import randoxLogo from '../../../assets/images/Randox.png';
@@ -41,11 +42,11 @@ export default function GetRezults_SelectProviderScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <ScrollView
-          contentContainerStyle={{ flexGrow: 1, paddingBottom: 120 }}
+          contentContainerStyle={{ flexGrow: 1, paddingBottom: 32 }}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          {/* Navbar row only */}
+          {/* Navbar row */}
           <ScreenHeader title="" subtitle={null} />
 
           {/* Page title + subtitle */}
@@ -84,15 +85,17 @@ export default function GetRezults_SelectProviderScreen() {
           </ScrollView>
         </ScrollView>
 
-        {/* Continue */}
-        <ZultsButton
-          label="Continue"
-          type="primary"
-          fullWidth
-          fixedBottom
-          disabled={!selectedProvider}
-          onPress={handleContinue}
-        />
+        {/* Footer with Continue button */}
+        <ScreenFooter>
+          <ZultsButton
+            label="Continue"
+            type="primary"
+            size="large"
+            fullWidth
+            disabled={!selectedProvider}
+            onPress={handleContinue}
+          />
+        </ScreenFooter>
       </KeyboardAvoidingView>
     </ScreenWrapper>
   );
@@ -151,11 +154,5 @@ const styles = StyleSheet.create({
     height: 10,
     borderRadius: 5,
     backgroundColor: colors.neutral[0],
-  },
-  continueButton: {
-    position: 'absolute',
-    bottom: 52,
-    left: 16,
-    right: 16,
   },
 });
