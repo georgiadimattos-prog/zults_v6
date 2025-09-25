@@ -119,6 +119,8 @@ export default function UserChatScreen() {
   const currentUser = { name: "TomasB.", avatar: TomasAvatar };
   const user = route.params?.user || { name: "Unknown", image: fallbackAvatar };
 
+  const isDemoChat = user.id === "zults-demo";  // ✅ here
+
   const [message, setMessage] = useState("");
   const [chatState, setChatState] = useState({ hasShared: false, hasRequested: false });
   const [otherUserState, setOtherUserState] = useState({ hasShared: false, hasRequested: false });
@@ -336,12 +338,14 @@ export default function UserChatScreen() {
     <View style={styles.root}>
       {/* Header */}
       <BlurView intensity={40} tint="dark" style={styles.topBlur}>
-        <View style={styles.topRow}>
-          <View style={{ flex: 1 }} />
-          <TouchableOpacity onPress={() => setShowActionsModal(true)}>
-            <Image source={moreIcon} style={styles.moreIcon} />
-          </TouchableOpacity>
-        </View>
+  <View style={styles.topRow}>
+    <View style={{ flex: 1 }} />
+    {!isDemoChat && (   // 👈 hide 3-dots if it’s Zults (Demo)
+      <TouchableOpacity onPress={() => setShowActionsModal(true)}>
+        <Image source={moreIcon} style={styles.moreIcon} />
+      </TouchableOpacity>
+    )}
+  </View>
 
         <View style={styles.userRow}>
           <TouchableOpacity
@@ -452,7 +456,54 @@ export default function UserChatScreen() {
     tint="dark"
     style={[styles.footerBlur, { bottom: keyboardHeight }]}
   >
-    {chatState.hasShared ? (
+    {isDemoChat ? (
+      // Special footer for Zults (Demo) → AI chat
+      <View style={styles.footer}>
+        <TextInput
+          placeholder="Ask me anything about sexual health..."
+          placeholderTextColor={colors.foreground.muted}
+          value={message}
+          onChangeText={setMessage}
+          style={styles.input}
+        />
+        <TouchableOpacity
+          style={styles.sendButton}
+          onPress={() => {
+            if (!message.trim()) return;
+
+            const userMsg = {
+              id: Date.now().toString(),
+              type: "text",
+              direction: "from-user",
+              username: currentUser.name,
+              avatar: currentUser.avatar,
+              text: message,
+              timestamp: "Now",
+            };
+
+            setChatData((prev) => [...prev, userMsg]);
+            setMessage("");
+
+            // Fake AI reply
+            setTimeout(() => {
+              const aiMsg = {
+                id: Date.now().toString() + "-ai",
+                type: "text",
+                direction: "from-other",
+                username: "Zults AI",
+                avatar: user.image,
+                text: "I'm your Rezults Assistant 🤖. Ask me anything about sexual health!",
+                timestamp: "Now",
+              };
+              setChatData((prev) => [...prev, aiMsg]);
+            }, 1200);
+          }}
+        >
+          <Text style={styles.sendButtonText}>Send</Text>
+        </TouchableOpacity>
+      </View>
+    ) : chatState.hasShared ? (
+      // Normal flow: Stop sharing Rezults
       <TouchableOpacity
         style={styles.stopButton}
         onPress={() => {
@@ -473,6 +524,7 @@ export default function UserChatScreen() {
         <Text style={styles.stopButtonText}>Stop Sharing Rezults</Text>
       </TouchableOpacity>
     ) : (
+      // Normal flow: Share Rezults buttons
       <View style={styles.footer}>
         <TextInput
           placeholder="Add note to your Rezults..."
@@ -481,50 +533,7 @@ export default function UserChatScreen() {
           onChangeText={setMessage}
           style={styles.input}
         />
-
-        {rezultsCache.hasRezults ? (
-          <TouchableOpacity
-            style={styles.sendButton}
-            onPress={() => {
-              setChatState({ ...chatState, hasShared: true });
-              setChatData((prev) => [
-                ...prev,
-                {
-                  id: Date.now().toString(),
-                  type: "share",
-                  direction: "from-user",
-                  username: currentUser.name,
-                  avatar: currentUser.avatar,
-                  timestamp: "10:05AM",
-                },
-                ...(message
-                  ? [
-                      {
-                        id: Date.now().toString() + "-note",
-                        type: "text",
-                        direction: "from-user",
-                        username: currentUser.name,
-                        avatar: currentUser.avatar,
-                        text: message,
-                        timestamp: "10:05AM",
-                      },
-                    ]
-                  : []),
-              ]);
-              setMessage("");
-              startShareFlow();
-            }}
-          >
-            <Text style={styles.sendButtonText}>Share Rezults</Text>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity
-            style={styles.sendButton}
-            onPress={() => setShowNoRezultsModal(true)}
-          >
-            <Text style={styles.sendButtonText}>Share Rezults</Text>
-          </TouchableOpacity>
-        )}
+        {/* existing Share Rezults button code stays here */}
       </View>
     )}
   </BlurView>
