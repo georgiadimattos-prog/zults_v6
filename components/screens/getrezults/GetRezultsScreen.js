@@ -5,7 +5,7 @@ import ScreenWrapper from '../../ui/ScreenWrapper';
 
 export default function GetRezultsScreen() {
   return (
-    <ScreenWrapper>
+    <ScreenWrapper topPadding={0}>
       <Text style={styles.text}>This is the Get Rezults Screen</Text>
     </ScreenWrapper>
   );

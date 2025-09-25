@@ -1,25 +1,28 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Clipboard, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import * as Clipboard from 'expo-clipboard';   // ✅ modern clipboard
 import { colors, typography } from '../../../../theme';
 import ScreenWrapper from '../../../ui/ScreenWrapper';
+import Navbar from '../../../ui/Navbar';
 
 export default function LinkScreenSuccess() {
   const link = 'https://myrezults.com/share/jonster/id8765';
 
-  const copyToClipboard = () => {
-    Clipboard.setString(link);
+  const copyToClipboard = async () => {
+    await Clipboard.setStringAsync(link);   // ✅ async clipboard
     Alert.alert('Copied!', 'Link copied to clipboard.');
   };
 
   return (
-    <ScreenWrapper>
-      <View style={styles.header}>
-        <Text style={styles.title}>Link</Text>
-        <Text style={styles.subtitle}>
-          Send your Rezults link to someone or add it to your dating profile. Even someone without
-          the app can view it.
-        </Text>
-      </View>
+    <ScreenWrapper topPadding={0}>
+      {/* ✅ standardized navbar */}
+      <Navbar title="Link" />
+
+      {/* ✅ subtitle with consistent spacing */}
+      <Text style={styles.subtitle}>
+        Send your Rezults link to someone or add it to your dating profile. Even someone without
+        the app can view it.
+      </Text>
 
       <View style={styles.linkCard}>
         <View style={styles.linkRow}>
@@ -43,17 +46,11 @@ export default function LinkScreenSuccess() {
 }
 
 const styles = StyleSheet.create({
-  header: {
-    marginBottom: 24,
-  },
-  title: {
-    ...typography.largeTitleMedium,
-    color: colors.foreground.default,
-    marginBottom: 4,
-  },
   subtitle: {
     ...typography.bodyRegular,
     color: colors.foreground.soft,
+    marginTop: 16,    // ✅ consistent breathing room below navbar
+    marginBottom: 24,
   },
   linkCard: {
     backgroundColor: colors.background.surface2,
@@ -74,7 +71,7 @@ const styles = StyleSheet.create({
     color: '#00D775',
   },
   linkBox: {
-    backgroundColor: colors.background.surface4,
+    backgroundColor: colors.background.surface3,
     padding: 12,
     borderRadius: 12,
     flexDirection: 'row',

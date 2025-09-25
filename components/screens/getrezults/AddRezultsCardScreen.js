@@ -35,7 +35,7 @@ export default function AddRezultsCardScreen() {
   };
 
   return (
-    <ScreenWrapper>
+    <ScreenWrapper topPadding={0}>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}

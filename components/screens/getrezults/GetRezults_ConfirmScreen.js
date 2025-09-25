@@ -10,8 +10,8 @@ import {
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { colors, typography } from '../../../theme';
 import ZultsButton from '../../ui/ZultsButton';
-import ScreenHeader from '../../ui/ScreenHeader';
 import ScreenWrapper from '../../ui/ScreenWrapper';
+import ScreenFooter from '../../ui/ScreenFooter';
 
 export default function GetRezults_ConfirmScreen() {
   const navigation = useNavigation();
@@ -23,72 +23,70 @@ export default function GetRezults_ConfirmScreen() {
   };
 
   return (
-    <ScreenWrapper>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+  <ScreenWrapper topPadding={0}>   {/* ✅ force consistent top padding */}
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       >
-        <ScreenHeader title="Your Rezults" subtitle="" />
+        <Text allowFontScaling={false} style={styles.subheading}>
+          By clicking “Add Rezults”, you confirm the information is yours and it is accurate.
+        </Text>
 
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
-          <Text allowFontScaling={false} style={styles.subheading}>
-            By clicking “Add Rezults”, you confirm the information is yours and it is accurate.
+        <View style={styles.card}>
+          <Text allowFontScaling={false} style={styles.cardLine}>John Doe</Text>
+          <Text allowFontScaling={false} style={styles.cardLine}>Sexual Health London</Text>
+          <Text allowFontScaling={false} style={styles.cardLine}>Tested on 12 Dec 2025</Text>
+          <Text allowFontScaling={false} style={styles.cardRezults}>
+            Tested negative: Gonorrhea, HIV, Syphilis, Chlamydia, Hep B, Hep C,
+            Gardnerella, Trichomoniasis, Ureaplasma, Mycoplasma
           </Text>
+        </View>
 
-          <View style={styles.card}>
-            <Text allowFontScaling={false} style={styles.cardLine}>John Doe</Text>
-            <Text allowFontScaling={false} style={styles.cardLine}>Sexual Health London</Text>
-            <Text allowFontScaling={false} style={styles.cardLine}>Tested on 12 Dec 2025</Text>
-            <Text allowFontScaling={false} style={styles.cardRezults}>
-              Tested negative: Gonorrhea, HIV, Syphilis, Chlamydia, Hep B, Hep C,
-              Gardnerella, Trichomoniasis, Ureaplasma, Mycoplasma
-            </Text>
-          </View>
+        <Text allowFontScaling={false} style={styles.sectionTitle}>Important Notes</Text>
+        <Text allowFontScaling={false} style={styles.infoBlock}>
+          These Rezults were created from home-tests completed on 12 Dec 2025.
+        </Text>
+        <Text allowFontScaling={false} style={styles.infoBlock}>
+          Some STIs take time to show up in results, meaning a recent infection might not be detected right away.
+        </Text>
+        <Text allowFontScaling={false} style={styles.infoBlock}>
+          These are at-home tests. We can't fully guarantee who took the test. If you see a blue tick next to someone’s profile, it means:
+        </Text>
+        <Text allowFontScaling={false} style={styles.infoList}>• We verified their name matches their test provider’s results</Text>
+        <Text allowFontScaling={false} style={styles.infoList}>• Their photo matches their official ID</Text>
 
-          <Text allowFontScaling={false} style={styles.sectionTitle}>Important Notes</Text>
-          <Text allowFontScaling={false} style={styles.infoBlock}>
-            These Rezults were created from home-tests completed on 12 Dec 2025.
-          </Text>
-          <Text allowFontScaling={false} style={styles.infoBlock}>
-            Some STIs take time to show up in results, meaning a recent infection might not be detected right away.
-          </Text>
-          <Text allowFontScaling={false} style={styles.infoBlock}>
-            These are at-home tests. We can't fully guarantee who took the test. If you see a blue tick next to someone’s profile, it means:
-          </Text>
-          <Text allowFontScaling={false} style={styles.infoList}>• We verified their name matches their test provider’s results</Text>
-          <Text allowFontScaling={false} style={styles.infoList}>• Their photo matches their official ID</Text>
+        <Text allowFontScaling={false} style={styles.sectionTitle}>Window Periods</Text>
+        <Text allowFontScaling={false} style={styles.infoList}>• Chlamydia & Gonorrhea: ~2 weeks</Text>
+        <Text allowFontScaling={false} style={styles.infoList}>• Syphilis, Hep B & C: 6–12 weeks</Text>
+        <Text allowFontScaling={false} style={styles.infoList}>• HIV: ~6 weeks</Text>
+      </ScrollView>
 
-          <Text allowFontScaling={false} style={styles.sectionTitle}>Window Periods</Text>
-          <Text allowFontScaling={false} style={styles.infoList}>• Chlamydia & Gonorrhea: ~2 weeks</Text>
-          <Text allowFontScaling={false} style={styles.infoList}>• Syphilis, Hep B & C: 6–12 weeks</Text>
-          <Text allowFontScaling={false} style={styles.infoList}>• HIV: ~6 weeks</Text>
-        </ScrollView>
-
-        {/* Primary on top */}
-<ScreenFooter>
-  <ZultsButton
-    label="Add Rezults"
-    type="primary"
-    size="large"
-    fullWidth
-    onPress={handleAddRezults}
-  />
-  <ZultsButton
-    label="Cancel"
-    type="secondary"
-    size="large"
-    fullWidth
-    onPress={() => navigation.goBack()}
-    style={{ marginTop: 12 }}
-  />
-</ScreenFooter>
-      </KeyboardAvoidingView>
-    </ScreenWrapper>
-  );
+      {/* Primary on top */}
+      <ScreenFooter>
+        <ZultsButton
+          label="Add Rezults"
+          type="primary"
+          size="large"
+          fullWidth
+          onPress={handleAddRezults}
+        />
+        <ZultsButton
+          label="Cancel"
+          type="secondary"
+          size="large"
+          fullWidth
+          onPress={() => navigation.goBack()}
+          style={{ marginTop: 12 }}
+        />
+      </ScreenFooter>
+    </KeyboardAvoidingView>
+  </ScreenWrapper>
+);
 }
 
 const styles = StyleSheet.create({

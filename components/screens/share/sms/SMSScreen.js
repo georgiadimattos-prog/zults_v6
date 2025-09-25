@@ -15,9 +15,9 @@ import { useNavigation } from '@react-navigation/native';
 import { colors, typography } from '../../../../theme';
 import infoIcon from '../../../../assets/images/info-icon.png';
 import ZultsButton from '../../../ui/ZultsButton';
-import ScreenHeader from '../../../ui/ScreenHeader';
 import ScreenWrapper from '../../../ui/ScreenWrapper';
 import ScreenFooter from '../../../ui/ScreenFooter';
+import Navbar, { NavbarBackRightText } from '../../ui/Navbar'; // ✅ import both
 
 export default function SMSScreen() {
   const [phone, setPhone] = useState('');
@@ -31,15 +31,19 @@ export default function SMSScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ScreenWrapper>
+        <ScreenWrapper topPadding={0}>   {/* ✅ match Get Rezults */}
           <ScrollView
             contentContainerStyle={styles.scrollContent}
             keyboardShouldPersistTaps="handled"
           >
-            <ScreenHeader
-              title="SMS"
-              subtitle="Send someone an anonymous nudge to get tested"
+            <NavbarBackRightText
+              rightText="Invite"
+              onRightPress={() => console.log('Invite pressed')}
             />
+
+            <Text style={styles.subtitle}>
+              Send someone an anonymous nudge to get tested
+            </Text>
 
             <View style={styles.inputWrapper}>
               <TextInput
@@ -80,6 +84,11 @@ export default function SMSScreen() {
 const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 32,
+  },
+  subtitle: {
+    ...typography.bodyRegular,
+    color: colors.foreground.soft,
+    marginBottom: 24,
   },
   inputWrapper: {
     borderWidth: 1,

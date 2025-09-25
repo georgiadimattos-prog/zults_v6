@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableWithoutFeedback,
   Image,
+  TouchableOpacity,
 } from 'react-native';
 import { colors, typography } from '../../../../theme';
 import ZultsButton from '../../../ui/ZultsButton';
@@ -17,7 +18,9 @@ export default function LinkUnavailableModal({ onClose, onGetRezults }) {
         <View style={styles.modal}>
           <View style={styles.header}>
             <Text style={styles.title}>Oops…</Text>
-            <Image source={closeCross} style={styles.closeIcon} />
+            <TouchableOpacity onPress={onClose} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+              <Image source={closeCross} style={styles.closeIcon} />
+            </TouchableOpacity>
           </View>
 
           <Text style={styles.bodyText}>
@@ -56,7 +59,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingBottom: 34,
+    paddingBottom: 34, // ✅ safe padding at bottom
   },
   modal: {
     width: '100%',
@@ -70,15 +73,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 16, // ✅ slightly more breathing room
   },
   title: {
-    ...typography.largeTitleMedium,
+    ...typography.title3Medium,   // ✅ matches modal headers elsewhere
     color: colors.foreground.default,
   },
   closeIcon: {
-    width: 16,
-    height: 16,
+    width: 20,   // ✅ bigger tap target
+    height: 20,
     tintColor: colors.foreground.soft,
   },
   bodyText: {

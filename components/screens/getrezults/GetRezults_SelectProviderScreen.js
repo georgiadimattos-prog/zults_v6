@@ -2,19 +2,22 @@ import React, { useState } from 'react';
 import {
   View,
   Text,
+  TextInput,
   StyleSheet,
   TouchableOpacity,
   Image,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  TouchableWithoutFeedback,
+  Keyboard,   // ✅ add this here
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { colors, typography } from '../../../theme';
 import ZultsButton from '../../ui/ZultsButton';
-import ScreenHeader from '../../ui/ScreenHeader';
 import ScreenWrapper from '../../ui/ScreenWrapper';
 import ScreenFooter from '../../ui/ScreenFooter';
+import Navbar from '../../ui/Navbar'; // ✅ add this at the top
 
 import shlLogo from '../../../assets/images/SHL.png';
 import randoxLogo from '../../../assets/images/Randox.png';
@@ -36,7 +39,7 @@ export default function GetRezults_SelectProviderScreen() {
   };
 
   return (
-    <ScreenWrapper>
+    <ScreenWrapper topPadding={0}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -47,7 +50,7 @@ export default function GetRezults_SelectProviderScreen() {
           showsVerticalScrollIndicator={false}
         >
           {/* Navbar row */}
-          <ScreenHeader title="" subtitle={null} />
+          <Navbar title="Select Provider" />
 
           {/* Page title + subtitle */}
           <Text allowFontScaling={false} style={styles.pageTitle}>

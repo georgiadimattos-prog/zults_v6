@@ -2,8 +2,8 @@ import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { colors, typography } from '../../../theme';
-import ScreenHeader from '../../ui/ScreenHeader';
 import ScreenWrapper from '../../ui/ScreenWrapper';
+import Navbar from '../../ui/Navbar';
 
 const STEPS = {
   shl: [
@@ -12,6 +12,7 @@ const STEPS = {
     'Tap “Share results link”.',
     'Copy the generated link.',
     'Paste it into the previous screen.',
+    'Only the link of your latest result can be used. Results older than 3 months are not valid.',
   ],
   randox: [
     'Sign in to your Randox Account.',
@@ -19,12 +20,14 @@ const STEPS = {
     'Tap “View” on your latest result.',
     'Scroll and tap “Share my results”.',
     'Copy the link and paste it into the previous screen.',
+    'Only the link of your latest result can be used. Results older than 3 months are not valid.',
   ],
   nhs: [
     'Open your NHS results portal.',
     'Find your latest results.',
     'Copy the public share link.',
     'Paste it into the previous screen.',
+    'Only the link of your latest result can be used. Results older than 3 months are not valid.',
   ],
 };
 
@@ -36,15 +39,11 @@ export default function GetRezults_HowToFindLinkScreen() {
   const steps = useMemo(() => STEPS[providerId] || STEPS.shl, [providerId]);
 
   return (
-    <ScreenWrapper>
-      <ScreenHeader
-        title="How to find your link?"
-        subtitle={null}
-        titleMarginTop={24}
-      />
+    <ScreenWrapper topPadding={0}>
+      <Navbar title="How to find your link?" />
 
       <ScrollView
-        contentContainerStyle={{ flexGrow: 1, paddingBottom: 32 }}
+        contentContainerStyle={{ flexGrow: 1, paddingBottom: 120 }}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
@@ -54,15 +53,15 @@ export default function GetRezults_HowToFindLinkScreen() {
           </Text>
         ))}
 
-        <Text style={styles.notice}>
-          Only the link of your latest result can be used. Results older than 3 months are not valid.
-        </Text>
+      </ScrollView>
 
+      {/* ✅ Fixed video section at bottom */}
+      <View style={styles.videoContainer}>
         <Text style={styles.tutorialTitle}>Watch the video tutorial</Text>
         <View style={styles.tutorialBox}>
           <Text style={styles.tutorialStub}>Video placeholder</Text>
         </View>
-      </ScrollView>
+      </View>
     </ScreenWrapper>
   );
 }
@@ -79,6 +78,11 @@ const styles = StyleSheet.create({
     color: colors.foreground.soft,
     marginTop: 8,
     marginBottom: 24,
+  },
+  videoContainer: {
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: colors.background.surface2,
   },
   tutorialTitle: {
     ...typography.bodyMedium,

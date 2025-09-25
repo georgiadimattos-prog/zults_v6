@@ -13,9 +13,9 @@ import {
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { colors, typography } from '../../../../theme';
 import ZultsButton from '../../../ui/ZultsButton';
-import ScreenHeader from '../../../ui/ScreenHeader';
 import ScreenWrapper from '../../../ui/ScreenWrapper';
 import ScreenFooter from '../../../ui/ScreenFooter';
+import Navbar from '../../../ui/Navbar';   // ✅ use standardized navbar
 
 export default function ReviewSMSRequest() {
   const route = useRoute();
@@ -29,15 +29,18 @@ export default function ReviewSMSRequest() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ScreenWrapper>
+        <ScreenWrapper topPadding={0}>   {/* ✅ consistent top padding */}
           <ScrollView
             contentContainerStyle={styles.scrollContent}
             keyboardShouldPersistTaps="handled"
           >
-            <ScreenHeader
-              title="Review your request"
-              subtitle="Please check the details before sending"
-            />
+            {/* ✅ New navbar */}
+            <Navbar title="Review your request" />
+
+            {/* Subtitle below navbar */}
+            <Text style={styles.subtitle}>
+              Please check the details before sending
+            </Text>
 
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Add phone number</Text>
@@ -93,6 +96,11 @@ export default function ReviewSMSRequest() {
 const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 32,
+  },
+  subtitle: {
+    ...typography.bodyRegular,
+    color: colors.foreground.soft,
+    marginBottom: 24,
   },
   inputGroup: {
     marginBottom: 24,

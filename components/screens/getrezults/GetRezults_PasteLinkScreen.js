@@ -1,20 +1,23 @@
 import React, { useState, useMemo } from 'react';
 import {
-  StyleSheet,
+  View,
+  Text,
   TextInput,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  ScrollView,
   KeyboardAvoidingView,
   Platform,
   TouchableWithoutFeedback,
-  Keyboard,
-  Text,
-  ScrollView,
+  Keyboard,   // ✅ add this
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { colors, typography } from '../../../theme';
 import ZultsButton from '../../ui/ZultsButton';
-import ScreenHeader from '../../ui/ScreenHeader';
 import ScreenWrapper from '../../ui/ScreenWrapper';
 import ScreenFooter from '../../ui/ScreenFooter';
+import { NavbarBackRightText } from '../../ui/Navbar';
 
 const PROVIDER_TITLES = {
   shl: 'Sexual Health London',
@@ -58,21 +61,19 @@ export default function GetRezults_PasteLinkScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ScreenWrapper>
+        <ScreenWrapper topPadding={0}>
           <ScrollView
             contentContainerStyle={{ flexGrow: 1, paddingBottom: 32 }}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
             {/* Navbar row */}
-            <ScreenHeader
-              title=""
-              subtitle={null}
-              rightText="How to find your link?"
-              onRightPress={() =>
-                navigation.navigate('GetRezultsHowToFindLink', { providerId })
-              }
-            />
+            <NavbarBackRightText
+  rightText="How to find your link?"
+  onRightPress={() =>
+    navigation.navigate('GetRezultsHowToFindLink', { providerId })
+  }
+/>
 
             {/* Page title + paragraph */}
             <Text allowFontScaling={false} style={styles.pageTitle}>
@@ -81,6 +82,9 @@ export default function GetRezults_PasteLinkScreen() {
             <Text allowFontScaling={false} style={styles.paragraph}>
               {paragraph}
             </Text>
+            <Text allowFontScaling={false} style={styles.subtitle}>
+  Example subtitle copy here
+</Text>
 
             {/* Input */}
             <Text allowFontScaling={false} style={styles.label}>
@@ -145,4 +149,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(20,20,20,0.5)',
     marginBottom: 24,
   },
+  subtitle: {
+  ...typography.captionSmallRegular,
+  color: colors.foreground.soft,
+  marginBottom: 24,
+  paddingHorizontal: 16,
+},
 });

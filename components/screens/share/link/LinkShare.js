@@ -10,6 +10,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { colors, typography } from '../../../../theme';
 import ScreenWrapper from '../../../ui/ScreenWrapper';
+import Navbar from '../../../ui/Navbar';   // ✅ standardized navbar
 
 export default function LinkShare() {
   const navigation = useNavigation();
@@ -25,9 +26,14 @@ export default function LinkShare() {
   };
 
   return (
-    <ScreenWrapper>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <Text style={styles.title}>Link</Text>
+    <ScreenWrapper topPadding={0}>   {/* ✅ consistent with Rezults/SMS */}
+      {/* ✅ standardized navbar */}
+      <Navbar title="Link" />
+
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         <Text style={styles.subtitle}>
           Send your Rezults link to someone or add it to your dating profile.
           Even someone without the app can view it.
@@ -45,6 +51,7 @@ export default function LinkShare() {
         </View>
       </ScrollView>
 
+      {/* Modal if user has no Rezults */}
       <Modal visible={modalVisible} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
@@ -80,15 +87,10 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 40,
   },
-  title: {
-    ...typography.largeTitleMedium,
-    color: colors.foreground.default,
-    marginTop: 32,
-  },
   subtitle: {
     ...typography.bodyRegular,
     color: colors.foreground.soft,
-    marginTop: 4,
+    marginTop: 16,   // ✅ breathing room below navbar
     marginBottom: 24,
   },
   linkBox: {

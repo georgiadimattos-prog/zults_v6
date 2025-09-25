@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Share } from 'react-native';
 import { colors, typography } from '../../../../theme';
 import ScreenWrapper from '../../../ui/ScreenWrapper';
+import Navbar from '../../../ui/Navbar';
 
 export default function LinkScreenShareSheet() {
   const link = 'https://myrezults.com/share/myrezults/binkey';
@@ -19,8 +20,11 @@ export default function LinkScreenShareSheet() {
   };
 
   return (
-    <ScreenWrapper>
-      <Text style={styles.title}>Link</Text>
+    <ScreenWrapper topPadding={0}>
+      {/* ✅ standardized navbar */}
+      <Navbar title="Link" />
+
+      {/* ✅ subtitle with consistent spacing */}
       <Text style={styles.subtitle}>
         You can send your Rezults link to someone or add it to your dating profile.
         Even someone without the app can view it.
@@ -34,14 +38,10 @@ export default function LinkScreenShareSheet() {
 }
 
 const styles = StyleSheet.create({
-  title: {
-    ...typography.largeTitleMedium,
-    color: colors.foreground.default,
-    marginBottom: 8,
-  },
   subtitle: {
     ...typography.bodyRegular,
     color: colors.foreground.soft,
+    marginTop: 16,    // ✅ consistent spacing below navbar
     marginBottom: 32,
   },
   shareButton: {

@@ -24,8 +24,8 @@ import goodguy from '../../../assets/images/goodguy.png';
 import SearchBar from '../../ui/SearchBar';
 import LinkScreenOffline from './link/LinkScreen_Offline';
 import ZultsButton from '../../ui/ZultsButton';
-import ScreenHeader from '../../ui/ScreenHeader';
 import ScreenWrapper from '../../ui/ScreenWrapper';
+import { NavbarBackRightText } from '../../ui/Navbar'; // ✅ use new navbar
 
 export default function ShareScreen({ navigation }) {
   const [search, setSearch] = useState('');
@@ -123,7 +123,7 @@ export default function ShareScreen({ navigation }) {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ScreenWrapper>
+        <ScreenWrapper topPadding={0}>   {/* ✅ consistent with other flows */}
           <StatusBar barStyle="light-content" backgroundColor={colors.background.surface1} />
 
           {searchFocused && activeTab === 'Users' ? (
@@ -140,11 +140,7 @@ export default function ShareScreen({ navigation }) {
               </TouchableOpacity>
             </View>
           ) : (
-            <ScreenHeader
-              title=""
-              subtitle={null}
-              subtitleMargin={0}
-              showBack
+            <NavbarBackRightText
               rightText="Invite"
               onRightPress={() => console.log('Invite pressed')}
             />

@@ -3,12 +3,16 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { colors, typography } from '../../../../theme';
 import LinkUnavailableModal from './LinkUnavailableModal';
 import ScreenWrapper from '../../../ui/ScreenWrapper';
+import Navbar from '../../../ui/Navbar';   // ✅ standardized navbar
 
 export default function LinkScreen_Offline({ navigation }) {
   const [showModal, setShowModal] = useState(false);
 
   return (
-    <ScreenWrapper topPadding={32}>
+    <ScreenWrapper topPadding={0}>   {/* ✅ consistent top padding */}
+      {/* ✅ Navbar added */}
+      <Navbar title="Link" />
+
       <View style={styles.card}>
         <View style={styles.cardHeader}>
           <Text style={styles.cardTitle}>Share-link</Text>
@@ -44,6 +48,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.surface3,
     borderRadius: 20,
     padding: 16,
+    marginTop: 16, // ✅ gives a bit of breathing room below navbar
   },
   cardHeader: {
     flexDirection: 'row',
@@ -52,10 +57,8 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   cardTitle: {
-    fontSize: 18,
-    fontWeight: '500',
+    ...typography.bodyLarge,          // ✅ standardized typography
     color: colors.foreground.default,
-    letterSpacing: -0.18,
   },
   statusPill: {
     flexDirection: 'row',
@@ -73,9 +76,8 @@ const styles = StyleSheet.create({
     marginRight: 6,
   },
   statusText: {
-    fontSize: 14,
+    ...typography.captionSmallRegular, // ✅ standardized small text
     color: '#FA5F21',
-    letterSpacing: -0.07,
   },
   generateButton: {
     backgroundColor: colors.neutral[0],
@@ -84,8 +86,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   generateButtonText: {
-    fontSize: 14,
-    fontWeight: '400',
+    ...typography.bodyMedium,        // ✅ consistent font
     color: '#1E1E1E',
   },
 });
