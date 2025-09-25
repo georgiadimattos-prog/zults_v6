@@ -6,8 +6,9 @@ import {
   Platform,
   TouchableWithoutFeedback,
   Keyboard,
-  TouchableOpacity,
   Text,
+  ScrollView,
+  View,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { colors, typography } from '../../../theme';
@@ -52,45 +53,60 @@ export default function GetRezults_PasteLinkScreen() {
   };
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScreenWrapper>
-          {/* Navbar row: arrow left + help text right */}
-          <ScreenHeader
-            title=""
-            subtitle={null}
-            rightText="How to find your link?"
-            onRightPress={() =>
-              navigation.navigate('GetRezultsHowToFindLink', { providerId })
-            }
-          />
+          <ScrollView
+            contentContainerStyle={{ flexGrow: 1, paddingBottom: 120 }}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
+            {/* Navbar row */}
+            <ScreenHeader
+              title=""
+              subtitle={null}
+              rightText="How to find your link?"
+              onRightPress={() =>
+                navigation.navigate('GetRezultsHowToFindLink', { providerId })
+              }
+            />
 
-          {/* Page title + paragraph */}
-          <Text style={styles.pageTitle}>{providerTitle}</Text>
-          <Text style={styles.paragraph}>{paragraph}</Text>
+            {/* Page title + paragraph */}
+            <Text allowFontScaling={false} style={styles.pageTitle}>
+              {providerTitle}
+            </Text>
+            <Text allowFontScaling={false} style={styles.paragraph}>
+              {paragraph}
+            </Text>
 
-          {/* Input */}
-          <Text style={styles.label}>Add your results link</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="https://www.shl.uk/share/…"
-            placeholderTextColor={colors.neutralText.subtext}
-            value={link}
-            onChangeText={setLink}
-            keyboardType="url"
-            autoCapitalize="none"
-            autoCorrect={false}
-          />
+            {/* Input */}
+            <Text allowFontScaling={false} style={styles.label}>
+              Add your results link
+            </Text>
+            <TextInput
+              style={styles.input}
+              placeholder="https://www.shl.uk/share/…"
+              placeholderTextColor={colors.neutralText.subtext}
+              value={link}
+              onChangeText={setLink}
+              keyboardType="url"
+              autoCapitalize="none"
+              autoCorrect={false}
+              allowFontScaling={false} // prevent iOS font size setting breaking input
+            />
+          </ScrollView>
 
           {/* Continue */}
           <ZultsButton
             label="Continue"
             type="primary"
-            size="large"
             fullWidth
+            fixedBottom
             onPress={handleContinue}
             disabled={link.trim().length < 5}
-            style={styles.continueButton}
           />
         </ScreenWrapper>
       </TouchableWithoutFeedback>
@@ -102,7 +118,7 @@ const styles = StyleSheet.create({
   pageTitle: {
     ...typography.largeTitleMedium,
     color: colors.foreground.default,
-    marginTop: 24, // space under navbar
+    marginTop: 24,
     marginBottom: 16,
   },
   paragraph: {

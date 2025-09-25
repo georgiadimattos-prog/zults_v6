@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { colors, typography } from '../../../theme';
 import ZultsButton from '../../ui/ZultsButton';
@@ -27,42 +36,64 @@ export default function GetRezults_SelectProviderScreen() {
 
   return (
     <ScreenWrapper>
-      {/* Navbar row only */}
-      <ScreenHeader title="" subtitle={null} />
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1, paddingBottom: 120 }}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Navbar row only */}
+          <ScreenHeader title="" subtitle={null} />
 
-      {/* Page title + subtitle */}
-      <Text style={styles.pageTitle}>Add Rezults</Text>
-      <Text style={styles.subtitle}>
-        To turn your STI results into Rezults, first select your test provider.
-      </Text>
+          {/* Page title + subtitle */}
+          <Text allowFontScaling={false} style={styles.pageTitle}>
+            Add Rezults
+          </Text>
+          <Text allowFontScaling={false} style={styles.subtitle}>
+            To turn your STI results into Rezults, first select your test provider.
+          </Text>
 
-      {/* Horizontal Carousel */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.carousel}>
-        {providers.map((provider) => {
-          const isSelected = selectedProvider === provider.id;
-          return (
-            <TouchableOpacity
-              key={provider.id}
-              style={[styles.card, isSelected && styles.cardSelected]}
-              onPress={() => setSelectedProvider(provider.id)}
-            >
-              <View style={styles.radioCircle}>{isSelected && <View style={styles.radioDot} />}</View>
-              <Image source={provider.logo} style={styles.logo} resizeMode="contain" />
-            </TouchableOpacity>
-          );
-        })}
-      </ScrollView>
+          {/* Horizontal Carousel */}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.carousel}
+          >
+            {providers.map((provider) => {
+              const isSelected = selectedProvider === provider.id;
+              return (
+                <TouchableOpacity
+                  key={provider.id}
+                  style={[styles.card, isSelected && styles.cardSelected]}
+                  onPress={() => setSelectedProvider(provider.id)}
+                >
+                  <View style={styles.radioCircle}>
+                    {isSelected && <View style={styles.radioDot} />}
+                  </View>
+                  <Image
+                    source={provider.logo}
+                    style={styles.logo}
+                    resizeMode="contain"
+                  />
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+        </ScrollView>
 
-      {/* Continue */}
-      <ZultsButton
-        label="Continue"
-        type="primary"
-        size="large"
-        fullWidth
-        disabled={!selectedProvider}
-        onPress={handleContinue}
-        style={styles.continueButton}
-      />
+        {/* Continue */}
+        <ZultsButton
+          label="Continue"
+          type="primary"
+          fullWidth
+          fixedBottom
+          disabled={!selectedProvider}
+          onPress={handleContinue}
+        />
+      </KeyboardAvoidingView>
     </ScreenWrapper>
   );
 }
@@ -74,7 +105,7 @@ const styles = StyleSheet.create({
   pageTitle: {
     ...typography.largeTitleMedium,
     color: colors.foreground.default,
-    marginTop: 24, // ✅ breathing room under navbar
+    marginTop: 24,
     marginBottom: 8,
   },
   subtitle: {
