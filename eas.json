@@ -9,13 +9,26 @@
       "distribution": "internal"
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "store",
+      "ios": {
+        "simulator": false
+      }
     },
     "production": {
-      "autoIncrement": true
+      "distribution": "store",
+      "autoIncrement": true,
+      "ios": {
+        "simulator": false
+      }
     }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "ios": {
+        "appleId": "georgiadimattos@hotmail.com",
+        "ascAppId": "P64S382FN5", // Apple Team ID (already confirmed earlier)
+        "sku": "zults-demo"       // any unique identifier for your build
+      }
+    }
   }
 }

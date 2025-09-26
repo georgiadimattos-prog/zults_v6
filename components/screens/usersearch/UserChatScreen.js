@@ -1,7 +1,3 @@
-/* components/screens/usersearch/UserChatScreen.js
-   Baseline-v40 + NoRezultsModal + Double-Tap Like (❤️) animation; emoji picker removed
-*/
-
 import React, { useState, useRef, useEffect, memo } from "react";
 import {
   View,
@@ -17,6 +13,7 @@ import {
   Keyboard,
   Animated,
   Easing,
+  KeyboardAvoidingView,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { BlurView } from "expo-blur";
@@ -116,6 +113,8 @@ export default function UserChatScreen() {
   const navigation = useNavigation();
   const route = useRoute();
 
+  const [footerHeight, setFooterHeight] = useState(0); // 👈 default value
+
   const currentUser = { name: "TomasB.", avatar: TomasAvatar };
   const user = route.params?.user || { name: "Unknown", image: fallbackAvatar };
 
@@ -129,6 +128,14 @@ export default function UserChatScreen() {
   const [showActionsModal, setShowActionsModal] = useState(false);
   const [showNoRezultsModal, setShowNoRezultsModal] = useState(false);
   const [isBlocked, setIsBlocked] = useState(false);
+
+  const [isAtBottom, setIsAtBottom] = useState(true);
+
+const handleScroll = (e) => {
+  const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
+  const distanceFromBottom = contentSize.height - (contentOffset.y + layoutMeasurement.height);
+  setIsAtBottom(distanceFromBottom < 50); // within 50px of bottom
+};
 
   const flatListRef = useRef(null);
   const typingIdRef = useRef(null);
@@ -218,12 +225,14 @@ useEffect(() => {
     const hideEvt = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
 
     const onShow = (e) => {
-      const h = e?.endCoordinates?.height ?? 0;
-      setKeyboardHeight(h);
-      requestAnimationFrame(() => {
-        flatListRef.current?.scrollToEnd({ animated: true });
-      });
-    };
+  const h = e?.endCoordinates?.height ?? 0;
+  setKeyboardHeight(h);
+  if (isAtBottom) {
+    requestAnimationFrame(() => {
+      flatListRef.current?.scrollToEnd({ animated: true });
+    });
+  }
+};
     const onHide = () => setKeyboardHeight(0);
 
     const subShow = Keyboard.addListener(showEvt, onShow);
@@ -241,15 +250,6 @@ useEffect(() => {
       shareTimers.current = [];
     };
   }, []);
-
-  useEffect(() => {
-    if (chatData.length > 0) {
-      flatListRef.current?.scrollToOffset({
-        offset: Math.max(0, chatData.length * 80 - 200),
-        animated: true,
-      });
-    }
-  }, [chatData]);
 
   // helper typing functions
   const addTyping = () => {
@@ -353,147 +353,165 @@ useEffect(() => {
   );
 
   return (
+  <KeyboardAvoidingView
+    style={{ flex: 1 }}
+    behavior={Platform.OS === "ios" ? "padding" : undefined}
+    keyboardVerticalOffset={0} // ✅ matches header height
+  >
     <View style={styles.root}>
       {/* Header */}
       <BlurView intensity={40} tint="dark" style={styles.topBlur}>
-  <View style={styles.topRow}>
-    <View style={{ flex: 1 }} />
-    {!isDemoChat && (   // 👈 hide 3-dots if it’s Zults (Demo)
-      <TouchableOpacity onPress={() => setShowActionsModal(true)}>
-        <Image source={moreIcon} style={styles.moreIcon} />
-      </TouchableOpacity>
-    )}
+        <View style={styles.topRow}>
+          <View style={{ flex: 1 }} />
+          {!isDemoChat && (
+            <TouchableOpacity onPress={() => setShowActionsModal(true)}>
+              <Image source={moreIcon} style={styles.moreIcon} />
+            </TouchableOpacity>
+          )}
+        </View>
+
+          <View style={styles.userRow}>
+            <TouchableOpacity
+              onPress={() => {
+                if (route.params?.from === "Activities") {
+                  navigation.goBack(); // back to Activities cleanly
+                } else {
+                  const hasAction = chatData.some(
+                    (msg) =>
+                      msg.type === "request" ||
+                      msg.type === "share" ||
+                      msg.type === "stop-share"
+                  );
+                  if (hasAction) {
+                    navigation.navigate("MainScreen"); // ✅ jump straight back to Main
+                  } else {
+                    navigation.goBack(); // ✅ normal back (to UserSearch → Main)
+                  }
+                }
+              }}
+            >
+              <Image source={arrowLeft} style={styles.backIcon} />
+            </TouchableOpacity>
+            <Image source={user.image || fallbackAvatar} style={styles.avatar} />
+            <Text style={styles.username}>{user.name}</Text>
+
+            {!isBlocked && (
+              isDemoChat ? (
+                // Demo chat → always View Rezults
+                <TouchableOpacity
+                  style={styles.rezultsButton}
+                  onPress={() => {
+                    navigation.navigate("Rezults", {
+                      username: user.name,
+                      avatar: user.image || fallbackAvatar,
+                      realName: user.realName || user.name,
+                      providerName: "Sexual Health London", // demo provider
+                      testDate: "25 Sep 2025",              // demo date
+                      showExpand: true,
+                    });
+                  }}
+                >
+                  <Text style={styles.rezultsButtonText}>View Rezults</Text>
+                </TouchableOpacity>
+              ) : (
+                // Normal users → keep your existing logic
+                <TouchableOpacity
+                  style={[
+                    styles.rezultsButton,
+                    chatState.hasShared && styles.rezultsButtonActive,
+                  ]}
+                  disabled={chatState.hasRequested && !otherUserState.hasShared}
+                  onPress={() => {
+                    if (otherUserState.hasShared) {
+                      navigation.navigate("Rezults", {
+                        username: user.name,
+                        avatar: user.image || fallbackAvatar,
+                        realName: user.realName || user.name,
+                        providerName:
+                          user.name === "Binkey"
+                            ? "Planned Parenthood"
+                            : "Sexual Health London",
+                        testDate: "25 Sep 2025",
+                        showExpand: true,
+                      });
+                      return;
+                    }
+                    if (!chatState.hasRequested) {
+                      setChatState({ ...chatState, hasRequested: true });
+                      setChatData((prev) => [
+                        ...prev,
+                        {
+                          id: Date.now().toString(),
+                          type: "request",
+                          direction: "from-user",
+                          username: currentUser.name,
+                          avatar: currentUser.avatar,
+                          timestamp: "10:02AM",
+                        },
+                      ]);
+                      startRequestFlow();
+                    }
+                  }}
+                >
+                  <Text
+                    style={[
+                      styles.rezultsButtonText,
+                      chatState.hasShared && styles.rezultsButtonTextActive,
+                    ]}
+                  >
+                    {otherUserState.hasShared
+                      ? "View Rezults"
+                      : chatState.hasRequested
+                      ? "Rezults Requested"
+                      : "Request Rezults"}
+                  </Text>
+                </TouchableOpacity>
+              )
+            )}
+          </View>
+        </BlurView>
+
+        {/* Messages */}
+        {isBlocked ? (
+  <View style={styles.blockOverlay}>
+    <Text style={styles.blockedText}>This user is blocked</Text>
   </View>
-
-        <View style={styles.userRow}>
-          <TouchableOpacity
-  onPress={() => {
-  if (route.params?.from === "Activities") {
-    navigation.goBack(); // back to Activities cleanly
-  } else {
-    const hasAction = chatData.some(
-      (msg) =>
-        msg.type === "request" ||
-        msg.type === "share" ||
-        msg.type === "stop-share"
-    );
-    if (hasAction) {
-      navigation.navigate("MainScreen"); // ✅ jump straight back to Main
-    } else {
-      navigation.goBack(); // ✅ normal back (to UserSearch → Main)
-    }
-  }
-}}
->
-  <Image source={arrowLeft} style={styles.backIcon} />
-</TouchableOpacity>
-          <Image source={user.image || fallbackAvatar} style={styles.avatar} />
-          <Text style={styles.username}>{user.name}</Text>
-
-          {!isBlocked && (
-  isDemoChat ? (
-    // Demo chat → always View Rezults
-    <TouchableOpacity
-      style={styles.rezultsButton}
-      onPress={() => {
-        navigation.navigate("Rezults", {
-          username: user.name,
-          avatar: user.image || fallbackAvatar,
-          realName: user.realName || user.name,
-          providerName: "Sexual Health London", // demo provider
-          testDate: "25 Sep 2025",              // demo date
-          showExpand: true,
-        });
+) : (
+  <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+    <FlatList
+      ref={flatListRef}
+      data={chatData}
+      keyExtractor={(item) => item.id}
+      renderItem={renderMessage}
+      keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
+      contentInsetAdjustmentBehavior="automatic"
+      contentContainerStyle={{
+        paddingHorizontal: 8,
+        paddingTop: 180,
       }}
-    >
-      <Text style={styles.rezultsButtonText}>View Rezults</Text>
-    </TouchableOpacity>
-  ) : (
-    // Normal users → keep your existing logic
-    <TouchableOpacity
-      style={[
-        styles.rezultsButton,
-        chatState.hasShared && styles.rezultsButtonActive,
-      ]}
-      disabled={chatState.hasRequested && !otherUserState.hasShared}
-      onPress={() => {
-        if (otherUserState.hasShared) {
-          navigation.navigate("Rezults", {
-            username: user.name,
-            avatar: user.image || fallbackAvatar,
-            realName: user.realName || user.name,
-            providerName:
-              user.name === "Binkey"
-                ? "Planned Parenthood"
-                : "Sexual Health London",
-            testDate: "25 Sep 2025",
-            showExpand: true,
+      ListFooterComponent={<View style={{ height: footerHeight + 50 }} />}
+      onScroll={handleScroll}
+      scrollEventThrottle={16}
+      onContentSizeChange={() => {
+        if (isAtBottom) {
+          requestAnimationFrame(() => {
+            flatListRef.current?.scrollToEnd({ animated: true });
           });
-          return;
-        }
-        if (!chatState.hasRequested) {
-          setChatState({ ...chatState, hasRequested: true });
-          setChatData((prev) => [
-            ...prev,
-            {
-              id: Date.now().toString(),
-              type: "request",
-              direction: "from-user",
-              username: currentUser.name,
-              avatar: currentUser.avatar,
-              timestamp: "10:02AM",
-            },
-          ]);
-          startRequestFlow();
         }
       }}
-    >
-      <Text
-        style={[
-          styles.rezultsButtonText,
-          chatState.hasShared && styles.rezultsButtonTextActive,
-        ]}
-      >
-        {otherUserState.hasShared
-          ? "View Rezults"
-          : chatState.hasRequested
-          ? "Rezults Requested"
-          : "Request Rezults"}
-      </Text>
-    </TouchableOpacity>
-  )
+    />
+  </TouchableWithoutFeedback>
 )}
-        </View>
-      </BlurView>
-
-      {/* Messages */}
-      {isBlocked ? (
-        <View style={styles.blockOverlay}>
-          <Text style={styles.blockedText}>This user is blocked</Text>
-        </View>
-      ) : (
-        <FlatList
-          ref={flatListRef}
-          data={chatData}
-          keyExtractor={(item) => item.id}
-          renderItem={renderMessage}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{
-            paddingHorizontal: 8,
-            paddingTop: 180,
-            paddingBottom: 140
-          }}
-        />
-      )}
 
       {/* Footer (emoji button removed) */}
 {!isBlocked && (
-  <BlurView
-    intensity={40}
-    tint="dark"
-    style={[styles.footerBlur, { bottom: keyboardHeight }]}
-  >
+ <BlurView
+  intensity={40}
+  tint="dark"
+  style={styles.footerBlur}
+  onLayout={(e) => setFooterHeight(e.nativeEvent.layout.height)}
+>
     {isDemoChat ? (
       // Special footer for Zults (Demo) → AI chat
       <View style={styles.footer}>
@@ -744,12 +762,13 @@ useEffect(() => {
 </Modal>
 
       {/* No Rezults Modal */}
-      <NoRezultsModal
-        visible={showNoRezultsModal}
-        onClose={() => setShowNoRezultsModal(false)}
-      />
-    </View>
-  );
+<NoRezultsModal
+    visible={showNoRezultsModal}
+    onClose={() => setShowNoRezultsModal(false)}
+/>
+</View>
+</KeyboardAvoidingView>
+);
 }
 
 const styles = StyleSheet.create({
@@ -797,15 +816,15 @@ const styles = StyleSheet.create({
   },
   footerBlur: {
     position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: 0,
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 40,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    backgroundColor: "transparent",
+  left: 0,
+  right: 0,
+  bottom: 0, // ✅ stick flush to bottom
+  paddingHorizontal: 20,
+  paddingTop: 12,         // 🔽 reduce padding so input is closer
+  paddingBottom: Platform.OS === "ios" ? 20 : 16, // ✅ no stripe, still safe
+  borderTopLeftRadius: 24,
+  borderTopRightRadius: 24,
+  backgroundColor: "transparent",
   },
   footer: { flexDirection: "row", alignItems: "center" },
   input: {
