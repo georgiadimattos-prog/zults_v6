@@ -15,7 +15,7 @@ import { colors, typography } from '../../../../theme';
 import ZultsButton from '../../../ui/ZultsButton';
 import ScreenWrapper from '../../../ui/ScreenWrapper';
 import ScreenFooter from '../../../ui/ScreenFooter';
-import Navbar from '../../../ui/Navbar';   // ✅ use standardized navbar
+import Navbar from '../../../ui/Navbar';   // ✅ standardized navbar
 
 export default function ReviewSMSRequest() {
   const route = useRoute();
@@ -29,15 +29,14 @@ export default function ReviewSMSRequest() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ScreenWrapper topPadding={0}>   {/* ✅ consistent top padding */}
+        <ScreenWrapper topPadding={0}>
           <ScrollView
             contentContainerStyle={styles.scrollContent}
             keyboardShouldPersistTaps="handled"
           >
-            {/* ✅ New navbar */}
-            <Navbar title="Review your request" />
+            <Navbar />
 
-            {/* Subtitle below navbar */}
+            <Text style={styles.pageTitle}>Review your request</Text>
             <Text style={styles.subtitle}>
               Please check the details before sending
             </Text>
@@ -45,7 +44,7 @@ export default function ReviewSMSRequest() {
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Add phone number</Text>
               <View style={styles.inputWrapper}>
-                <Text style={styles.inputText}>{phone}</Text>
+                <Text style={styles.inputText}>{String(phone)}</Text>
               </View>
             </View>
 
@@ -97,6 +96,11 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 32,
   },
+  pageTitle: {
+    ...typography.largeTitleMedium,
+    color: colors.foreground.default,
+    marginBottom: 8,
+  },
   subtitle: {
     ...typography.bodyRegular,
     color: colors.foreground.soft,
@@ -127,7 +131,6 @@ const styles = StyleSheet.create({
   },
   checkboxContainer: {
     flexDirection: 'row',
-    gap: 10,
     alignItems: 'flex-start',
     flexWrap: 'wrap',
   },
@@ -141,6 +144,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 3,
     backgroundColor: '#292929',
+    marginRight: 10, // ✅ spacing
   },
   checkboxChecked: {
     backgroundColor: colors.neutral[0],

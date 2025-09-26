@@ -25,7 +25,11 @@ export default function ZultsButton({
         : size === 'medium'
         ? 'buttonSmallMedium'
         : 'buttonLargeMedium';
-    return [typography[textType], styles.text, styles[`${type}Text`]];
+
+    // ✅ Safe fallback if the typography key doesn’t exist
+    const safeStyle = typography[textType] || typography.bodyMedium;
+
+    return [safeStyle, styles.text, styles[`${type}Text`]];
   };
 
   return (
@@ -35,7 +39,7 @@ export default function ZultsButton({
       disabled={disabled}
       activeOpacity={0.8}
     >
-      <Text style={getTextStyle()}>{label}</Text>
+      <Text style={getTextStyle()}>{String(label)}</Text>
     </TouchableOpacity>
   );
 }
@@ -64,6 +68,6 @@ const styles = StyleSheet.create({
   // State
   disabled: {
     opacity: 0.4,
-    minHeight: 56,  // 🔥 ensures same height when disabled
+    minHeight: 56, // 🔥 ensures same height when disabled
   },
 });

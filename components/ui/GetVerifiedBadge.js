@@ -1,37 +1,39 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
-import { colors, typography } from '../../theme';
-import warningIcon from '../../assets/images/warning.png';
+import React from "react";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { colors, typography } from "../../theme";
 
-export default function GetVerifiedBadge() {
+export default function NotificationCard({ text, onPress }) {
   return (
-    <View style={styles.badge}>
-      <Image source={warningIcon} style={styles.icon} resizeMode="contain" />
-      <Text style={styles.text} numberOfLines={1} ellipsizeMode="tail">Get Verified</Text>
+    <View style={styles.card}>
+      <Text style={styles.text}>{text}</Text>
+      <TouchableOpacity style={styles.button} onPress={onPress}>
+        <Text style={styles.buttonText}>Action</Text>
+      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  badge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#3B1111',
-    height: 24,
-    width: 120,
-    borderRadius: 17,
-    paddingHorizontal: 10,
-  },
-  icon: {
-    width: 16,
-    height: 16,
-    marginRight: 6,
+  card: {
+    backgroundColor: colors.background.surface2,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
   },
   text: {
-    ...typography.caption,
-    color: colors.error.default,
-    includeFontPadding: false, // Native-only
-    maxWidth: '100%',
+    ...typography.captionSmallRegular, // ✅ replaced `caption`
+    color: colors.foreground.soft,
+    marginBottom: 12,
+  },
+  button: {
+    alignSelf: "flex-start",
+    backgroundColor: colors.button.activeBackgroundPrimary,
+    borderRadius: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+  },
+  buttonText: {
+    ...typography.bodyMedium, // ✅ replaced `captionMedium`
+    color: colors.button.activeLabelPrimary,
   },
 });

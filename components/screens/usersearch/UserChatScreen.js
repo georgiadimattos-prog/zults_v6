@@ -482,13 +482,19 @@ useEffect(() => {
           contentContainerStyle={{
             paddingHorizontal: 8,
             paddingTop: 180,
-            paddingBottom: 140 + keyboardHeight,
+            paddingBottom: 140
           }}
         />
       )}
 
       {/* Footer (emoji button removed) */}
-{isDemoChat ? (
+{!isBlocked && (
+  <BlurView
+    intensity={40}
+    tint="dark"
+    style={[styles.footerBlur, { bottom: keyboardHeight }]}
+  >
+    {isDemoChat ? (
       // Special footer for Zults (Demo) → AI chat
       <View style={styles.footer}>
         <TextInput
@@ -610,6 +616,8 @@ useEffect(() => {
         )}
       </View>
     )}
+  </BlurView>
+)}
 
 
       {/* Block / Unblock Modal */}

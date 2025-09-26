@@ -10,7 +10,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { colors, typography } from "../../../../theme";
 import ScreenWrapper from "../../../ui/ScreenWrapper";
-import Navbar from "../../../ui/Navbar";
+import { NavbarBackRightText } from "../../../ui/Navbar";
 import ZultsButton from "../../../ui/ZultsButton";
 import { rezultsCache } from "../../../../cache/rezultsCache"; // ✅ import cache
 
@@ -30,7 +30,10 @@ export default function LinkScreen_Offline() {
 
   return (
     <ScreenWrapper topPadding={0}>
-      <Navbar title="Link" />
+      <NavbarBackRightText
+  rightText="Invite"
+  onRightPress={() => console.log("Invite pressed")}
+/>
 
       <View style={styles.card}>
         <View style={styles.cardHeader}>
@@ -105,7 +108,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   cardTitle: {
-    ...typography.bodyLarge,
+    ...typography.bodyMedium,
     color: colors.foreground.default,
   },
   statusPill: {

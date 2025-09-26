@@ -22,10 +22,11 @@ import melany from '../../../assets/images/melany.png';
 import madman from '../../../assets/images/madman.png';
 import goodguy from '../../../assets/images/goodguy.png';
 import SearchBar from '../../ui/SearchBar';
-import LinkScreenOffline from './link/LinkScreen_Offline';
+import LinkScreenOffline from "./link/LinkScreen_Offline";
+
 import ZultsButton from '../../ui/ZultsButton';
 import ScreenWrapper from '../../ui/ScreenWrapper';
-import { NavbarBackRightText } from '../../ui/Navbar'; // ✅ use new navbar
+import { NavbarBackRightText } from '../../ui/Navbar';
 
 export default function ShareScreen({ navigation }) {
   const [search, setSearch] = useState('');
@@ -123,7 +124,7 @@ export default function ShareScreen({ navigation }) {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ScreenWrapper topPadding={0}>   {/* ✅ consistent with other flows */}
+        <ScreenWrapper topPadding={0}>
           <StatusBar barStyle="light-content" backgroundColor={colors.background.surface1} />
 
           {searchFocused && activeTab === 'Users' ? (
@@ -168,7 +169,7 @@ export default function ShareScreen({ navigation }) {
             ))}
           </View>
 
-          <Text style={styles.pageTitle}>{activeTab}</Text>
+          <Text style={styles.pageTitle}>{String(activeTab)}</Text>
           <Text style={styles.subtitle}>
             {activeTab === 'Users'
               ? 'Send or request Rezults from another user'
@@ -228,7 +229,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   tabActiveText: {
-    ...typography.headlineRegular,
+    ...typography.bodyMedium,
     color: colors.background.surface1,
   },
   tabInactive: {
@@ -237,7 +238,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   tabInactiveText: {
-    ...typography.headlineRegular,
+    ...typography.bodyMedium,
     color: colors.foreground.soft,
   },
   pageTitle: {

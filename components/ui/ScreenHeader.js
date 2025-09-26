@@ -38,16 +38,18 @@ export default function ScreenHeader({
 
         {rightText && (
           <TouchableOpacity onPress={onRightPress} style={styles.rightButton}>
-            <Text style={styles.rightText}>{rightText}</Text>
+            <Text style={styles.rightText}>{String(rightText)}</Text> 
           </TouchableOpacity>
         )}
       </View>
 
       {/* Title + Subtitle */}
       <View style={{ marginTop: titleMarginTop }}>
-        {title ? <Text style={styles.title}>{title}</Text> : null}
+        {title ? <Text style={styles.title}>{String(title)}</Text> : null}
         {subtitle ? (
-          <Text style={[styles.subtitle, { marginBottom: subtitleMargin }]}>{subtitle}</Text>
+          <Text style={[styles.subtitle, { marginBottom: subtitleMargin }]}>
+            {String(subtitle)}
+          </Text>
         ) : null}
       </View>
     </View>
@@ -57,7 +59,6 @@ export default function ScreenHeader({
 const styles = StyleSheet.create({
   container: {
     paddingTop: Platform.OS === "ios" ? 42 : 36,       // space for status bar
-    paddingHorizontal: 20,
     paddingHorizontal: 16,
     marginBottom: 0,
   },

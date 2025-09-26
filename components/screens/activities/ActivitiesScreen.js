@@ -45,17 +45,17 @@ export default function ActivitiesScreen() {
           lastText =
             lastMsg.direction === "from-user"
               ? "You requested to view Rezults"
-              : `${username} requested to view Rezults`;
+              : `${chat.user?.name || username} requested to view Rezults`;
         } else if (lastMsg.type === "share") {
           lastText =
             lastMsg.direction === "from-user"
               ? "You shared your Rezults"
-              : `${username} shared their Rezults`;
+              : `${chat.user?.name || username} shared their Rezults`;
         } else if (lastMsg.type === "stop-share") {
           lastText =
             lastMsg.direction === "from-user"
               ? "You stopped sharing Rezults"
-              : `${username} stopped sharing Rezults`;
+              : `${chat.user?.name || username} stopped sharing Rezults`;
         } else {
           lastText = lastMsg.type;
         }
@@ -63,7 +63,7 @@ export default function ActivitiesScreen() {
 
       return {
         id: username,
-        name: username,
+        name: chat.user?.name || username,
         avatar: chat.user?.image || fallbackAvatar,
         lastText,
         lastTimestamp: lastMsg ? lastMsg.timestamp : "",
@@ -144,9 +144,9 @@ export default function ActivitiesScreen() {
             {item.name}{" "}
             {item.hasUnread && <Text style={styles.unreadDot}>•</Text>}
           </Text>
-          <Text style={styles.lastText}>{item.lastText}</Text>
+          <Text style={styles.lastText}>{String(item.lastText || "")}</Text>
         </View>
-        <Text style={styles.timestamp}>{item.lastTimestamp}</Text>
+        <Text style={styles.timestamp}>{String(item.lastTimestamp || "")}</Text>
         {item.id !== "zults-demo" && (
           <TouchableOpacity onPress={() => toggleFavorite(item.id)}>
             <Image
@@ -250,11 +250,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   tabActiveText: {
-    ...typography.headlineRegular,
+    ...typography.bodyMedium,
     color: colors.background.surface1,
   },
   tabInactiveText: {
-    ...typography.headlineRegular,
+    ...typography.bodyMedium,
     color: colors.foreground.soft,
   },
 

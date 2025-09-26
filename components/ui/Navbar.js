@@ -106,6 +106,7 @@ export function NavbarOptions({ onBackPress, onOptions }) {
 //
 export function NavbarBackRightText({ onBackPress, rightText, onRightPress }) {
   const navigation = useNavigation();
+
   return (
     <View style={[styles.container, { justifyContent: 'space-between' }]}>
       {/* Left: back arrow */}
@@ -120,7 +121,9 @@ export function NavbarBackRightText({ onBackPress, rightText, onRightPress }) {
 
       {/* Right: text button */}
       <TouchableOpacity onPress={onRightPress}>
-        <Text style={styles.rightText}>{rightText}</Text>
+        <Text style={styles.rightText}>
+          {rightText != null ? String(rightText) : ''}
+        </Text>
       </TouchableOpacity>
     </View>
   );

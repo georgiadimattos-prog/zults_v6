@@ -25,13 +25,16 @@ export default function SMSScreen() {
 
   const isValid = phone.length >= 8;
 
+  // 🔎 Log phone state on every render
+  console.log("DEBUG [SMSScreen] phone state:", phone, "typeof:", typeof phone);
+
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ScreenWrapper topPadding={0}>   {/* ✅ match Get Rezults */}
+        <ScreenWrapper topPadding={0}>
           <ScrollView
             contentContainerStyle={styles.scrollContent}
             keyboardShouldPersistTaps="handled"
@@ -49,7 +52,10 @@ export default function SMSScreen() {
               <TextInput
                 style={styles.input}
                 value={phone}
-                onChangeText={setPhone}
+                onChangeText={(val) => {
+                  console.log("DEBUG [SMSScreen] onChangeText value:", val, "typeof:", typeof val);
+                  setPhone(val);
+                }}
                 placeholder="Add phone number"
                 placeholderTextColor={colors.neutralText.subtext}
                 keyboardType="phone-pad"
@@ -72,7 +78,10 @@ export default function SMSScreen() {
               size="large"
               fullWidth
               disabled={!isValid}
-              onPress={() => navigation.navigate('ReviewSMS', { phone })}
+              onPress={() => {
+                console.log("DEBUG [SMSScreen] navigating with phone param:", phone, "typeof:", typeof phone);
+                navigation.navigate('ReviewSMSRequest', { phone });
+              }}
             />
           </ScreenFooter>
         </ScreenWrapper>
