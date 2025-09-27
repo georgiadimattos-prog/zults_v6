@@ -5,6 +5,7 @@ import { colors, typography } from "../../../theme";
 import ScreenWrapper from "../../ui/ScreenWrapper";
 import RezultsCard from "../../ui/RezultsCard";
 import ZultsButton from "../../ui/ZultsButton";
+import Navbar from '../../ui/Navbar';
 
 // ✅ import the cache
 import { rezultsCache } from "../../../cache/rezultsCache";
@@ -36,65 +37,88 @@ export default function AddRezultsCardScreen() {
 
   return (
     <ScreenWrapper topPadding={0}>
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        <Text style={styles.pageTitle}>Your Rezults</Text>
-        <Text style={styles.paragraph}>
-          By clicking “Add Rezults”, you confirm the information is yours and it
-          is accurate.
+  {/* Navbar with back arrow */}
+  <Navbar onBackPress={() => navigation.navigate('GetRezultsProvider')} />
+
+  <ScrollView
+    contentContainerStyle={styles.scrollContent}
+    showsVerticalScrollIndicator={false}
+  >
+    {/* Page title + subtitle */}
+    <View style={styles.headerBlock}>
+      <Text allowFontScaling={false} style={styles.pageTitle}>
+        Your Rezults
+      </Text>
+      <Text allowFontScaling={false} style={styles.subtitle}>
+        By clicking Add Rezults, you confirm this information is your own and accurate.{' '}
+        <Text
+          style={styles.link}
+          onPress={() => navigation.navigate('PolicyScreen')}
+        >
+          Review our policy.
         </Text>
+      </Text>
+    </View>
 
-        <RezultsCard
-          userName="John Doe"
-          providerName="Sexual Health London"
-          testDate="12 Dec 2025"
-        />
+    {/* Rezults card preview */}
+    <RezultsCard
+      userName="John Doe"
+      providerName="Sexual Health London"
+      testDate="12 Dec 2025"
+    />
 
-        <Text style={styles.flipHint}>Tap your Rezults to see reverse</Text>
-      </ScrollView>
+    {/* Helper text */}
+    <Text allowFontScaling={false} style={styles.flipHint}>
+      Tap the card to view the reverse.
+    </Text>
+  </ScrollView>
 
-      <ZultsButton
-        label="Add Rezults"
-        type="primary"
-        size="large"
-        fullWidth
-        onPress={handleAddRezults}
-        style={styles.button}
-      />
-      <ZultsButton
-        label="Cancel"
-        type="secondary"
-        size="large"
-        fullWidth
-        onPress={handleCancel}
-        style={[styles.button, { bottom: 100 }]}
-      />
-    </ScreenWrapper>
+  {/* Footer actions */}
+  <ZultsButton
+    label="Add Rezults"
+    type="primary"
+    size="large"
+    fullWidth
+    onPress={handleAddRezults}
+    style={styles.button}
+  />
+  <ZultsButton
+    label="Cancel"
+    type="secondary"
+    size="large"
+    fullWidth
+    onPress={() => navigation.navigate('MainScreen')}
+    style={[styles.button, { bottom: 100 }]}
+  />
+</ScreenWrapper>
+
   );
 }
 
 const styles = StyleSheet.create({
   scrollContent: {
-    paddingTop: 48,
     paddingBottom: 200,
-    gap: 24,
-    alignItems: "center",
   },
-  pageTitle: {
-    ...typography.largeTitleMedium,
-    color: colors.foreground.default,
-    marginBottom: 16,
-    alignSelf: "flex-start",
+  headerBlock: {
+    marginTop: 32,
+    marginBottom: 24,
     paddingHorizontal: 16,
   },
+  pageTitle: {
+  ...typography.largeTitleMedium,
+  color: colors.foreground.default,
+  marginBottom: 6,
+},
+subtitle: {
+  ...typography.bodyRegular,  // consistent everywhere
+  color: colors.foreground.soft,
+  marginBottom: 24,
+},
   paragraph: {
     ...typography.bodyRegular,
     color: colors.foreground.soft,
-    marginBottom: 32,
+    marginBottom: 24,
     lineHeight: 20,
-    alignSelf: "flex-start",
     paddingHorizontal: 16,
   },
   flipHint: {
@@ -110,4 +134,8 @@ const styles = StyleSheet.create({
     bottom: 40,
     zIndex: 100,
   },
+  link: {
+  textDecorationLine: 'underline',
+  color: colors.brand.primary,  // or colors.foreground.default if you want subtle
+},
 });

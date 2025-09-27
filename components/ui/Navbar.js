@@ -128,3 +128,16 @@ export function NavbarBackRightText({ onBackPress, rightText, onRightPress }) {
     </View>
   );
 }
+
+//
+// NavbarClose: Close (×) button on the right
+//
+export function NavbarClose({ onClose }) {
+  return (
+    <View style={[styles.container, { justifyContent: 'flex-end' }]}>
+      <TouchableOpacity onPress={onClose}>
+        <Text style={{ fontSize: 28, color: colors.foreground.default }}>×</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
