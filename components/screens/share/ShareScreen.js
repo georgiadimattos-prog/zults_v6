@@ -119,57 +119,82 @@ export default function ShareScreen({ navigation }) {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ScreenWrapper topPadding={0}>
-          <StatusBar barStyle="light-content" backgroundColor={colors.background.surface1} />
+  <KeyboardAvoidingView
+    style={{ flex: 1 }}
+    behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+  >
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+  <ScreenWrapper topPadding={0}>
+    <StatusBar
+      barStyle="light-content"
+      backgroundColor={colors.background.surface1}
+    />
 
-          {searchFocused && activeTab === 'Users' ? (
-            <View style={styles.closeHeader}>
-              <TouchableOpacity
-                onPress={() => {
-                  setSearch('');
-                  setSearchFocused(false);
-                  Keyboard.dismiss();
-                }}
-                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+    {/* ✅ Navbar handles Invite/Cancel */}
+    <NavbarBackRightText
+      rightText={searchFocused && activeTab === 'Users' ? 'Cancel' : 'Invite'}
+      onRightPress={() => {
+        if (searchFocused && activeTab === 'Users') {
+          setSearch('');
+          setSearchFocused(false);
+          Keyboard.dismiss();
+        } else {
+          console.log('Invite pressed');
+        }
+      }}
+    />
+
+    {/* ✅ If Users tab + searching → takeover mode */}
+    {activeTab === 'Users' && searchFocused ? (
+      <>
+        <SearchBar
+          value={search}
+          onChangeText={setSearch}
+          onCancel={() => {
+            setSearch('');
+            setSearchFocused(false);
+          }}
+          onFocus={() => setSearchFocused(true)}
+        />
+
+        {/* Only user results list */}
+        {renderTabContent()}
+      </>
+    ) : (
+      <>
+        {/* Normal layout with tabs + header */}
+        <View style={styles.tabsContainer}>
+          {['Users', 'Link', 'SMS'].map((tab) => (
+            <TouchableOpacity
+              key={tab}
+              style={activeTab === tab ? styles.tabActive : styles.tabInactive}
+              onPress={() => {
+                setActiveTab(tab);
+                setSearch('');
+                setSearchFocused(false);
+              }}
+            >
+              <Text
+                style={
+                  activeTab === tab
+                    ? styles.tabActiveText
+                    : styles.tabInactiveText
+                }
               >
-                <Image source={closeCross} style={styles.closeIcon} />
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <NavbarBackRightText
-              rightText="Invite"
-              onRightPress={() => console.log('Invite pressed')}
-            />
-          )}
+                {tab}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
 
-          <View style={styles.tabsContainer}>
-            {['Users', 'Link', 'SMS'].map((tab) => (
-              <TouchableOpacity
-                key={tab}
-                style={activeTab === tab ? styles.tabActive : styles.tabInactive}
-                onPress={() => {
-                  setActiveTab(tab);
-                  setSearch('');
-                  setSearchFocused(false);
-                }}
-              >
-                <Text
-                  style={
-                    activeTab === tab ? styles.tabActiveText : styles.tabInactiveText
-                  }
-                >
-                  {tab}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-
-          <Text style={styles.pageTitle}>{String(activeTab)}</Text>
+        <View style={styles.headerBlock}>
+          <Text style={styles.pageTitle}>
+            {activeTab === 'Users'
+              ? 'Users'
+              : activeTab === 'Link'
+              ? 'Link'
+              : 'SMS'}
+          </Text>
           <Text style={styles.subtitle}>
             {activeTab === 'Users'
               ? 'Send or request Rezults from another user'
@@ -177,56 +202,61 @@ export default function ShareScreen({ navigation }) {
               ? 'Send someone an anonymous nudge via SMS'
               : 'Send your Rezults link to someone or add it to your dating profile. Even someone without the app can view it.'}
           </Text>
+        </View>
 
-          {activeTab === 'Users' && (
-            <SearchBar
-              value={search}
-              onChangeText={setSearch}
-              onCancel={() => {
-                setSearch('');
-                setSearchFocused(false);
-              }}
-              onFocus={() => setSearchFocused(true)}
-            />
-          )}
+        {/* Search bar only in Users tab (not focused takeover) */}
+        {activeTab === 'Users' && (
+          <SearchBar
+            value={search}
+            onChangeText={setSearch}
+            onCancel={() => {
+              setSearch('');
+              setSearchFocused(false);
+            }}
+            onFocus={() => setSearchFocused(true)}
+          />
+        )}
 
-          {renderTabContent()}
-        </ScreenWrapper>
-      </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
-  );
+        {/* Tab-specific content */}
+        {renderTabContent()}
+      </>
+    )}
+  </ScreenWrapper>
+</TouchableWithoutFeedback>
+  </KeyboardAvoidingView>
+);
 }
 
 const styles = StyleSheet.create({
   closeHeader: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    alignItems: "center",
     marginBottom: 24,
   },
   closeIcon: {
     width: 20,
     height: 20,
-    tintColor: '#fff',
+    tintColor: "#fff",
     marginRight: 4,
     marginTop: 10,
   },
   tabsContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     backgroundColor: colors.background.surface2,
     borderRadius: 18,
     height: 36,
     padding: 4,
-    marginTop: 8,
-    marginBottom: 24,
-    alignSelf: 'stretch',
+    marginTop: 16,       // ⬅️ matches Rezults flow
+    marginBottom: 24,    // ⬅️ consistent rhythm
+    alignSelf: "stretch",
   },
   tabActive: {
     flex: 1,
     backgroundColor: colors.foreground.default,
     borderRadius: 14,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   tabActiveText: {
     ...typography.bodyMedium,
@@ -234,29 +264,34 @@ const styles = StyleSheet.create({
   },
   tabInactive: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   tabInactiveText: {
     ...typography.bodyMedium,
     color: colors.foreground.soft,
   },
+  headerBlock: {
+    marginTop: 32,        // ⬅️ just like Rezults screens
+    marginBottom: 24,
+  },
   pageTitle: {
     ...typography.largeTitleMedium,
     color: colors.foreground.default,
-    marginBottom: 4,
+    marginBottom: 6,
   },
   subtitle: {
     ...typography.bodyRegular,
     color: colors.foreground.soft,
     marginBottom: 24,
+    lineHeight: 20,
   },
   userList: {
     marginTop: 8,
   },
   userRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: 16,
     borderBottomColor: colors.background.surface2,
     borderBottomWidth: 1,
@@ -280,13 +315,13 @@ const styles = StyleSheet.create({
     paddingBottom: 32,
   },
   inputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     borderWidth: 1,
     borderColor: colors.neutral[0],
     borderRadius: 12,
     marginBottom: 8,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   codeBox: {
     backgroundColor: colors.background.surface2,
@@ -307,9 +342,9 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
   },
   smsInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#0D3E2D',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#0D3E2D",
     padding: 12,
     borderRadius: 12,
     marginBottom: 24,
@@ -318,17 +353,17 @@ const styles = StyleSheet.create({
     width: 16,
     height: 16,
     marginRight: 8,
-    tintColor: '#1DCA7A',
+    tintColor: "#1DCA7A",
   },
   infoText: {
     ...typography.captionSmallRegular,
     color: colors.neutral[0],
   },
   infoHighlight: {
-    color: '#1DCA7A',
+    color: "#1DCA7A",
   },
   continueButtonFixed: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 52,
     left: 16,
     right: 16,

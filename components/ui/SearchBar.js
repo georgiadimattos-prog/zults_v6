@@ -1,90 +1,61 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import React from 'react';
+import { View, TextInput, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { colors, typography } from '../../theme';
 import searchIcon from '../../assets/images/search-icon.png';
+import closeIcon from '../../assets/images/close-cross.png'; // reuse your existing cross
 
 export default function SearchBar({ value, onChangeText, onCancel, onFocus }) {
-
   return (
-    <View style={[styles.wrapper, value.length > 0 && styles.wrapperFocused]}>
-      <View style={styles.iconContainer}>
-        <Image source={searchIcon} style={styles.icon} />
-      </View>
+    <View style={styles.container}>
+      {/* Magnifying glass */}
+      <Image source={searchIcon} style={styles.icon} />
 
-      <View style={styles.inputBlock}>
-  {value.length > 0 && (
-    <Text style={styles.label}>Search by username</Text>
-  )}
-  <TextInput
-    style={styles.input}
-    value={value}
-    onChangeText={onChangeText}
-    placeholder={value.length > 0 ? '' : 'Search by username'}
-    placeholderTextColor={colors.neutralText.subtext}
-    onFocus={() => {
-      onFocus?.();
-    }}
-    onBlur={() => {
-      if (value.length === 0) onCancel?.();
-    }}
-  />
-</View>
+      {/* Input */}
+      <TextInput
+        style={styles.input}
+        value={value}
+        onChangeText={onChangeText}
+        placeholder="Search by username"
+        placeholderTextColor={colors.neutralText.subtext}
+        onFocus={onFocus}
+      />
 
-{/*
-<View>
-  {value.length > 0 && (
-    <TouchableOpacity onPress={onCancel}>
-      <Text style={styles.cancel}>Cancel</Text>
-    </TouchableOpacity>
-  )}
-</View>
-*/}
-</View>
+      {/* Clear button only when typing */}
+      {value.length > 0 && (
+        <TouchableOpacity onPress={() => onChangeText('')}>
+          <Image source={closeIcon} style={styles.clearIcon} />
+        </TouchableOpacity>
+      )}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  wrapper: {
+  container: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1.2,
-    borderColor: colors.neutral[900],
-    borderRadius: 16,
-    height: 56,
-    paddingHorizontal: 12,
+    backgroundColor: colors.background.surface2, // ✅ subtle pill bg
+    borderRadius: 12,
+    paddingHorizontal: 10,
     marginBottom: 16,
-  },
-  wrapperFocused: {
-    borderColor: colors.neutral[0],
-  },
-  iconContainer: {
-    width: 24,
-    height: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
+    height: 40,
   },
   icon: {
-    width: 15,
-    height: 15,
+    width: 16,
+    height: 16,
     tintColor: colors.neutralText.subtext,
-  },
-  inputBlock: {
-    flex: 1,
-    marginLeft: 8,
-  },
-  label: {
-    ...typography.captionSmallRegular,
-    color: colors.neutralText.subtext,
-    marginBottom: 2,
+    marginRight: 6,
   },
   input: {
+    flex: 1,
     ...typography.bodyRegular,
     color: colors.foreground.default,
-    padding: 0,
+    paddingVertical: 0, // ✅ centers text vertically like iOS
   },
-  cancel: {
-    ...typography.captionSmallRegular,
-    color: colors.neutralText.subtext,
-    marginLeft: 8,
+  clearIcon: {
+    width: 16,
+    height: 16,
+    tintColor: colors.neutralText.subtext,
+    marginLeft: 6,
   },
 });
