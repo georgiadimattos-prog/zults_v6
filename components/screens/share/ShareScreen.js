@@ -21,6 +21,7 @@ import tomas from '../../../assets/images/TomasB.png';
 import melany from '../../../assets/images/melany.png';
 import madman from '../../../assets/images/madman.png';
 import goodguy from '../../../assets/images/goodguy.png';
+import zultsImage from '../../../assets/images/zults.png';
 import SearchBar from '../../ui/SearchBar';
 import ScreenFooter from '../../ui/ScreenFooter';
 import ZultsButton from '../../ui/ZultsButton';
@@ -78,6 +79,7 @@ export default function ShareScreen({ navigation }) {
     { name: 'Binkey', image: melany, isVerified: true },
     { name: 'DJordan', image: madman, isVerified: false },
     { name: 'AdamReed', image: goodguy, isVerified: false },
+    { id: 'zults-demo', name: 'Zults (Demo)', image: zultsImage, isBot: true },
   ];
 
   const filteredUsers = users.filter((u) =>
@@ -87,8 +89,13 @@ export default function ShareScreen({ navigation }) {
   const NAVBAR_HEIGHT = 30;
 
   const handleUserPress = (user) => {
-    navigation.navigate('UserChat', { user });
-  };
+  navigation.navigate('UserChat', { 
+    user: { 
+      ...user, 
+      isBot: user.isBot === true // ✅ preserve the flag 
+    } 
+  });
+};
 
   const renderTabContent = () => {
     if (activeTab === 'Users') {

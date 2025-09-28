@@ -25,6 +25,7 @@ import moreIcon from "../../../assets/images/navbar-dots.png";
 import fallbackAvatar from "../../../assets/images/melany.png";
 import { rezultsCache } from "../../../cache/rezultsCache";
 import { chatCache } from "../../../cache/chatCache";
+import { useDemoChat } from "../../ui/useDemoChat";
 
 const TomasAvatar = require("../../../assets/images/tomas.png");
 
@@ -102,11 +103,13 @@ export default function UserChatScreen() {
   const navigation = useNavigation();
   const route = useRoute();
 
+  const { seedDemoChat } = useDemoChat();
+
   const [footerHeight, setFooterHeight] = useState(0);
 
   const currentUser = { name: "TomasB.", avatar: TomasAvatar };
   const user = route.params?.user || { name: "Unknown", image: fallbackAvatar };
-  const isDemoChat = user.id === "zults-demo";
+  const isDemoChat = user.isBot === true; // ✅ detect via flag, not id
 
   const [message, setMessage] = useState("");
   const [chatState, setChatState] = useState({ hasShared: false, hasRequested: false });
@@ -149,36 +152,10 @@ export default function UserChatScreen() {
       return;
     }
 
-    if (user.id === "zults-demo") {
-      setChatData([]);
-      chatCache[key] = {
-        user: { id: user.id, name: "Zults Bot", image: user.image, isBot: true },
-        chatData: [],
-        chatState: { hasShared: false, hasRequested: false },
-        otherUserState: { hasShared: false, hasRequested: false },
-        blocked: false,
-      };
-
-      const scheduleMessage = (id, delay, type, text = "") => {
-        setTimeout(() => {
-          addTyping();
-          setTimeout(() => {
-            removeTyping();
-            const msg = { id, type, direction: "from-other", username: "Zults Bot", avatar: user.image, text, timestamp: "Now" };
-            setChatData((prev) => [...prev, msg]);
-            chatCache[key].chatData.push(msg);
-          }, 2000);
-        }, delay);
-      };
-
-      scheduleMessage("demo-msg-1", 1000, "text", "Hi 👋 I’m Zults Bot — your sexual health companion 💜 I’ll be here to answer any questions you might have, even the ones that feel a little embarrassing to ask a friend.");
-      scheduleMessage("demo-msg-2", 6000, "text", "You can chat with me about sexual health, Rezults, or just to understand how this all works. Think of me as your supportive best friend in the dating world — no judgement, only clear answers.");
-      scheduleMessage("demo-msg-3", 11000, "text", "And to show you how Rezults sharing works, I’m already sharing mine with you in this chat. That way you can see what it looks like when people share with you — or when you share with them once you have a Rezults to show.");
-      scheduleMessage("demo-msg-4", 16000, "share");
-
-      setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 300);
-    }
-  }, [user]);
+    if (user.isBot && chatData.length === 0) {
+    seedDemoChat(user, setChatData, flatListRef);
+  }
+}, [user]);
 
   // persist to cache
   useEffect(() => {

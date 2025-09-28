@@ -125,17 +125,17 @@ export default function ActivitiesScreen() {
         style={styles.row}
         onPress={() => {
           if (item.id !== "zults-demo") {
-            if (chatCache[item.id]) chatCache[item.id].hasUnread = false;
-            navigation.navigate("UserChat", {
-              user: { name: item.name, image: item.avatar },
-              from: "Activities",
-            });
-          } else {
-            navigation.navigate("UserChat", {
-              user: { id: "zults-demo", name: "Zults (Demo)", image: zultsLogo },
-              from: "Activities",
-            });
-          }
+  if (chatCache[item.id]) chatCache[item.id].hasUnread = false;
+  navigation.navigate("UserChat", {
+    user: { id: item.id, name: item.name, image: item.avatar, isBot: false },
+    from: "Activities",
+  });
+} else {
+  navigation.navigate("UserChat", {
+    user: { id: "zults-demo", name: "Zults (Demo)", image: zultsLogo, isBot: true },
+    from: "Activities",
+  });
+}
         }}
       >
         <Image source={item.avatar} style={styles.avatar} />
