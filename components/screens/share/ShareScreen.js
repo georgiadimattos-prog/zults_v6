@@ -28,8 +28,13 @@ import ScreenWrapper from '../../ui/ScreenWrapper';
 import { NavbarBackRightText } from '../../ui/Navbar';
 import SMSTab from './tabs/SMSTab';
 import LinkTab from './tabs/LinkTab';
+import * as Contacts from "expo-contacts";
+import { Share, Alert } from "react-native";
+import { rezultsCache } from "../../../cache/rezultsCache";
+import { useInvite } from "../../ui/useInvite"; 
 
 export default function ShareScreen({ navigation }) {
+  const { sendInvite } = useInvite();
   const [search, setSearch] = useState('');
   const [searchFocused, setSearchFocused] = useState(false);
   const [activeTab, setActiveTab] = useState('Users');
@@ -135,17 +140,17 @@ export default function ShareScreen({ navigation }) {
           <StatusBar barStyle="light-content" backgroundColor={colors.background.surface1} />
 
           <NavbarBackRightText
-            rightText={searchFocused && activeTab === 'Users' ? 'Cancel' : 'Invite'}
-            onRightPress={() => {
-              if (searchFocused && activeTab === 'Users') {
-                setSearch('');
-                setSearchFocused(false);
-                Keyboard.dismiss();
-              } else {
-                console.log('Invite pressed');
-              }
-            }}
-          />
+  rightText={searchFocused && activeTab === 'Users' ? 'Cancel' : 'Invite'}
+  onRightPress={() => {
+    if (searchFocused && activeTab === 'Users') {
+      setSearch('');
+      setSearchFocused(false);
+      Keyboard.dismiss();
+    } else {
+      sendInvite(); // ✅ reuse hook, no need to duplicate code
+    }
+  }}
+/>
 
           {/* Tabs + header */}
           <Animated.View
