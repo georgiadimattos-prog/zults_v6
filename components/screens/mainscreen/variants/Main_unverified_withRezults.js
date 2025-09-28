@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   View,
   ScrollView,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Text,
   Image,
+  Animated,
 } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { colors, typography } from "../../../../theme";
@@ -28,6 +29,9 @@ export default function MainUnverifiedWithRezults({ onLinkPress, onSharePress })
   const [recentUsers, setRecentUsers] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  // 🔄 animation controller for RezultsCard
+  const fadeAnim = useRef(new Animated.Value(1)).current;
 
   // 🔄 refresh whenever screen is focused
   useFocusEffect(
@@ -85,6 +89,26 @@ export default function MainUnverifiedWithRezults({ onLinkPress, onSharePress })
     );
   };
 
+  // 🗑 handle Rezults deletion with animation
+  const handleDeleteRezults = () => {
+    // animate RezultsCard fade + shrink
+    Animated.timing(fadeAnim, {
+      toValue: 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start(() => {
+      // clear cache
+      rezultsCache.hasRezults = false;
+      rezultsCache.card = null;
+
+      // reset navigation → MainScreen will re-render into "no Rezults" state
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "MainScreen" }],
+      });
+    });
+  };
+
   return (
     <ScreenWrapper>
       <StatusBar barStyle="light-content" backgroundColor={colors.background.surface1} />
@@ -96,11 +120,19 @@ export default function MainUnverifiedWithRezults({ onLinkPress, onSharePress })
           onDelete={() => setShowDeleteModal(true)}
         />
 
-        <RezultsCard
-          userName={rezultsCache.card?.userName || "Unknown User"}
-          providerName={rezultsCache.card?.providerName || "Unknown Provider"}
-          testDate={rezultsCache.card?.testDate || "Unknown Date"}
-        />
+        {/* Animated Rezults card */}
+        <Animated.View
+          style={{
+            opacity: fadeAnim,
+            transform: [{ scale: fadeAnim }],
+          }}
+        >
+          <RezultsCard
+            userName={rezultsCache.card?.userName || "Unknown User"}
+            providerName={rezultsCache.card?.providerName || "Unknown Provider"}
+            testDate={rezultsCache.card?.testDate || "Unknown Date"}
+          />
+        </Animated.View>
 
         <ExpireContainer expiryDate="29 Sep 2025" daysLeft={43} />
 
@@ -143,12 +175,7 @@ export default function MainUnverifiedWithRezults({ onLinkPress, onSharePress })
       <DeleteModal
         visible={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
-        onConfirm={() => {
-          setShowDeleteModal(false);
-          rezultsCache.hasRezults = false;
-          rezultsCache.card = null;
-          navigation.navigate("MainScreen");
-        }}
+        onConfirm={handleDeleteRezults}
       />
     </ScreenWrapper>
   );

@@ -22,7 +22,7 @@ import AddRezultsCardScreen from "./components/screens/getrezults/AddRezultsCard
 import PolicyScreen from "./components/screens/getrezults/PolicyScreen";
 
 // Share Screens
-import ShareScreen from "./components/screens/share/ShareScreen";  // ✅ SMS is now inside here
+import ShareScreen from "./components/screens/share/ShareScreen"; // ✅ SMS is now inside here
 import ReviewSMSRequest from "./components/screens/share/sms/ReviewSMSRequest";
 import SMSRequestSent from "./components/screens/share/sms/SMSRequestSent";
 import LinkScreenShareSheet from "./components/screens/share/link/LinkScreen_ShareSheet";
@@ -46,7 +46,14 @@ export default function App() {
 
   if (!fontsLoaded) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#000" }}>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#000",
+        }}
+      >
         <Text style={{ color: "#fff", fontSize: 18 }}>Loading...</Text>
       </View>
     );
@@ -55,20 +62,45 @@ export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="MainScreen" screenOptions={{ headerShown: false, animation: "slide_from_right" }}>
+        <Stack.Navigator
+          initialRouteName="MainScreen"
+          screenOptions={{
+            headerShown: false,
+            animation: "slide_from_right", // default for all screens
+          }}
+        >
           {/* Main */}
-          <Stack.Screen name="MainScreen" component={MainScreen} />
+          <Stack.Screen
+            name="MainScreen"
+            component={MainScreen}
+            options={{ animation: "fade" }} // 👈 override: fade for MainScreen
+          />
           <Stack.Screen name="Settings" component={SettingsScreen} />
 
           {/* Activities */}
           <Stack.Screen name="Activities" component={ActivitiesScreen} />
 
           {/* Get Rezults Flow */}
-          <Stack.Screen name="GetRezultsProvider" component={GetRezults_SelectProviderScreen} />
-          <Stack.Screen name="GetRezultsLinkInput" component={GetRezults_PasteLinkScreen} />
-          <Stack.Screen name="GetRezultsLoading" component={GetRezults_LoadingScreen} />
-          <Stack.Screen name="GetRezultsHowToFindLink" component={GetRezults_HowToFindLinkScreen} />
-          <Stack.Screen name="AddRezultsCard" component={AddRezultsCardScreen} />
+          <Stack.Screen
+            name="GetRezultsProvider"
+            component={GetRezults_SelectProviderScreen}
+          />
+          <Stack.Screen
+            name="GetRezultsLinkInput"
+            component={GetRezults_PasteLinkScreen}
+          />
+          <Stack.Screen
+            name="GetRezultsLoading"
+            component={GetRezults_LoadingScreen}
+          />
+          <Stack.Screen
+            name="GetRezultsHowToFindLink"
+            component={GetRezults_HowToFindLinkScreen}
+          />
+          <Stack.Screen
+            name="AddRezultsCard"
+            component={AddRezultsCardScreen}
+          />
           <Stack.Screen name="PolicyScreen" component={PolicyScreen} />
 
           {/* Share */}

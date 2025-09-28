@@ -53,24 +53,23 @@ export default function SMSTab({ navigation }) {
         showsVerticalScrollIndicator={false}
       >
         {/* Phone input */}
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Phone number</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput
-              style={styles.input}
-              value={phone}
-              onChangeText={setPhone}
-              placeholder="Add phone number"
-              placeholderTextColor={colors.neutralText.subtext}
-              keyboardType="phone-pad"
-              onFocus={() => {
-                if (!phone) {
-                  setPhone('+447123456789'); // 👈 demo number prefilled
-                }
-              }}
-            />
-          </View>
-        </View>
+<View style={styles.inputGroup}>
+  <View style={styles.inputWrapper}>
+    <TextInput
+      style={styles.input}
+      value={phone}
+      onChangeText={setPhone}
+      placeholder="Add phone number"   // ✅ back to clean Apple style
+      placeholderTextColor={colors.neutralText.subtext}
+      keyboardType="phone-pad"
+      onFocus={() => {
+        if (!phone) {
+          setPhone("+447123456789"); // 👈 demo number prefilled
+        }
+      }}
+    />
+  </View>
+</View>
 
         {/* Info banner */}
         <View style={styles.infoBox}>

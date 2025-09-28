@@ -7,10 +7,29 @@ import {
   StyleSheet,
 } from "react-native";
 import { BlurView } from "expo-blur";
+import { useNavigation } from "@react-navigation/native";
 import { colors, typography } from "../../theme";
 import ZultsButton from "./ZultsButton";
+import { rezultsCache } from "../../cache/rezultsCache";
 
-export default function DeleteModal({ visible, onClose, onConfirm }) {
+export default function DeleteModal({ visible, onClose }) {
+  const navigation = useNavigation();
+
+  const handleDelete = () => {
+    // 1. Clear Rezults cache
+    rezultsCache.hasRezults = false;
+    rezultsCache.card = null;
+
+    // 2. Close modal
+    onClose?.();
+
+    // 3. Reset navigation so MainScreen remounts
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "MainScreen" }],
+    });
+  };
+
   return (
     <Modal
       visible={visible}
@@ -33,20 +52,17 @@ export default function DeleteModal({ visible, onClose, onConfirm }) {
               {/* Actions */}
               <ZultsButton
                 label="Delete Rezults"
-                type="secondary"   // 👈 styled as destructive
+                type="primary"   // ✅ strong action
                 size="large"
                 fullWidth
-                onPress={() => {
-                  onConfirm?.();
-                  onClose();
-                }}
+                onPress={handleDelete}
               />
 
               <View style={{ height: 12 }} />
 
               <ZultsButton
                 label="Cancel"
-                type="primary"     // 👈 normal
+                type="ghost"     // ✅ low emphasis cancel
                 size="large"
                 fullWidth
                 onPress={onClose}

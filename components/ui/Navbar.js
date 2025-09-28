@@ -10,6 +10,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: 56,
     paddingHorizontal: 10, // ✅ uniform right
+    paddingRight: 16,  // ✅ more breathing space on right
     justifyContent: 'space-between', // ✅ handles left + right content nicely
   },
   left: {

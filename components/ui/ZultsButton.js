@@ -1,84 +1,123 @@
-import React from 'react';
-import { TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { colors, typography } from '../../theme';
-import * as Haptics from 'expo-haptics';
+// components/ui/ZultsButton.js
+import React from "react";
+import { TouchableOpacity, Text, StyleSheet } from "react-native";
+import { colors, typography } from "../../theme";
+import * as Haptics from "expo-haptics";
 
 export default function ZultsButton({
   label,
-  onPress,
-  type = 'primary', // primary | secondary
-  size = 'large',   // large | medium | small
+  type = "primary",   // "primary" | "secondary" | "ghost"
+  size = "large",      // "large" (56px) | "small" (40px)
   fullWidth = true,
   disabled = false,
-  style = {},
+  onPress,
+  style,
 }) {
-  const getButtonStyle = () => {
-    const baseStyle = [styles.base, styles[size], styles[type]];
-    if (fullWidth) baseStyle.push({ alignSelf: 'stretch' });
-    if (disabled) baseStyle.push(styles.disabled);
-    return [baseStyle, style];
-  };
+  const containerStyles = [
+    styles.base,
+    styles[size],
+    styles[`${type}${disabled ? "Disabled" : "Active"}`],
+    fullWidth && { alignSelf: "stretch" },
+    style,
+  ];
 
-  const getTextStyle = () => {
-    const textType =
-      size === 'small'
-        ? 'captionSmallRegular'
-        : size === 'medium'
-        ? 'buttonSmallMedium'
-        : 'buttonLargeMedium';
+  const textStyles = [
+    styles.textBase,
+    styles[`text_${size}`],
+    styles[`text_${type}${disabled ? "Disabled" : "Active"}`],
+  ];
 
-    const safeStyle = typography[textType] || typography.bodyMedium;
-
-    return [safeStyle, styles.text, styles[`${type}Text`]];
+  const handlePress = () => {
+    if (!disabled) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      onPress?.();
+    }
   };
 
   return (
     <TouchableOpacity
-      style={getButtonStyle()}
-      onPress={() => {
-        if (!disabled) {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); // ✅ cleaner haptic
-          onPress && onPress();
-        }
-      }}
+      style={containerStyles}
+      onPress={handlePress}
       disabled={disabled}
-      activeOpacity={0.8}
+      activeOpacity={0.75}
     >
-      <Text style={getTextStyle()} allowFontScaling={false}>
-        {String(label)}
+      <Text style={textStyles} allowFontScaling={false}>
+        {label}
       </Text>
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
+  // Base
   base: {
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
 
-  // ✅ Sizes — global heights only (no paddingHorizontal)
-  large: { height: 56 },
-  medium: { height: 48 },
-  small: { height: 40 },
+  // Sizes
+  large: {
+    height: 56,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+  },
+  small: {
+    height: 40,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
 
-  // Types
-  primary: { backgroundColor: colors.neutral[0] },
-  secondary: {
-    backgroundColor: 'transparent',
-    borderWidth: 1.2,
-    borderColor: colors.foreground.soft,
+  // Variants
+  primaryActive: {
+    backgroundColor: colors.neutral[0], // white
+  },
+  primaryDisabled: {
+    backgroundColor: "#7B7B7B",
+  },
+
+  secondaryActive: {
+    backgroundColor: "#292929",
+  },
+  secondaryDisabled: {
+    backgroundColor: "#292929",
+  },
+
+  ghostActive: {
+    backgroundColor: "transparent",
+  },
+  ghostDisabled: {
+    backgroundColor: "transparent",
   },
 
   // Text
-  text: { textAlign: 'center', textAlignVertical: 'center' },
-  primaryText: { color: colors.button.activeLabelPrimary },
-  secondaryText: { color: colors.foreground.default },
+  textBase: {
+    textAlign: "center",
+  },
+  text_large: {
+    ...typography.buttonLargeRegular, // 16px
+  },
+  text_small: {
+    ...typography.buttonSmallRegular, // 14px
+  },
 
-  // Disabled
-  disabled: {
-    opacity: 0.4,
-    minHeight: 56,
+  // Text colors per variant
+  text_primaryActive: {
+    color: colors.button.activeLabelPrimary, // #141414
+  },
+  text_primaryDisabled: {
+    color: "#404040",
+  },
+  text_secondaryActive: {
+    color: "#D5D5D5",
+  },
+  text_secondaryDisabled: {
+    color: "#5D5D5D",
+  },
+  text_ghostActive: {
+    color: "#C2C2C2",
+    fontFamily: "ZultsDiatype-Medium",
+  },
+  text_ghostDisabled: {
+    color: "#5D5D5D",
   },
 });

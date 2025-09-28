@@ -267,6 +267,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     marginBottom: 24,
     alignSelf: 'stretch',
+    marginHorizontal: 16,   // ✅ add equal side padding
   },
   tabActive: {
     flex: 1,

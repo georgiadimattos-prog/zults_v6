@@ -38,27 +38,27 @@ export default function ConfirmModal({
               ) : null}
 
               {/* Confirm button */}
-              <ZultsButton
-                label={confirmLabel}
-                type="primary"
-                size="large"
-                fullWidth
-                onPress={() => {
-                  onConfirm?.();
-                  onClose();
-                }}
-              />
+<ZultsButton
+  label={confirmLabel}
+  type="primary"   // ✅ strong action
+  size="large"
+  fullWidth
+  onPress={() => {
+    onConfirm?.();
+    onClose();
+  }}
+/>
 
-              <View style={{ height: 12 }} />
+<View style={{ height: 12 }} />
 
-              {/* Cancel button */}
-              <ZultsButton
-                label="Cancel"
-                type="secondary"
-                size="large"
-                fullWidth
-                onPress={onClose}
-              />
+{/* Cancel button */}
+<ZultsButton
+  label="Cancel"
+  type="ghost"     // ✅ low emphasis cancel
+  size="large"
+  fullWidth
+  onPress={onClose}
+/>
             </View>
           </TouchableWithoutFeedback>
         </BlurView>
