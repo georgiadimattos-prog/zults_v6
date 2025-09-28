@@ -6,6 +6,7 @@ import ScreenWrapper from "../../ui/ScreenWrapper";
 import RezultsCard from "../../ui/RezultsCard";
 import ZultsButton from "../../ui/ZultsButton";
 import Navbar from '../../ui/Navbar';
+import ScreenFooter from "../../ui/ScreenFooter";
 
 // ✅ import the cache
 import { rezultsCache } from "../../../cache/rezultsCache";
@@ -41,55 +42,55 @@ export default function AddRezultsCardScreen() {
   <Navbar onBackPress={() => navigation.navigate('GetRezultsProvider')} />
 
   <ScrollView
-    contentContainerStyle={styles.scrollContent}
-    showsVerticalScrollIndicator={false}
-  >
-    {/* Page title + subtitle */}
-    <View style={styles.headerBlock}>
-      <Text allowFontScaling={false} style={styles.pageTitle}>
-        Your Rezults
-      </Text>
-      <Text allowFontScaling={false} style={styles.subtitle}>
-        By clicking Add Rezults, you confirm this information is your own and accurate.{' '}
-        <Text
-          style={styles.link}
-          onPress={() => navigation.navigate('PolicyScreen')}
-        >
-          Review our policy.
-        </Text>
-      </Text>
-    </View>
-
-    {/* Rezults card preview */}
-    <RezultsCard
-      userName="John Doe"
-      providerName="Sexual Health London"
-      testDate="12 Dec 2025"
-    />
-
-    {/* Helper text */}
-    <Text allowFontScaling={false} style={styles.flipHint}>
-      Tap the card to view the reverse.
+  contentContainerStyle={styles.scrollContent}
+  showsVerticalScrollIndicator={false}
+>
+  {/* Page title + subtitle */}
+  <View style={styles.headerBlock}>
+    <Text allowFontScaling={false} style={styles.pageTitle}>
+      Your Rezults
     </Text>
-  </ScrollView>
+    <Text allowFontScaling={false} style={styles.subtitle}>
+      By clicking Add Rezults, you confirm this information is your own and accurate.{' '}
+      <Text
+        style={styles.link}
+        onPress={() => navigation.navigate('PolicyScreen')}
+      >
+        Review our policy.
+      </Text>
+    </Text>
+  </View>
 
-  {/* Footer actions */}
+  {/* Rezults card preview */}
+  <RezultsCard
+    userName="John Doe"
+    providerName="Sexual Health London"
+    testDate="12 Dec 2025"
+  />
+
+  {/* Helper text */}
+  <Text allowFontScaling={false} style={styles.flipHint}>
+    Tap the card to view the reverse.
+  </Text>
+</ScrollView>
+
+  {/* ✅ Footer actions (inside ScreenFooter, no absolute positioning) */}
+<ScreenFooter>
   <ZultsButton
     label="Add Rezults"
     type="primary"
     size="large"
     fullWidth
     onPress={handleAddRezults}
-    style={styles.button}
   />
   <ZultsButton
     label="Cancel"
     type="secondary"
     size="large"
     fullWidth
-    onPress={() => navigation.navigate('MainScreen')}
-    style={[styles.button, { bottom: 100 }]}
+    onPress={handleCancel}
   />
+</ScreenFooter>
 </ScreenWrapper>
 
   );
@@ -97,29 +98,23 @@ export default function AddRezultsCardScreen() {
 
 const styles = StyleSheet.create({
   scrollContent: {
-    paddingBottom: 200,
+    flexGrow: 1,
+    paddingBottom: 120,
+    paddingHorizontal: 16,   // ✅ consistent inset
   },
   headerBlock: {
     marginTop: 32,
     marginBottom: 24,
-    paddingHorizontal: 16,
   },
   pageTitle: {
-  ...typography.largeTitleMedium,
-  color: colors.foreground.default,
-  marginBottom: 6,
-},
-subtitle: {
-  ...typography.bodyRegular,  // consistent everywhere
-  color: colors.foreground.soft,
-  marginBottom: 24,
-},
-  paragraph: {
+    ...typography.largeTitleMedium,
+    color: colors.foreground.default,
+    marginBottom: 6,
+  },
+  subtitle: {
     ...typography.bodyRegular,
     color: colors.foreground.soft,
     marginBottom: 24,
-    lineHeight: 20,
-    paddingHorizontal: 16,
   },
   flipHint: {
     ...typography.captionSmallRegular,
@@ -127,15 +122,8 @@ subtitle: {
     marginTop: 16,
     textAlign: "center",
   },
-  button: {
-    position: "absolute",
-    left: 16,
-    right: 16,
-    bottom: 40,
-    zIndex: 100,
-  },
   link: {
-  textDecorationLine: 'underline',
-  color: colors.brand.primary,  // or colors.foreground.default if you want subtle
-},
+    textDecorationLine: 'underline',
+    color: colors.brand.primary,
+  },
 });

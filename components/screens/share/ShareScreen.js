@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';   // ⬅️ added useRef + useEffect
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -12,31 +12,31 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   StatusBar,
-  Animated,   // ⬅️ added Animated
+  Animated,
 } from 'react-native';
 import { colors, typography } from '../../../theme';
-import infoIcon from '../../../assets/images/info-icon.png';
 import arrowRight from '../../../assets/images/navbar-arrow-right.png';
+import infoIcon from '../../../assets/images/info-icon.png';
 import tomas from '../../../assets/images/tomas.png';
 import melany from '../../../assets/images/melany.png';
 import madman from '../../../assets/images/madman.png';
 import goodguy from '../../../assets/images/goodguy.png';
 import SearchBar from '../../ui/SearchBar';
-import LinkScreenOffline from "./link/LinkScreen_Offline";
-
+import ScreenFooter from '../../ui/ScreenFooter';
 import ZultsButton from '../../ui/ZultsButton';
 import ScreenWrapper from '../../ui/ScreenWrapper';
 import { NavbarBackRightText } from '../../ui/Navbar';
+import SMSTab from './tabs/SMSTab';
+import LinkTab from './tabs/LinkTab';
 
 export default function ShareScreen({ navigation }) {
   const [search, setSearch] = useState('');
   const [searchFocused, setSearchFocused] = useState(false);
   const [activeTab, setActiveTab] = useState('Users');
-  const [phone, setPhone] = useState('');
+  const [phone, setPhone] = useState(''); // ✅ added back
 
-  // animations
-  const fadeAnim = useRef(new Animated.Value(1)).current;      // normal layout
-  const takeoverAnim = useRef(new Animated.Value(0)).current;  // search takeover
+  const fadeAnim = useRef(new Animated.Value(1)).current;
+  const takeoverAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (searchFocused && activeTab === 'Users') {
@@ -79,17 +79,21 @@ export default function ShareScreen({ navigation }) {
     u.name.toLowerCase().includes(search.toLowerCase())
   );
 
+  const NAVBAR_HEIGHT = 30;
+
   const handleUserPress = (user) => {
     navigation.navigate('UserChat', { user });
   };
 
-  const isPhoneValid = phone.length >= 8;
-
   const renderTabContent = () => {
     if (activeTab === 'Users') {
+      if (!searchFocused) return null;
+
+      const listToShow = search.trim().length === 0 ? users : filteredUsers;
+
       return (
         <ScrollView style={styles.userList}>
-          {filteredUsers.map((user, index) => (
+          {listToShow.map((user, index) => (
             <TouchableOpacity
               key={index}
               style={styles.userRow}
@@ -100,54 +104,23 @@ export default function ShareScreen({ navigation }) {
               <Image source={arrowRight} style={styles.arrow} />
             </TouchableOpacity>
           ))}
+
+          {search.trim().length > 0 && listToShow.length === 0 && (
+            <Text style={[styles.subtitle, { textAlign: 'center', marginTop: 24 }]}>
+              No users found
+            </Text>
+          )}
         </ScrollView>
       );
     }
 
     if (activeTab === 'SMS') {
-      return (
-        <>
-          <ScrollView contentContainerStyle={styles.smsWrapper}>
-            <View style={styles.inputRow}>
-              <View style={styles.codeBox}>
-                <Text style={styles.codeText}>+44</Text>
-              </View>
-              <TextInput
-                style={styles.input}
-                value={phone}
-                onChangeText={setPhone}
-                placeholder="Add phone number"
-                placeholderTextColor={colors.neutralText.subtext}
-                keyboardType="phone-pad"
-              />
-            </View>
-
-            <View style={styles.smsInfo}>
-              <Image source={infoIcon} style={styles.infoIcon} />
-              <Text style={styles.infoText}>
-                You have <Text style={styles.infoHighlight}>1 of 1</Text> SMS available this week
-              </Text>
-            </View>
-
-            <View style={{ height: 120 }} />
-          </ScrollView>
-
-          <ZultsButton
-            label="Continue"
-            type="primary"
-            size="large"
-            fullWidth
-            disabled={!isPhoneValid}
-            onPress={() => navigation.navigate('ReviewSMS', { phone: '+44' + phone })}
-            style={styles.continueButtonFixed}
-          />
-        </>
-      );
-    }
+  return <SMSTab navigation={navigation} />;
+}
 
     if (activeTab === 'Link') {
-      return <LinkScreenOffline navigation={navigation} />;
-    }
+  return <LinkTab />;
+}
 
     return null;
   };
@@ -159,12 +132,8 @@ export default function ShareScreen({ navigation }) {
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScreenWrapper topPadding={0}>
-          <StatusBar
-            barStyle="light-content"
-            backgroundColor={colors.background.surface1}
-          />
+          <StatusBar barStyle="light-content" backgroundColor={colors.background.surface1} />
 
-          {/* ✅ Navbar handles Invite/Cancel */}
           <NavbarBackRightText
             rightText={searchFocused && activeTab === 'Users' ? 'Cancel' : 'Invite'}
             onRightPress={() => {
@@ -178,7 +147,7 @@ export default function ShareScreen({ navigation }) {
             }}
           />
 
-          {/* ✅ Normal layout (tabs + header + optional search) */}
+          {/* Tabs + header */}
           <Animated.View
             style={{
               opacity: fadeAnim,
@@ -186,7 +155,7 @@ export default function ShareScreen({ navigation }) {
                 {
                   translateY: fadeAnim.interpolate({
                     inputRange: [0, 1],
-                    outputRange: [-20, 0], // slide slightly up when hiding
+                    outputRange: [-20, 0],
                   }),
                 },
               ],
@@ -205,9 +174,7 @@ export default function ShareScreen({ navigation }) {
                 >
                   <Text
                     style={
-                      activeTab === tab
-                        ? styles.tabActiveText
-                        : styles.tabInactiveText
+                      activeTab === tab ? styles.tabActiveText : styles.tabInactiveText
                     }
                   >
                     {tab}
@@ -216,7 +183,7 @@ export default function ShareScreen({ navigation }) {
               ))}
             </View>
 
-            <View style={styles.headerBlock}>
+            <View style={[styles.headerBlock, styles.content]}>
               <Text style={styles.pageTitle}>
                 {activeTab === 'Users'
                   ? 'Users'
@@ -226,61 +193,63 @@ export default function ShareScreen({ navigation }) {
               </Text>
               <Text style={styles.subtitle}>
                 {activeTab === 'Users'
-                  ? 'Send or request Rezults from another user'
-                  : activeTab === 'SMS'
-                  ? 'Send someone an anonymous nudge via SMS'
-                  : 'Send your Rezults link to someone or add it to your dating profile. Even someone without the app can view it.'}
+                  ? 'Share or request Rezults with other users.'
+                  : activeTab === 'Link'
+                  ? 'Create a shareable Rezults link so anyone without the app can view it.'
+                  : 'Send someone an anonymous nudge to get tested.'}
               </Text>
             </View>
 
             {activeTab === 'Users' && (
-              <SearchBar
-                value={search}
-                onChangeText={setSearch}
-                onCancel={() => {
-                  setSearch('');
-                  setSearchFocused(false);
-                }}
-                onFocus={() => setSearchFocused(true)}
-              />
+              <View style={styles.content}>
+                <SearchBar
+                  value={search}
+                  onChangeText={setSearch}
+                  onCancel={() => {
+                    setSearch('');
+                    setSearchFocused(false);
+                  }}
+                  onFocus={() => setSearchFocused(true)}
+                />
+              </View>
             )}
 
             {renderTabContent()}
           </Animated.View>
 
-          {/* ✅ Takeover layout (search + results) */}
+          {/* Search takeover for Users */}
           {activeTab === 'Users' && (
             <Animated.View
               style={{
-    position: 'absolute',
-    top: 100, // still anchored below navbar
-    left: 0,
-    right: 0,
-    bottom: 0, // ⬅️ make sure it fills the rest
-    opacity: takeoverAnim,
-    transform: [
-      {
-        translateY: takeoverAnim.interpolate({
-          inputRange: [0, 1],
-          outputRange: [20, 0],
-        }),
-      },
-    ],
-  }}
->
+                position: 'absolute',
+                top: NAVBAR_HEIGHT,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                opacity: takeoverAnim,
+                transform: [
+                  {
+                    translateY: takeoverAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [20, 0],
+                    }),
+                  },
+                ],
+              }}
+            >
               <View style={{ flex: 1, paddingHorizontal: 16, marginTop: 40 }}>
-    <SearchBar
-      value={search}
-      onChangeText={setSearch}
-      onCancel={() => {
-        setSearch('');
-        setSearchFocused(false);
-      }}
-      onFocus={() => setSearchFocused(true)}
-    />
-    {renderTabContent()}
-  </View>
-</Animated.View>
+                <SearchBar
+                  value={search}
+                  onChangeText={setSearch}
+                  onCancel={() => {
+                    setSearch('');
+                    setSearchFocused(false);
+                  }}
+                  onFocus={() => setSearchFocused(true)}
+                />
+                {renderTabContent()}
+              </View>
+            </Animated.View>
           )}
         </ScreenWrapper>
       </TouchableWithoutFeedback>
@@ -289,35 +258,22 @@ export default function ShareScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  closeHeader: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    alignItems: "center",
-    marginBottom: 24,
-  },
-  closeIcon: {
-    width: 20,
-    height: 20,
-    tintColor: "#fff",
-    marginRight: 4,
-    marginTop: 10,
-  },
   tabsContainer: {
-    flexDirection: "row",
+    flexDirection: 'row',
     backgroundColor: colors.background.surface2,
     borderRadius: 18,
     height: 36,
     padding: 4,
-    marginTop: 16,       // ⬅️ matches Rezults flow
-    marginBottom: 24,    // ⬅️ consistent rhythm
-    alignSelf: "stretch",
+    marginTop: 16,
+    marginBottom: 24,
+    alignSelf: 'stretch',
   },
   tabActive: {
     flex: 1,
     backgroundColor: colors.foreground.default,
     borderRadius: 14,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   tabActiveText: {
     ...typography.bodyMedium,
@@ -325,15 +281,15 @@ const styles = StyleSheet.create({
   },
   tabInactive: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   tabInactiveText: {
     ...typography.bodyMedium,
     color: colors.foreground.soft,
   },
   headerBlock: {
-    marginTop: 32,        // ⬅️ just like Rezults screens
+    marginTop: 32,
     marginBottom: 24,
   },
   pageTitle: {
@@ -351,8 +307,8 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   userRow: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingVertical: 16,
     borderBottomColor: colors.background.surface2,
     borderBottomWidth: 1,
@@ -372,62 +328,50 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
   },
-  smsWrapper: {
-    paddingBottom: 32,
+  content: {
+    paddingHorizontal: 16,
   },
-  inputRow: {
-    flexDirection: "row",
-    alignItems: "center",
+  inputGroup: {
+    paddingHorizontal: 16,
+    marginBottom: 24,
+  },
+  label: {
+    ...typography.captionSmallRegular,
+    color: colors.neutralText.label,
+    marginBottom: 6,
+  },
+  inputWrapper: {
     borderWidth: 1,
-    borderColor: colors.neutral[0],
+    borderColor: 'rgba(255,255,255,0.15)',
     borderRadius: 12,
-    marginBottom: 8,
-    overflow: "hidden",
-  },
-  codeBox: {
-    backgroundColor: colors.background.surface2,
-    paddingHorizontal: 12,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    paddingHorizontal: 16,
     paddingVertical: 14,
-    borderRightWidth: 1,
-    borderRightColor: colors.neutral[0],
-  },
-  codeText: {
-    ...typography.bodyRegular,
-    color: colors.foreground.default,
   },
   input: {
-    flex: 1,
     ...typography.bodyRegular,
     color: colors.foreground.default,
-    paddingHorizontal: 12,
-    paddingVertical: 14,
   },
-  smsInfo: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#0D3E2D",
+  infoBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#0D3E2D',
     padding: 12,
     borderRadius: 12,
-    marginBottom: 24,
+    marginHorizontal: 16,
   },
   infoIcon: {
     width: 16,
     height: 16,
     marginRight: 8,
-    tintColor: "#1DCA7A",
+    tintColor: '#1DCA7A',
   },
   infoText: {
+    flexShrink: 1,
     ...typography.captionSmallRegular,
     color: colors.neutral[0],
   },
   infoHighlight: {
-    color: "#1DCA7A",
-  },
-  continueButtonFixed: {
-    position: "absolute",
-    bottom: 52,
-    left: 16,
-    right: 16,
-    zIndex: 100,
+    color: '#1DCA7A',
   },
 });

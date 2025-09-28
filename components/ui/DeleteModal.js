@@ -3,23 +3,19 @@ import {
   Modal,
   View,
   Text,
-  TouchableOpacity,
   TouchableWithoutFeedback,
   StyleSheet,
 } from "react-native";
 import { BlurView } from "expo-blur";
 import { colors, typography } from "../../theme";
+import ZultsButton from "./ZultsButton";
 
-export default function DeleteModal({
-  visible,
-  onClose,
-  onConfirm,
-}) {
+export default function DeleteModal({ visible, onClose, onConfirm }) {
   return (
     <Modal
       visible={visible}
       transparent
-      animationType="slide"
+      animationType="fade"
       onRequestClose={onClose}
     >
       <TouchableWithoutFeedback onPress={onClose}>
@@ -31,25 +27,30 @@ export default function DeleteModal({
 
               {/* Description */}
               <Text style={styles.description}>
-                This will permanently delete your Rezults, any active shares,
-                and disable your Rezults link.
+                This will permanently remove your Rezults and disable sharing.
               </Text>
 
-              {/* Confirm button */}
-              <TouchableOpacity
-                style={styles.primaryButton}
+              {/* Actions */}
+              <ZultsButton
+                label="Delete Rezults"
+                type="secondary"   // 👈 styled as destructive
+                size="large"
+                fullWidth
                 onPress={() => {
                   onConfirm?.();
                   onClose();
                 }}
-              >
-                <Text style={styles.primaryText}>Yes, delete</Text>
-              </TouchableOpacity>
+              />
 
-              {/* Cancel button */}
-              <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
-                <Text style={styles.cancelText}>Cancel</Text>
-              </TouchableOpacity>
+              <View style={{ height: 12 }} />
+
+              <ZultsButton
+                label="Cancel"
+                type="primary"     // 👈 normal
+                size="large"
+                fullWidth
+                onPress={onClose}
+              />
             </View>
           </TouchableWithoutFeedback>
         </BlurView>
@@ -80,31 +81,5 @@ const styles = StyleSheet.create({
     ...typography.bodyRegular,
     color: colors.foreground.soft,
     marginBottom: 24,
-  },
-  primaryButton: {
-    width: "100%",
-    height: 56,
-    borderRadius: 12,
-    backgroundColor: colors.neutral[0],
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 12,
-  },
-  primaryText: {
-    ...typography.buttonLargeRegular,
-    color: colors.button.activeLabelPrimary,
-  },
-  cancelButton: {
-    width: "100%",
-    height: 56,
-    borderRadius: 12,
-    backgroundColor: "transparent",
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 16,
-  },
-  cancelText: {
-    ...typography.buttonLargeRegular,
-    color: colors.foreground.default,
   },
 });

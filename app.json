@@ -13,11 +13,12 @@
       "backgroundColor": "#000000"
     },
     "ios": {
-      "bundleIdentifier": "com.ewellness.zults.v5demo",
-      "supportsTablet": true,
-      "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
-      }
+  "bundleIdentifier": "com.ewellness.zults.v5demo",
+  "buildNumber": "4",
+  "supportsTablet": true,
+  "infoPlist": {
+    "ITSAppUsesNonExemptEncryption": false
+  }
     },
     "android": {
       "adaptiveIcon": {

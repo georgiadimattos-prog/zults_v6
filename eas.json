@@ -26,8 +26,7 @@
     "production": {
       "ios": {
         "appleId": "georgiadimattos@hotmail.com",
-        "ascAppId": "P64S382FN5", // Apple Team ID (already confirmed earlier)
-        "sku": "zults-demo"       // any unique identifier for your build
+        "ascAppId": "6753002663"
       }
     }
   }

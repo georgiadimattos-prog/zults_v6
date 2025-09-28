@@ -3,12 +3,12 @@ import {
   Modal,
   View,
   Text,
-  TouchableOpacity,
   TouchableWithoutFeedback,
   StyleSheet,
 } from "react-native";
 import { BlurView } from "expo-blur";
 import { colors, typography } from "../../theme";
+import ZultsButton from "./ZultsButton";
 
 export default function ConfirmModal({
   visible,
@@ -22,7 +22,7 @@ export default function ConfirmModal({
     <Modal
       visible={visible}
       transparent
-      animationType="slide"
+      animationType="fade"
       onRequestClose={onClose}
     >
       <TouchableWithoutFeedback onPress={onClose}>
@@ -38,20 +38,27 @@ export default function ConfirmModal({
               ) : null}
 
               {/* Confirm button */}
-              <TouchableOpacity
-                style={styles.primaryButton}
+              <ZultsButton
+                label={confirmLabel}
+                type="primary"
+                size="large"
+                fullWidth
                 onPress={() => {
                   onConfirm?.();
                   onClose();
                 }}
-              >
-                <Text style={styles.primaryText}>{confirmLabel}</Text>
-              </TouchableOpacity>
+              />
+
+              <View style={{ height: 12 }} />
 
               {/* Cancel button */}
-              <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
-                <Text style={styles.cancelText}>Cancel</Text>
-              </TouchableOpacity>
+              <ZultsButton
+                label="Cancel"
+                type="secondary"
+                size="large"
+                fullWidth
+                onPress={onClose}
+              />
             </View>
           </TouchableWithoutFeedback>
         </BlurView>
@@ -82,31 +89,5 @@ const styles = StyleSheet.create({
     ...typography.bodyRegular,
     color: colors.foreground.soft,
     marginBottom: 24,
-  },
-  primaryButton: {
-    width: "100%",
-    height: 56,
-    borderRadius: 12,
-    backgroundColor: colors.neutral[0],
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 12,
-  },
-  primaryText: {
-    ...typography.buttonLargeRegular,
-    color: colors.button.activeLabelPrimary,
-  },
-  cancelButton: {
-    width: "100%",
-    height: 56,
-    borderRadius: 12,
-    backgroundColor: "transparent",
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 16,
-  },
-  cancelText: {
-    ...typography.buttonLargeRegular,
-    color: colors.foreground.default,
   },
 });

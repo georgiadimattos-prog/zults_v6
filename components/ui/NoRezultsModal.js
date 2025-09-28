@@ -19,7 +19,7 @@ export default function NoRezultsModal({ visible, onClose }) {
     <Modal
       visible={visible}
       transparent
-      animationType="slide"
+      animationType="fade"
       onRequestClose={onClose}
     >
       {/* Tap outside to close */}

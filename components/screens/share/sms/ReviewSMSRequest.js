@@ -30,82 +30,104 @@ export default function ReviewSMSRequest() {
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScreenWrapper topPadding={0}>
-          <ScrollView
-            contentContainerStyle={styles.scrollContent}
-            keyboardShouldPersistTaps="handled"
-          >
-            <Navbar />
+  {/* ✅ Navbar pinned at the top, outside scroll */}
+  <Navbar />
 
-            <Text style={styles.pageTitle}>Review your request</Text>
-            <Text style={styles.subtitle}>
-              Please check the details before sending
-            </Text>
+  {/* Scrollable content */}
+  <ScrollView
+    contentContainerStyle={[styles.content, { flexGrow: 1, paddingBottom: 120 }]}
+    keyboardShouldPersistTaps="handled"
+  >
+    {/* Header */}
+    <View style={styles.headerBlock}>
+      <Text allowFontScaling={false} style={styles.pageTitle}>
+        Review SMS
+      </Text>
+      <Text allowFontScaling={false} style={styles.subtitle}>
+        Check the details before you send.
+      </Text>
+    </View>
 
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Add phone number</Text>
-              <View style={styles.inputWrapper}>
-                <Text style={styles.inputText}>{String(phone)}</Text>
-              </View>
-            </View>
+    {/* Phone number */}
+    <View style={styles.inputGroup}>
+      <Text style={styles.label}>Phone number</Text>
+      <View style={styles.inputWrapper}>
+        <Text style={styles.inputText}>{String(phone)}</Text>
+      </View>
+    </View>
 
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Message</Text>
-              <View style={styles.inputWrapper}>
-                <Text style={styles.inputText}>
-                  Someone sent you a reminder to consider getting tested for STIs.
-                  This may be from a past or potential partner.
-                </Text>
-              </View>
-            </View>
+    {/* Message (static, not editable) */}
+    <View style={styles.inputGroup}>
+      <Text style={styles.label}>Message</Text>
+      <View style={styles.staticBox}>
+        <Text style={styles.staticText}>
+          A reminder to consider getting tested for STIs. This may be from a past or potential partner.
+        </Text>
+      </View>
+    </View>
 
-            <View style={styles.checkboxRow}>
-              <TouchableOpacity
-                onPress={() => setAgreed(!agreed)}
-                style={styles.checkboxContainer}
-                activeOpacity={0.7}
-              >
-                <View style={[styles.checkbox, agreed && styles.checkboxChecked]}>
-                  {agreed && <Text style={styles.checkmark}>✓</Text>}
-                </View>
-                <Text style={styles.checkboxText}>
-                  By using this service you agree its purpose is for a legitimate purpose
-                  and you have considered the implications for the recipient.
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </ScrollView>
+    {/* Checkbox */}
+    <View style={styles.checkboxRow}>
+      <TouchableOpacity
+        onPress={() => setAgreed(!agreed)}
+        style={styles.checkboxContainer}
+        activeOpacity={0.7}
+      >
+        <View style={[styles.checkbox, agreed && styles.checkboxChecked]}>
+          {agreed && <Text style={styles.checkmark}>✓</Text>}
+        </View>
+        <Text style={styles.checkboxText}>
+          I confirm this request is for a legitimate purpose and I’ve considered its impact on the recipient.
+        </Text>
+      </TouchableOpacity>
+    </View>
+  </ScrollView>
 
-          {/* Footer with CTA */}
-          <ScreenFooter>
-            <ZultsButton
-              label="Send Request"
-              type="primary"
-              size="large"
-              fullWidth
-              disabled={!agreed}
-              onPress={() => navigation.navigate('SMSRequestSent')}
-            />
-          </ScreenFooter>
-        </ScreenWrapper>
+  {/* Footer stays pinned too */}
+  <ScreenFooter>
+    <ZultsButton
+      label="Send SMS"
+      type="primary"
+      size="large"
+      fullWidth
+      disabled={!agreed}
+      onPress={() => navigation.navigate('SMSRequestSent')}
+    />
+  </ScreenFooter>
+</ScreenWrapper>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  scrollContent: {
-    paddingBottom: 32,
+  content: {
+    paddingHorizontal: 16, // ✅ Apple-style gutter
+  },
+  headerBlock: {
+    marginTop: 32,
+    marginBottom: 24,
   },
   pageTitle: {
     ...typography.largeTitleMedium,
     color: colors.foreground.default,
-    marginBottom: 8,
+    marginBottom: 6,
   },
   subtitle: {
     ...typography.bodyRegular,
     color: colors.foreground.soft,
     marginBottom: 24,
   },
+  staticBox: {   // 👈 new style
+  borderRadius: 12,
+  backgroundColor: 'rgba(255,255,255,0.05)', // subtle frosted bg
+  padding: 16,
+},
+staticText: {
+  ...typography.bodyRegular,
+  color: colors.foreground.default,
+  lineHeight: 20,
+},
   inputGroup: {
     marginBottom: 24,
   },
@@ -144,7 +166,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 3,
     backgroundColor: '#292929',
-    marginRight: 10, // ✅ spacing
+    marginRight: 10,
   },
   checkboxChecked: {
     backgroundColor: colors.neutral[0],

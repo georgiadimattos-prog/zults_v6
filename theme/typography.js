@@ -4,15 +4,15 @@ export const typography = {
   // Large Titles
   largeTitleMedium: {
     fontFamily: fonts.medium,
-    fontSize: 32,
-    lineHeight: 36,
-    letterSpacing: -0.64,
+    fontSize: 34,
+    lineHeight: 41,
+    letterSpacing: -0.5,
   },
   largeTitleRegular: {
     fontFamily: fonts.regular,
-    fontSize: 32,
-    lineHeight: 36,
-    letterSpacing: -0.64,
+    fontSize: 34,
+    lineHeight: 41,
+    letterSpacing: -0.5,
   },
 
   // Title 1

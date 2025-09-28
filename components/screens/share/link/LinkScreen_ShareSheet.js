@@ -1,16 +1,19 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Share } from 'react-native';
+import { View, Text, StyleSheet, Share } from 'react-native';
+import { useRoute } from '@react-navigation/native';
 import { colors, typography } from '../../../../theme';
 import ScreenWrapper from '../../../ui/ScreenWrapper';
 import Navbar from '../../../ui/Navbar';
+import ZultsButton from '../../../ui/ZultsButton';
 
 export default function LinkScreenShareSheet() {
-  const link = 'https://myrezults.com/share/myrezults/binkey';
+  const route = useRoute();
+  const link = route.params?.link || 'https://myrezults.com/share/demo';
 
   const handleShare = async () => {
     try {
       await Share.share({
-        message: `Check out my Rezults link: ${link}`,
+        message: `Here’s my Rezults link: ${link}`,
         url: link,
         title: 'My Rezults',
       });
@@ -21,37 +24,35 @@ export default function LinkScreenShareSheet() {
 
   return (
     <ScreenWrapper topPadding={0}>
-      {/* ✅ standardized navbar */}
-      <Navbar title="Link" />
+      <Navbar />
 
-      {/* ✅ subtitle with consistent spacing */}
-      <Text style={styles.subtitle}>
-        You can send your Rezults link to someone or add it to your dating profile.
-        Even someone without the app can view it.
-      </Text>
+      <View style={styles.content}>
+        <Text style={styles.subtitle}>
+          Send your Rezults link to someone or add it to your dating profile. 
+          Even someone without the app can view it.
+        </Text>
 
-      <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
-        <Text style={styles.shareButtonText}>Share Link</Text>
-      </TouchableOpacity>
+        <ZultsButton
+          label="Share Link"
+          type="primary"
+          size="large"
+          fullWidth
+          onPress={handleShare}
+        />
+      </View>
     </ScreenWrapper>
   );
 }
 
 const styles = StyleSheet.create({
+  content: {
+    paddingHorizontal: 16,
+    marginTop: 24,
+  },
   subtitle: {
     ...typography.bodyRegular,
     color: colors.foreground.soft,
-    marginTop: 16,    // ✅ consistent spacing below navbar
-    marginBottom: 32,
-  },
-  shareButton: {
-    backgroundColor: colors.neutral[0],
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: 'center',
-  },
-  shareButtonText: {
-    ...typography.bodyLarge,
-    color: colors.button.activeLabelPrimary,
+    marginBottom: 24,
+    textAlign: 'center',
   },
 });

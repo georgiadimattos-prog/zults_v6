@@ -7,6 +7,7 @@ import {
   TouchableWithoutFeedback,
   StyleSheet,
 } from "react-native";
+import { BlurView } from "expo-blur";
 import { colors, typography } from "../../theme";
 
 export default function ActionModal({
@@ -20,12 +21,12 @@ export default function ActionModal({
     <Modal
       visible={visible}
       transparent
-      animationType="slide"
+      animationType="fade"
       onRequestClose={onClose}
     >
       {/* Tap outside to close */}
       <TouchableWithoutFeedback onPress={onClose}>
-        <View style={styles.overlay}>
+        <BlurView intensity={40} tint="dark" style={styles.overlay}>
           {/* Prevent closing when tapping inside content */}
           <TouchableWithoutFeedback>
             <View style={styles.container}>
@@ -52,15 +53,12 @@ export default function ActionModal({
               ))}
 
               {/* Cancel button */}
-              <TouchableOpacity
-                style={styles.cancelButton}
-                onPress={onClose}
-              >
+              <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
                 <Text style={styles.cancelText}>Cancel</Text>
               </TouchableOpacity>
             </View>
           </TouchableWithoutFeedback>
-        </View>
+        </BlurView>
       </TouchableWithoutFeedback>
     </Modal>
   );
@@ -69,7 +67,6 @@ export default function ActionModal({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
     justifyContent: "flex-end",
   },
   container: {

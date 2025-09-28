@@ -36,7 +36,7 @@ export default function SMSRequestSent() {
           />
           <Text style={styles.title}>Sent!</Text>
           <Text style={styles.subtitle}>
-            You’ll be able to send another anonymous SMS in one week.
+            You can send another SMS in one week.
           </Text>
         </View>
       </View>

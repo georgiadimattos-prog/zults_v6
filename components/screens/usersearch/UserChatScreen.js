@@ -149,7 +149,6 @@ const handleScroll = (e) => {
 
 // restore from cache
 useEffect(() => {
-  // ✅ use user.id if available so demo is always keyed as "zults-demo"
   const key = user.id || user.name || "default";
 
   // 1. Restore if we already have chat in cache
@@ -159,6 +158,12 @@ useEffect(() => {
     setChatState(saved.chatState || { hasShared: false, hasRequested: false });
     setOtherUserState(saved.otherUserState || { hasShared: false, hasRequested: false });
     if (saved.blocked) setIsBlocked(true);
+
+    // 👇 returning → instant jump to bottom
+    setTimeout(() => {
+      flatListRef.current?.scrollToEnd({ animated: false });
+    }, 0);
+
     return; // ✅ stop here, no reseeding
   }
 
@@ -197,6 +202,11 @@ useEffect(() => {
       otherUserState: { hasShared: false, hasRequested: false },
       blocked: false,
     };
+
+    // 👇 first-time demo → smooth scroll
+    setTimeout(() => {
+      flatListRef.current?.scrollToEnd({ animated: true });
+    }, 300);
   }
 }, [user]);
 
@@ -487,12 +497,16 @@ useEffect(() => {
       showsVerticalScrollIndicator={false}
       contentInsetAdjustmentBehavior="automatic"
       contentContainerStyle={{
-        paddingHorizontal: 8,
-        paddingTop: 180,
-      }}
-      ListFooterComponent={<View style={{ height: footerHeight + 50 }} />}
-      onScroll={handleScroll}
-      scrollEventThrottle={16}
+  paddingHorizontal: 8,
+  paddingTop: 180,
+}}
+ListFooterComponent={
+  isDemoChat
+    ? <View style={{ height: footerHeight + 50 }} /> // demo chat → dynamic
+    : <View style={{ height: 140 }} />              // user chat → fixed baseline
+}
+onScroll={handleScroll}
+scrollEventThrottle={16}
       onContentSizeChange={() => {
         if (isAtBottom) {
           requestAnimationFrame(() => {
@@ -590,48 +604,22 @@ useEffect(() => {
           style={styles.input}
         />
         {rezultsCache.hasRezults ? (
-          <TouchableOpacity
-            style={styles.sendButton}
-            onPress={() => {
-              setChatState({ ...chatState, hasShared: true });
-              setChatData((prev) => [
-                ...prev,
-                {
-                  id: Date.now().toString(),
-                  type: "share",
-                  direction: "from-user",
-                  username: currentUser.name,
-                  avatar: currentUser.avatar,
-                  timestamp: "10:05AM",
-                },
-                ...(message
-                  ? [
-                      {
-                        id: Date.now().toString() + "-note",
-                        type: "text",
-                        direction: "from-user",
-                        username: currentUser.name,
-                        avatar: currentUser.avatar,
-                        text: message,
-                        timestamp: "10:05AM",
-                      },
-                    ]
-                  : []),
-              ]);
-              setMessage("");
-              startShareFlow();
-            }}
-          >
-            <Text style={styles.sendButtonText}>Share Rezults</Text>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity
-            style={styles.sendButton}
-            onPress={() => setShowNoRezultsModal(true)}
-          >
-            <Text style={styles.sendButtonText}>Share Rezults</Text>
-          </TouchableOpacity>
-        )}
+  <TouchableOpacity
+    style={styles.sendButton}
+    onPress={() => {
+      // ... normal share flow
+    }}
+  >
+    <Text style={styles.sendButtonText}>Share Rezults</Text>
+  </TouchableOpacity>
+) : (
+  <TouchableOpacity
+    style={styles.sendButton}
+    onPress={() => setShowNoRezultsModal(true)}   // 👈 already here
+  >
+    <Text style={styles.sendButtonText}>Share Rezults</Text>
+  </TouchableOpacity>
+)}
       </View>
     )}
   </BlurView>
@@ -639,127 +627,37 @@ useEffect(() => {
 
 
       {/* Block / Unblock Modal */}
-<Modal
+{/* Block / Unblock Modal */}
+<ActionModal
   visible={showActionsModal}
-  transparent
-  animationType="slide"
-  onRequestClose={() => setShowActionsModal(false)}
->
-  <TouchableWithoutFeedback onPress={() => setShowActionsModal(false)}>
-    <View style={{ flex: 1 }}>
-      {/* Background Blur */}
-      <BlurView
-        intensity={50}
-        tint="dark"
-        style={StyleSheet.absoluteFill}
-      />
-      <View style={{ flex: 1, justifyContent: "flex-end" }}>
-        <TouchableWithoutFeedback>
-          <View
-            style={{
-              backgroundColor: colors.background.surface2,
-              borderTopLeftRadius: 32,
-              borderTopRightRadius: 32,
-              paddingTop: 24,
-              paddingHorizontal: 20,
-              paddingBottom: 32,
-            }}
-          >
-            {/* Title */}
-            <Text
-              style={{
-                ...typography.title1Medium,
-                color: colors.foreground.default,
-                marginBottom: 12,
-              }}
-            >
-              {isBlocked ? "Unblock user?" : "Block user?"}
-            </Text>
+  onClose={() => setShowActionsModal(false)}
+  title={isBlocked ? "Unblock user?" : "Block user?"}
+  description={
+    isBlocked
+      ? "Unblock this user to continue chatting and sharing Rezults."
+      : "This user won’t be able to send their Rezults or request to see yours. They won’t be notified if you block them."
+  }
+  actions={[
+    {
+      label: isBlocked ? "Unblock" : "Block",
+      onPress: () => {
+        const key = user.name || "default";
 
-            {/* Description */}
-            <Text
-              style={{
-                ...typography.bodyRegular,
-                color: colors.foreground.soft,
-                marginBottom: 24,
-              }}
-            >
-              {isBlocked
-                ? "Unblock this user to continue chatting and sharing Rezults."
-                : "This user won’t be able to send their Rezults or request to see yours. They won’t be notified if you block them."}
-            </Text>
-
-            {/* Primary Action */}
-            <TouchableOpacity
-              style={{
-                width: "100%",
-                height: 56,
-                borderRadius: 16,
-                backgroundColor: colors.neutral[0],
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-              onPress={() => {
-                const key = user.name || "default";
-
-                if (isBlocked) {
-                  // ✅ Unblock
-                  setIsBlocked(false);
-                  setChatData([]);
-                  setChatState({ hasShared: false, hasRequested: false });
-                  setOtherUserState({ hasShared: false, hasRequested: false });
-
-                  // persist unblock in chatCache
-                  if (chatCache[key]) chatCache[key].blocked = false;
-                } else {
-                  // ✅ Block
-                  setIsBlocked(true);
-                  setChatData([]);
-
-                  // persist block in chatCache
-                  if (chatCache[key]) chatCache[key].blocked = true;
-                }
-
-                setShowActionsModal(false);
-              }}
-            >
-              <Text
-                style={{
-                  ...typography.buttonLargeRegular,
-                  color: colors.button.activeLabelPrimary,
-                }}
-              >
-                {isBlocked ? "Unblock" : "Block"}
-              </Text>
-            </TouchableOpacity>
-
-            {/* Cancel */}
-            <TouchableOpacity
-              style={{
-                width: "100%",
-                height: 56,
-                borderRadius: 16,
-                alignItems: "center",
-                justifyContent: "center",
-                marginTop: 12,
-              }}
-              onPress={() => setShowActionsModal(false)}
-            >
-              <Text
-                style={{
-                  ...typography.buttonLargeRegular,
-                  color: colors.foreground.default,
-                }}
-              >
-                Cancel
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </TouchableWithoutFeedback>
-      </View>
-    </View>
-  </TouchableWithoutFeedback>
-</Modal>
+        if (isBlocked) {
+          setIsBlocked(false);
+          setChatData([]);
+          setChatState({ hasShared: false, hasRequested: false });
+          setOtherUserState({ hasShared: false, hasRequested: false });
+          if (chatCache[key]) chatCache[key].blocked = false;
+        } else {
+          setIsBlocked(true);
+          setChatData([]);
+          if (chatCache[key]) chatCache[key].blocked = true;
+        }
+      },
+    },
+  ]}
+/>
 
       {/* No Rezults Modal */}
 <NoRezultsModal

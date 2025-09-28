@@ -9,14 +9,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     height: 56,
-    paddingLeft: 0,
-    paddingRight: 16,
-    justifyContent: 'flex-start',
+    paddingHorizontal: 10, // ✅ uniform right
+    justifyContent: 'space-between', // ✅ handles left + right content nicely
   },
   left: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingLeft: 5, // ✅ consistent across all variants
   },
   icon: {
     width: 24,
@@ -30,6 +28,12 @@ const styles = StyleSheet.create({
     ...typography.bodyMedium,
     color: colors.info.onContainer,
   },
+  backButton: {
+  width: 44,   // ✅ Apple recommended minimum
+  height: 44,  // ✅ Apple recommended minimum
+  justifyContent: 'center',
+  alignItems: 'center',
+},
 });
 
 //
@@ -40,12 +44,16 @@ export default function Navbar({ onBackPress }) {
   return (
     <View style={styles.container}>
       <View style={styles.left}>
-        <TouchableOpacity onPress={onBackPress || navigation.goBack}>
-          <Image
-            source={require('../../assets/images/navbar-arrow.png')}
-            style={styles.icon}
-          />
-        </TouchableOpacity>
+        <TouchableOpacity
+  onPress={onBackPress || navigation.goBack}
+  style={styles.backButton}   // ✅ makes the invisible box bigger
+  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} // ✅ extra margin
+>
+  <Image
+    source={require('../../assets/images/navbar-arrow.png')}
+    style={styles.icon}
+  />
+</TouchableOpacity>
       </View>
       <View style={styles.spacer} />
     </View>
@@ -60,12 +68,16 @@ export function NavbarBackInvite({ onBackPress, onInvite }) {
   return (
     <View style={styles.container}>
       <View style={styles.left}>
-        <TouchableOpacity onPress={onBackPress || navigation.goBack}>
-          <Image
-            source={require('../../assets/images/navbar-arrow.png')}
-            style={styles.icon}
-          />
-        </TouchableOpacity>
+        <TouchableOpacity
+  onPress={onBackPress || navigation.goBack}
+  style={styles.backButton}   // ✅ makes the invisible box bigger
+  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} // ✅ extra margin
+>
+  <Image
+    source={require('../../assets/images/navbar-arrow.png')}
+    style={styles.icon}
+  />
+</TouchableOpacity>
       </View>
 
       <TouchableOpacity onPress={onInvite}>
@@ -83,12 +95,16 @@ export function NavbarOptions({ onBackPress, onOptions }) {
   return (
     <View style={styles.container}>
       <View style={styles.left}>
-        <TouchableOpacity onPress={onBackPress || navigation.goBack}>
-          <Image
-            source={require('../../assets/images/navbar-arrow.png')}
-            style={styles.icon}
-          />
-        </TouchableOpacity>
+        <TouchableOpacity
+  onPress={onBackPress || navigation.goBack}
+  style={styles.backButton}   // ✅ makes the invisible box bigger
+  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} // ✅ extra margin
+>
+  <Image
+    source={require('../../assets/images/navbar-arrow.png')}
+    style={styles.icon}
+  />
+</TouchableOpacity>
       </View>
 
       <TouchableOpacity onPress={onOptions}>
@@ -111,12 +127,16 @@ export function NavbarBackRightText({ onBackPress, rightText, onRightPress }) {
     <View style={[styles.container, { justifyContent: 'space-between' }]}>
       {/* Left: back arrow */}
       <View style={styles.left}>
-        <TouchableOpacity onPress={onBackPress || navigation.goBack}>
-          <Image
-            source={require('../../assets/images/navbar-arrow.png')}
-            style={styles.icon}
-          />
-        </TouchableOpacity>
+        <TouchableOpacity
+  onPress={onBackPress || navigation.goBack}
+  style={styles.backButton}   // ✅ makes the invisible box bigger
+  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} // ✅ extra margin
+>
+  <Image
+    source={require('../../assets/images/navbar-arrow.png')}
+    style={styles.icon}
+  />
+</TouchableOpacity>
       </View>
 
       {/* Right: text button */}

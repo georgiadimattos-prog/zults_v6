@@ -17,17 +17,16 @@ import ActivitiesScreen from "./components/screens/activities/ActivitiesScreen";
 import GetRezults_SelectProviderScreen from "./components/screens/getrezults/GetRezults_SelectProviderScreen";
 import GetRezults_PasteLinkScreen from "./components/screens/getrezults/GetRezults_PasteLinkScreen";
 import GetRezults_LoadingScreen from "./components/screens/getrezults/GetRezults_LoadingScreen";
-import GetRezults_ConfirmScreen from "./components/screens/getrezults/GetRezults_ConfirmScreen";
 import GetRezults_HowToFindLinkScreen from "./components/screens/getrezults/GetRezults_HowToFindLinkScreen";
 import AddRezultsCardScreen from "./components/screens/getrezults/AddRezultsCardScreen";
+import PolicyScreen from "./components/screens/getrezults/PolicyScreen";
 
 // Share Screens
-import ShareScreen from "./components/screens/share/ShareScreen";
-import SMSRequestSent from "./components/screens/share/sms/SMSRequestSent";
+import ShareScreen from "./components/screens/share/ShareScreen";  // ✅ SMS is now inside here
 import ReviewSMSRequest from "./components/screens/share/sms/ReviewSMSRequest";
+import SMSRequestSent from "./components/screens/share/sms/SMSRequestSent";
 import LinkScreenShareSheet from "./components/screens/share/link/LinkScreen_ShareSheet";
 import LinkScreenSuccess from "./components/screens/share/link/LinkScreen_Success";
-import LinkScreenOffline from "./components/screens/share/link/LinkScreen_Offline";
 
 // Chat + Rezults
 import UserChatScreen from "./components/screens/usersearch/UserChatScreen";
@@ -47,14 +46,7 @@ export default function App() {
 
   if (!fontsLoaded) {
     return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: "#000",
-        }}
-      >
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#000" }}>
         <Text style={{ color: "#fff", fontSize: 18 }}>Loading...</Text>
       </View>
     );
@@ -63,14 +55,8 @@ export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <NavigationContainer>
-        <Stack.Navigator
-          initialRouteName="MainScreen"
-          screenOptions={{
-            headerShown: false,
-            animation: "slide_from_right",
-          }}
-        >
-          {/* Main Wrapper Screen */}
+        <Stack.Navigator initialRouteName="MainScreen" screenOptions={{ headerShown: false, animation: "slide_from_right" }}>
+          {/* Main */}
           <Stack.Screen name="MainScreen" component={MainScreen} />
           <Stack.Screen name="Settings" component={SettingsScreen} />
 
@@ -78,41 +64,19 @@ export default function App() {
           <Stack.Screen name="Activities" component={ActivitiesScreen} />
 
           {/* Get Rezults Flow */}
-          <Stack.Screen
-            name="GetRezultsProvider"
-            component={GetRezults_SelectProviderScreen}
-          />
-          <Stack.Screen
-            name="GetRezultsLinkInput"
-            component={GetRezults_PasteLinkScreen}
-          />
-          <Stack.Screen
-            name="GetRezultsLoading"
-            component={GetRezults_LoadingScreen}
-          />
-          <Stack.Screen
-            name="GetRezultsConfirm"
-            component={GetRezults_ConfirmScreen}
-          />
-          <Stack.Screen
-            name="GetRezultsHowToFindLink"
-            component={GetRezults_HowToFindLinkScreen}
-          />
-          <Stack.Screen
-            name="AddRezultsCard"
-            component={AddRezultsCardScreen}
-          />
+          <Stack.Screen name="GetRezultsProvider" component={GetRezults_SelectProviderScreen} />
+          <Stack.Screen name="GetRezultsLinkInput" component={GetRezults_PasteLinkScreen} />
+          <Stack.Screen name="GetRezultsLoading" component={GetRezults_LoadingScreen} />
+          <Stack.Screen name="GetRezultsHowToFindLink" component={GetRezults_HowToFindLinkScreen} />
+          <Stack.Screen name="AddRezultsCard" component={AddRezultsCardScreen} />
+          <Stack.Screen name="PolicyScreen" component={PolicyScreen} />
 
-          {/* Share Screens */}
+          {/* Share */}
           <Stack.Screen name="Share" component={ShareScreen} />
+          <Stack.Screen name="ReviewSMSRequest" component={ReviewSMSRequest} />
           <Stack.Screen name="SMSRequestSent" component={SMSRequestSent} />
-          <Stack.Screen name="ReviewSMS" component={ReviewSMSRequest} />
-          <Stack.Screen
-            name="LinkShareSheet"
-            component={LinkScreenShareSheet}
-          />
+          <Stack.Screen name="LinkShareSheet" component={LinkScreenShareSheet} />
           <Stack.Screen name="LinkSuccess" component={LinkScreenSuccess} />
-          <Stack.Screen name="LinkOffline" component={LinkScreenOffline} />
 
           {/* Chat + Rezults */}
           <Stack.Screen name="UserChat" component={UserChatScreen} />

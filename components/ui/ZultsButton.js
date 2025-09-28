@@ -1,6 +1,7 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { colors, typography } from '../../theme';
+import * as Haptics from 'expo-haptics';
 
 export default function ZultsButton({
   label,
@@ -26,7 +27,6 @@ export default function ZultsButton({
         ? 'buttonSmallMedium'
         : 'buttonLargeMedium';
 
-    // ✅ Safe fallback if the typography key doesn’t exist
     const safeStyle = typography[textType] || typography.bodyMedium;
 
     return [safeStyle, styles.text, styles[`${type}Text`]];
@@ -35,11 +35,18 @@ export default function ZultsButton({
   return (
     <TouchableOpacity
       style={getButtonStyle()}
-      onPress={onPress}
+      onPress={() => {
+        if (!disabled) {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); // ✅ cleaner haptic
+          onPress && onPress();
+        }
+      }}
       disabled={disabled}
       activeOpacity={0.8}
     >
-      <Text style={getTextStyle()}>{String(label)}</Text>
+      <Text style={getTextStyle()} allowFontScaling={false}>
+        {String(label)}
+      </Text>
     </TouchableOpacity>
   );
 }
@@ -51,23 +58,27 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  // ✅ Sizes — locked global heights
-  large: { height: 56, paddingHorizontal: 24 },
-  medium: { height: 48, paddingHorizontal: 20 },
-  small: { height: 40, paddingHorizontal: 16 },
+  // ✅ Sizes — global heights only (no paddingHorizontal)
+  large: { height: 56 },
+  medium: { height: 48 },
+  small: { height: 40 },
 
   // Types
   primary: { backgroundColor: colors.neutral[0] },
-  secondary: { backgroundColor: colors.background.surface2 },
+  secondary: {
+    backgroundColor: 'transparent',
+    borderWidth: 1.2,
+    borderColor: colors.foreground.soft,
+  },
 
   // Text
-  text: { textAlign: 'center' },
+  text: { textAlign: 'center', textAlignVertical: 'center' },
   primaryText: { color: colors.button.activeLabelPrimary },
   secondaryText: { color: colors.foreground.default },
 
-  // State
+  // Disabled
   disabled: {
     opacity: 0.4,
-    minHeight: 56, // 🔥 ensures same height when disabled
+    minHeight: 56,
   },
 });
