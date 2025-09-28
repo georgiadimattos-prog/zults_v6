@@ -42,7 +42,7 @@ export default function NoRezultsModal({ visible, onClose }) {
                 style={styles.primaryButton}
                 onPress={() => {
                   onClose?.();
-                  navigation.navigate("GetRezultsProvider"); // go to provider picker
+                  navigation.navigate("GetRezultsProvider"); // ✅ provider picker
                 }}
               >
                 <Text style={styles.primaryText}>Get Rezults</Text>
