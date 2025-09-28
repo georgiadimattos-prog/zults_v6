@@ -2,7 +2,7 @@
 import { useRef } from "react";
 import { chatCache } from "../../cache/chatCache";
 
-// ⏱ small helper for scheduling messages
+// ⏱ helper for scheduling
 const scheduleMessage = (delay, fn) => setTimeout(fn, delay);
 
 export function useDemoChat() {
@@ -42,49 +42,35 @@ export function useDemoChat() {
       blocked: false,
     };
 
-    // helper to push a message
     const pushMessage = (msg) => {
       setChatData((prev) => [...prev, msg]);
       chatCache[key].chatData.push(msg);
-      setTimeout(() => {
-        flatListRef?.current?.scrollToEnd({ animated: true });
-      }, 300);
+      setTimeout(() => flatListRef?.current?.scrollToEnd({ animated: true }), 300);
     };
 
-    // 🟣 Welcome sequence
-    scheduleMessage(1000, () => {
-      addTyping(setChatData, user);
-      scheduleMessage(2000, () => {
-        removeTyping(setChatData);
-        pushMessage({
-          id: "demo-msg-1",
-          type: "text",
-          direction: "from-other",
-          username: "Zults Bot",
-          avatar: user.image,
-          text: "Hi 👋 I’m Zults Bot — your sexual health companion 💜 I’ll be here to answer any questions you might have, even the ones that feel a little embarrassing to ask a friend.",
-          timestamp: "Now",
-        });
-      });
+    // 🟣 Show first 2 messages instantly
+    pushMessage({
+      id: "demo-msg-1",
+      type: "text",
+      direction: "from-other",
+      username: "Zults Bot",
+      avatar: user.image,
+      text: "Hi 👋 I’m Zults Bot — your sexual health companion 💜",
+      timestamp: "Now",
     });
 
-    scheduleMessage(6000, () => {
-      addTyping(setChatData, user);
-      scheduleMessage(2000, () => {
-        removeTyping(setChatData);
-        pushMessage({
-          id: "demo-msg-2",
-          type: "text",
-          direction: "from-other",
-          username: "Zults Bot",
-          avatar: user.image,
-          text: "You can chat with me about sexual health, Rezults, or just to understand how this all works. Think of me as your supportive best friend in the dating world — no judgement, only clear answers.",
-          timestamp: "Now",
-        });
-      });
+    pushMessage({
+      id: "demo-msg-2",
+      type: "text",
+      direction: "from-other",
+      username: "Zults Bot",
+      avatar: user.image,
+      text: "You can chat with me about sexual health, Rezults, or anything you’re unsure about 💬.",
+      timestamp: "Now",
     });
 
-    scheduleMessage(11000, () => {
+    // ⏱ Later messages with typing effect
+    scheduleMessage(4000, () => {
       addTyping(setChatData, user);
       scheduleMessage(2000, () => {
         removeTyping(setChatData);
@@ -94,25 +80,20 @@ export function useDemoChat() {
           direction: "from-other",
           username: "Zults Bot",
           avatar: user.image,
-          text: "And to show you how Rezults sharing works, I’m already sharing mine with you in this chat. That way you can see what it looks like when people share with you — or when you share with them once you have a Rezults to show.",
+          text: "Here’s an example of how Rezults sharing looks ⬇️",
           timestamp: "Now",
         });
       });
     });
 
-    // Rezults demo bubble
-    scheduleMessage(16000, () => {
-      addTyping(setChatData, user);
-      scheduleMessage(2000, () => {
-        removeTyping(setChatData);
-        pushMessage({
-          id: "demo-msg-4",
-          type: "share",
-          direction: "from-other",
-          username: "Zults Bot",
-          avatar: user.image,
-          timestamp: "Now",
-        });
+    scheduleMessage(10000, () => {
+      pushMessage({
+        id: "demo-msg-4",
+        type: "share",
+        direction: "from-other",
+        username: "Zults Bot",
+        avatar: user.image,
+        timestamp: "Now",
       });
     });
   };

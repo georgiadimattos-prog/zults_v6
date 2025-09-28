@@ -137,22 +137,28 @@ export default function UserChatScreen() {
     setIsAtBottom(distanceFromBottom < 50);
   };
 
-  // restore from cache
-  useEffect(() => {
-    const key = user.id || user.name || "default";
+const hasSeededRef = useRef(false);
 
-    if (chatCache[key]) {
-      const saved = chatCache[key];
-      setChatData(saved.chatData || []);
-      setChatState(saved.chatState || { hasShared: false, hasRequested: false });
-      setOtherUserState(saved.otherUserState || { hasShared: false, hasRequested: false });
-      if (saved.blocked) setIsBlocked(true);
+// restore from cache or seed demo bot
+useEffect(() => {
+  const key = user.id || user.name || "default";
 
-      setTimeout(() => flatListRef.current?.scrollToEnd({ animated: false }), 0);
-      return;
-    }
+  // restore saved history if available
+  if (chatCache[key] && chatCache[key].chatData?.length > 0) {
+    const saved = chatCache[key];
+    setChatData(saved.chatData || []);
+    setChatState(saved.chatState || { hasShared: false, hasRequested: false });
+    setOtherUserState(saved.otherUserState || { hasShared: false, hasRequested: false });
+    if (saved.blocked) setIsBlocked(true);
 
-    if (user.isBot && chatData.length === 0) {
+    setTimeout(() => flatListRef.current?.scrollToEnd({ animated: false }), 0);
+    return;
+  }
+
+  // 🟣 seed welcome flow when first opening Zults Bot
+  if (user.isBot && !hasSeededRef.current) {
+    hasSeededRef.current = true;
+    setChatData([]); // clear any stale cache
     seedDemoChat(user, setChatData, flatListRef);
   }
 }, [user]);
@@ -400,67 +406,49 @@ export default function UserChatScreen() {
             onLayout={(e) => setFooterHeight(e.nativeEvent.layout.height)}
           >
             {isDemoChat ? (
-              <View style={styles.footer}>
-                <TextInput
-                  placeholder="Ask me anything about sexual health..."
-                  placeholderTextColor={colors.foreground.muted}
-                  value={message}
-                  onChangeText={setMessage}
-                  style={styles.input}
-                />
-                <TouchableOpacity
-                  style={styles.sendButton}
-                  onPress={() => {
-                    if (!message.trim()) return;
-                    const userMsg = {
-                      id: Date.now().toString(),
-                      type: "text",
-                      direction: "from-user",
-                      username: currentUser.name,
-                      avatar: currentUser.avatar,
-                      text: message,
-                      timestamp: "Now",
-                    };
-                    setChatData((prev) => [...prev, userMsg]);
-                    setMessage("");
+  <View style={styles.footer}>
+    <TextInput
+      placeholder="Ask me anything about sexual health..."
+      placeholderTextColor={colors.foreground.muted}
+      value={message}
+      onChangeText={setMessage}
+      style={styles.input}
+    />
+    <TouchableOpacity
+      style={styles.sendButton}
+      onPress={() => {
+        if (!message.trim()) return;
 
-                    setTimeout(() => {
-                      const aiMsg = {
-                        id: Date.now().toString() + "-ai",
-                        type: "text",
-                        direction: "from-other",
-                        username: "Zults AI",
-                        avatar: user.image,
-                        text: "I'm your Rezults Assistant 🤖. Ask me anything about sexual health!",
-                        timestamp: "Now",
-                      };
-                      setChatData((prev) => [...prev, aiMsg]);
-                    }, 1200);
-                  }}
-                >
-                  <Text style={styles.sendButtonText}>Send</Text>
-                </TouchableOpacity>
-              </View>
-            ) : chatState.hasShared ? (
-              <TouchableOpacity
-                style={styles.stopButton}
-                onPress={() => {
-                  setChatState({ ...chatState, hasShared: false });
-                  setChatData((prev) => [
-                    ...prev,
-                    {
-                      id: Date.now().toString(),
-                      type: "stop-share",
-                      direction: "from-user",
-                      username: currentUser.name,
-                      avatar: currentUser.avatar,
-                      timestamp: "10:06AM",
-                    },
-                  ]);
-                }}
-              >
-                <Text style={styles.stopButtonText}>Stop Sharing Rezults</Text>
-              </TouchableOpacity>
+        const userMsg = {
+          id: Date.now().toString(),
+          type: "text",
+          direction: "from-user",
+          username: currentUser.name,
+          avatar: currentUser.avatar,
+          text: message,
+          timestamp: "Now",
+        };
+        setChatData((prev) => [...prev, userMsg]);
+        setMessage("");
+
+        // ✅ lighter reply for demo bot
+        setTimeout(() => {
+          const aiMsg = {
+            id: Date.now().toString() + "-ai",
+            type: "text",
+            direction: "from-other",
+            username: "Zults Bot",
+            avatar: user.image,
+            text: "Got it 👍 Ask me anything about Rezults or sexual health.",
+            timestamp: "Now",
+          };
+          setChatData((prev) => [...prev, aiMsg]);
+        }, 1200);
+      }}
+    >
+      <Image source={require("../../../assets/images/send-arrow.png")} style={styles.sendIcon} />
+    </TouchableOpacity>
+  </View>
             ) : (
               <View style={styles.footer}>
                 <TextInput
@@ -471,38 +459,38 @@ export default function UserChatScreen() {
                   style={styles.input}
                 />
                 {rezultsCache.hasRezults ? (
-                  <TouchableOpacity
-                    style={styles.sendButton}
-                    onPress={() => {
-                      setChatState({ ...chatState, hasShared: true });
-                      setChatData((prev) => [
-                        ...prev,
-                        {
-                          id: Date.now().toString(),
-                          type: "share",
-                          direction: "from-user",
-                          username: currentUser.name,
-                          avatar: currentUser.avatar,
-                          timestamp: "Now",
-                        },
-                      ]);
-                      startShareFlow();
-                    }}
-                  >
-                    <Text style={styles.sendButtonText}>Share Rezults</Text>
-                  </TouchableOpacity>
-                ) : (
-                  <TouchableOpacity
-                    style={styles.sendButton}
-                    onPress={() => setShowNoRezultsModal(true)}
-                  >
-                    <Text style={styles.sendButtonText}>Share Rezults</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
-            )}
-          </BlurView>
-        )}
+  <TouchableOpacity
+    style={styles.shareRezultsButton}   // ⬅️ use pill style
+    onPress={() => {
+      setChatState({ ...chatState, hasShared: true });
+      setChatData((prev) => [
+        ...prev,
+        {
+          id: Date.now().toString(),
+          type: "share",
+          direction: "from-user",
+          username: currentUser.name,
+          avatar: currentUser.avatar,
+          timestamp: "Now",
+        },
+      ]);
+      startShareFlow();
+    }}
+  >
+    <Text style={styles.shareRezultsButtonText}>Share Rezults</Text>
+  </TouchableOpacity>
+) : (
+  <TouchableOpacity
+    style={styles.shareRezultsButton}   // ⬅️ same pill style
+    onPress={() => setShowNoRezultsModal(true)}
+  >
+    <Text style={styles.shareRezultsButtonText}>Share Rezults</Text>
+  </TouchableOpacity>
+)}
+</View>
+)}
+</BlurView>
+)}
 
         {/* Block / Unblock Modal */}
         <ActionModal
@@ -547,6 +535,7 @@ export default function UserChatScreen() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.background.surface1 },
+
   topBlur: {
     paddingTop: Platform.OS === "ios" ? 72 : 56,
     paddingBottom: 20,
@@ -558,17 +547,28 @@ const styles = StyleSheet.create({
     zIndex: 10,
     backgroundColor: "transparent",
   },
+
   topRow: {
     flexDirection: "row",
     justifyContent: "flex-end",
     alignItems: "center",
     marginBottom: 12,
   },
+
   moreIcon: { width: 24, height: 24, tintColor: colors.foreground.default },
+
   userRow: { flexDirection: "row", alignItems: "center", gap: 12 },
+
   backIcon: { width: 28, height: 28, tintColor: colors.foreground.default },
+
   avatar: { width: 40, height: 40, borderRadius: 20 },
-  username: { ...typography.bodyMedium, color: colors.foreground.default, flex: 1 },
+
+  username: {
+    ...typography.bodyMedium,
+    color: colors.foreground.default,
+    flex: 1,
+  },
+
   rezultsButton: {
     paddingHorizontal: 14,
     paddingVertical: 6,
@@ -577,9 +577,22 @@ const styles = StyleSheet.create({
     borderColor: colors.foreground.default,
     backgroundColor: colors.background.surface1,
   },
-  rezultsButtonActive: { backgroundColor: colors.brand.purple1, borderColor: colors.brand.purple1 },
-  rezultsButtonText: { ...typography.bodyMedium, color: colors.foreground.default },
-  rezultsButtonTextActive: { color: colors.neutral[0], fontWeight: "600" },
+
+  rezultsButtonActive: {
+    backgroundColor: colors.brand.purple1,
+    borderColor: colors.brand.purple1,
+  },
+
+  rezultsButtonText: {
+    ...typography.bodyMedium,
+    color: colors.foreground.default,
+  },
+
+  rezultsButtonTextActive: {
+    color: colors.neutral[0],
+    fontWeight: "600",
+  },
+
   typingBubble: {
     backgroundColor: colors.background.surface2,
     borderRadius: 16,
@@ -588,6 +601,7 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     margin: 8,
   },
+
   footerBlur: {
     position: "absolute",
     left: 0,
@@ -595,31 +609,60 @@ const styles = StyleSheet.create({
     bottom: 0,
     paddingHorizontal: 20,
     paddingTop: 12,
-    paddingBottom: Platform.OS === "ios" ? 20 : 16,
+    paddingBottom: Platform.OS === "ios" ? 34 : 20,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     backgroundColor: "transparent",
   },
+
   footer: { flexDirection: "row", alignItems: "center" },
+
   input: {
     flex: 1,
-    height: 44,
-    borderRadius: 22,
+    height: 38,
+    borderRadius: 19,
     borderWidth: 1,
     borderColor: colors.foreground.muted,
-    paddingHorizontal: 14,
+    paddingHorizontal: 12,
     marginRight: 8,
     ...typography.bodyRegular,
     color: colors.foreground.default,
     backgroundColor: colors.background.surface1,
   },
+
+  // ✅ Rectangular "Share Rezults" button
+  shareRezultsButton: {
+  backgroundColor: colors.brand.purple1,
+  height: 38,              // match input height
+  borderRadius: 19,        // half of height → pill shape
+  paddingHorizontal: 14,   // keep width spacing
+  alignItems: "center",
+  justifyContent: "center",
+},
+
+  shareRezultsButtonText: {
+    ...typography.bodyMedium,
+    color: colors.neutral[0],
+    fontWeight: "600",
+  },
+
+  // ✅ Circular chat footer send button
   sendButton: {
     backgroundColor: colors.brand.purple1,
-    borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
+    width: 38,           // match input height
+    height: 38,
+    borderRadius: 19,    // half of width/height
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: 8,
   },
-  sendButtonText: { ...typography.bodyMedium, color: colors.neutral[0], fontWeight: "600" },
+
+  sendIcon: {
+    width: 20,
+    height: 20,
+    tintColor: colors.neutral[0], // keep arrow white
+  },
+
   stopButton: {
     width: "100%",
     paddingVertical: 16,
@@ -627,7 +670,13 @@ const styles = StyleSheet.create({
     backgroundColor: colors.brand.purple1,
     alignItems: "center",
   },
-  stopButtonText: { ...typography.bodyMedium, color: colors.neutral[0], fontWeight: "600" },
+
+  stopButtonText: {
+    ...typography.bodyMedium,
+    color: colors.neutral[0],
+    fontWeight: "600",
+  },
+
   dateDivider: {
     alignSelf: "center",
     backgroundColor: colors.background.surface2,
@@ -636,12 +685,21 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     marginVertical: 8,
   },
-  dateText: { ...typography.captionSmallRegular, color: colors.foreground.muted },
+
+  dateText: {
+    ...typography.captionSmallRegular,
+    color: colors.foreground.muted,
+  },
+
   blockOverlay: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(0,0,0,0.6)",
   },
-  blockedText: { ...typography.bodyMedium, color: colors.foreground.soft },
+
+  blockedText: {
+    ...typography.bodyMedium,
+    color: colors.foreground.soft,
+  },
 });

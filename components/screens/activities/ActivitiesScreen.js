@@ -73,18 +73,28 @@ export default function ActivitiesScreen() {
     });
 
     // inject demo if nothing left
-    if (data.length === 0) {
-      data.push({
-        id: "zults-demo",
-        name: "Zults (Demo)",
-        avatar: zultsLogo,
-        lastText:
-          "Hi there, this is a demo Rezults so you can see how they appear in the app. 💜 We hope you enjoy using Zults and make the most of it to stay safe, healthy, and confident! ✨",
-        lastTimestamp: "Now",
-        hasUnread: false,
-        favorite: false,
-      });
-    }
+if (data.length === 0) {
+  // If no chats exist at all, create an empty demo chat in cache
+  if (!chatCache["zults-demo"]) {
+    chatCache["zults-demo"] = {
+      user: { id: "zults-demo", name: "Zults (Demo)", image: zultsLogo, isBot: true },
+      chatData: [],
+      chatState: { hasShared: false, hasRequested: false },
+      otherUserState: { hasShared: false, hasRequested: false },
+      blocked: false,
+    };
+  }
+
+  data.push({
+    id: "zults-demo",
+    name: "Zults (Demo)",
+    avatar: zultsLogo,
+    lastText: chatCache["zults-demo"].chatData.slice(-1)[0]?.text || "No activity yet",
+    lastTimestamp: chatCache["zults-demo"].chatData.slice(-1)[0]?.timestamp || "",
+    hasUnread: false,
+    favorite: false,
+  });
+}
 
     setActivities(data);
   };

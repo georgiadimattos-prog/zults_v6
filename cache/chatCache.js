@@ -1,7 +1,8 @@
 // cache/chatCache.js
 export const chatCache = {};
 
-let demoSeeded = false;  // keep private inside module
+// simple module-level flag for demo seeding
+let demoSeeded = false;
 
 export function hasSeededDemo() {
   return demoSeeded;

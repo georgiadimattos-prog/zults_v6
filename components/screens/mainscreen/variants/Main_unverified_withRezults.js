@@ -51,36 +51,20 @@ export default function MainUnverifiedWithRezults({ onLinkPress, onSharePress })
 
       // ✅ only seed demo once
       if (users.length === 0 && !hasSeededDemo()) {
-  const demoId = 'zults-demo';
+  const demoId = "zults-demo";
 
   chatCache[demoId] = {
-    user: { id: demoId, name: "Zults Demo", image: zultsLogo, isBot: true },
-    chatData: [
-      {
-        id: "demo-msg-1",
-        type: "text",
-        direction: "from-other",
-        username: "Zults AI",
-        avatar: zultsLogo,
-        text: "Hi there, I’m your Rezults Assistant 🤖. Ask me anything about sexual health!",
-        timestamp: "Now",
-      },
-      {
-        id: "demo-msg-2",
-        type: "text",
-        direction: "from-other",
-        username: "Zults Demo",
-        avatar: zultsLogo,
-        text: "This is a demo Rezults so you can see how they appear in the app 💜",
-        timestamp: "Now",
-      },
-    ],
+    user: { id: demoId, name: "Zults (Demo)", image: zultsLogo, isBot: true },
+    chatData: [], // ⬅️ no hardcoded messages anymore
+    chatState: { hasShared: false, hasRequested: false },
+    otherUserState: { hasShared: false, hasRequested: false },
+    blocked: false,
   };
 
   users = [
     {
       id: demoId,
-      name: "Zults Demo",
+      name: "Zults (Demo)",
       avatar: zultsLogo,
       lastTimestamp: "Now",
     },
