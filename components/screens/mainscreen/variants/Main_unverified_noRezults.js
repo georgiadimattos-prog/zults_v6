@@ -42,16 +42,43 @@ export default function MainUnverifiedNoRezults({ onLinkPress, onSharePress }) {
 
       // ✅ only seed demo once
       if (users.length === 0 && !hasSeededDemo()) {
-        users = [
-          {
-            id: 'zults-demo',
-            name: 'Zults (Demo)',
-            avatar: zultsLogo,
-            lastTimestamp: 'Now',
-          },
-        ];
-        markDemoSeeded();
-      }
+  const demoId = 'zults-demo';
+
+  chatCache[demoId] = {
+    user: { id: demoId, name: "Zults Demo", image: zultsLogo, isBot: true },
+    chatData: [
+      {
+        id: "demo-msg-1",
+        type: "text",
+        direction: "from-other",
+        username: "Zults AI",
+        avatar: zultsLogo,
+        text: "Hi there, I’m your Rezults Assistant 🤖. Ask me anything about sexual health!",
+        timestamp: "Now",
+      },
+      {
+        id: "demo-msg-2",
+        type: "text",
+        direction: "from-other",
+        username: "Zults Demo",
+        avatar: zultsLogo,
+        text: "This is a demo Rezults so you can see how they appear in the app 💜",
+        timestamp: "Now",
+      },
+    ],
+  };
+
+  users = [
+    {
+      id: demoId,
+      name: "Zults Demo",
+      avatar: zultsLogo,
+      lastTimestamp: "Now",
+    },
+  ];
+
+  markDemoSeeded();
+}
 
       console.log("🔄 [MainUnverifiedNoRezults] Rebuilt from chatCache:", chatCache);
       setRecentUsers(users);
@@ -117,6 +144,7 @@ export default function MainUnverifiedNoRezults({ onLinkPress, onSharePress }) {
 
 const styles = StyleSheet.create({
   scrollContent: {
+    paddingHorizontal: 16,
     paddingBottom: 32,
     gap: 24,
   },

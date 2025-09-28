@@ -138,10 +138,11 @@ export function NavbarBackRightText({ onBackPress, rightText, onRightPress }) {
 
   return (
     <View style={styles.container}>
+      {/* Left: back arrow */}
       <View style={styles.left}>
         <TouchableOpacity
           onPress={onBackPress || navigation.goBack}
-          style={styles.backButton}
+          style={styles.backButton} // ✅ keep 44×44 for icon
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
           <Image
@@ -151,9 +152,17 @@ export function NavbarBackRightText({ onBackPress, rightText, onRightPress }) {
         </TouchableOpacity>
       </View>
 
+      {/* Right: flexible text link */}
       <View style={styles.right}>
-        <TouchableOpacity onPress={onRightPress} style={styles.backButton}>
-          <Text style={styles.rightText}>
+        <TouchableOpacity
+          onPress={onRightPress}
+          style={{ paddingHorizontal: 8, paddingVertical: 6 }} // ✅ flexible, not fixed size
+        >
+          <Text
+            style={styles.rightText}
+            numberOfLines={1}     // ✅ stays on one line
+            ellipsizeMode="tail"  // ✅ adds "…" if too long
+          >
             {rightText != null ? String(rightText) : ''}
           </Text>
         </TouchableOpacity>

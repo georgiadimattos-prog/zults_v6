@@ -35,6 +35,7 @@ const styles = StyleSheet.create({
     zIndex: 10,
     paddingBottom: 24,
     paddingTop: 24,
+     paddingHorizontal: 16,
   },
   avatar: {
     width: 48,

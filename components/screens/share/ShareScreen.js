@@ -17,7 +17,7 @@ import {
 import { colors, typography } from '../../../theme';
 import arrowRight from '../../../assets/images/navbar-arrow-right.png';
 import infoIcon from '../../../assets/images/info-icon.png';
-import tomas from '../../../assets/images/tomas.png';
+import tomas from '../../../assets/images/TomasB.png';
 import melany from '../../../assets/images/melany.png';
 import madman from '../../../assets/images/madman.png';
 import goodguy from '../../../assets/images/goodguy.png';
@@ -76,8 +76,8 @@ export default function ShareScreen({ navigation }) {
   const users = [
     { name: 'TomasB.', image: tomas, isVerified: false },
     { name: 'Binkey', image: melany, isVerified: true },
-    { name: 'MadMan', image: madman, isVerified: false },
-    { name: 'Zults (demo)', image: goodguy, isVerified: false },
+    { name: 'DJordan', image: madman, isVerified: false },
+    { name: 'AdamReed', image: goodguy, isVerified: false },
   ];
 
   const filteredUsers = users.filter((u) =>

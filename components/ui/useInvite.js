@@ -5,7 +5,7 @@ import { rezultsCache } from "../../cache/rezultsCache";
 export function useInvite() {
   const sendInvite = async () => {
     try {
-      const username = rezultsCache.card?.userName || "MyDemo";
+      const username = rezultsCache.card?.userName || "Jonster";
       const link = "https://apps.apple.com/gb/app/zults/id1540963918";
       const message = `Download Zults and find me 💜 My username is: ${username}\n\nGet the app here: ${link}`;
 
