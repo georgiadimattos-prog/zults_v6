@@ -26,6 +26,8 @@ import fallbackAvatar from "../../../assets/images/melany.png";
 import { rezultsCache } from "../../../cache/rezultsCache";
 import { chatCache } from "../../../cache/chatCache";
 import { useDemoChat } from "../../ui/useDemoChat";
+import ZultsButton from "../../ui/ZultsButton";
+import RezultsActionButton from "../../ui/RezultsActionButton";
 
 const TomasAvatar = require("../../../assets/images/tomas.png");
 
@@ -260,108 +262,104 @@ useEffect(() => {
       <View style={styles.root}>
         {/* Header */}
         <BlurView intensity={40} tint="dark" style={styles.topBlur}>
-          <View style={styles.topRow}>
-            <View style={{ flex: 1 }} />
-            {!isDemoChat && (
-              <TouchableOpacity onPress={() => setShowActionsModal(true)}>
-                <Image source={moreIcon} style={styles.moreIcon} />
-              </TouchableOpacity>
-            )}
-          </View>
+  <View style={styles.topRow}>
+    <View style={{ flex: 1 }} />
+    {!isDemoChat && (
+      <TouchableOpacity onPress={() => setShowActionsModal(true)}>
+        <Image source={moreIcon} style={styles.moreIcon} />
+      </TouchableOpacity>
+    )}
+  </View>
 
-          <View style={styles.userRow}>
-            <TouchableOpacity
-              onPress={() => {
-                if (route.params?.from === "Activities") {
-                  navigation.goBack();
-                } else {
-                  const hasAction = chatData.some(
-                    (msg) =>
-                      msg.type === "request" ||
-                      msg.type === "share" ||
-                      msg.type === "stop-share"
-                  );
-                  if (hasAction) {
-                    navigation.navigate("MainScreen");
-                  } else {
-                    navigation.goBack();
-                  }
-                }
-              }}
-            >
-              <Image source={arrowLeft} style={styles.backIcon} />
-            </TouchableOpacity>
+  <View style={styles.userRow}>
+    <TouchableOpacity
+      onPress={() => {
+        if (route.params?.from === "Activities") {
+          navigation.goBack();
+        } else {
+          const hasAction = chatData.some(
+            (msg) =>
+              msg.type === "request" ||
+              msg.type === "share" ||
+              msg.type === "stop-share"
+          );
+          if (hasAction) {
+            navigation.navigate("MainScreen");
+          } else {
+            navigation.goBack();
+          }
+        }
+      }}
+    >
+      <Image source={arrowLeft} style={styles.backIcon} />
+    </TouchableOpacity>
 
-            <Image source={user.image || fallbackAvatar} style={styles.avatar} />
-            <Text style={styles.username}>{user.name}</Text>
+    <Image source={user.image || fallbackAvatar} style={styles.avatar} />
+    <Text style={styles.username}>{user.name}</Text>
 
-            {!isBlocked && (
-              isDemoChat ? (
-                <TouchableOpacity
-                  style={styles.rezultsButton}
-                  onPress={() => {
-                    navigation.navigate("Rezults", {
-                      username: user.name,
-                      avatar: user.image || fallbackAvatar,
-                      realName: user.realName || user.name,
-                      providerName: "Sexual Health London",
-                      testDate: "25 Sep 2025",
-                      showExpand: true,
-                    });
-                  }}
-                >
-                  <Text style={styles.rezultsButtonText}>View Rezults</Text>
-                </TouchableOpacity>
-              ) : (
-                <TouchableOpacity
-                  style={[styles.rezultsButton, chatState.hasShared && styles.rezultsButtonActive]}
-                  disabled={chatState.hasRequested && !otherUserState.hasShared}
-                  onPress={() => {
-                    if (otherUserState.hasShared) {
-                      navigation.navigate("Rezults", {
-                        username: user.name,
-                        avatar: user.image || fallbackAvatar,
-                        realName: user.realName || user.name,
-                        providerName: user.name === "Binkey" ? "Planned Parenthood" : "Sexual Health London",
-                        testDate: "25 Sep 2025",
-                        showExpand: true,
-                      });
-                      return;
-                    }
-                    if (!chatState.hasRequested) {
-                      setChatState({ ...chatState, hasRequested: true });
-                      setChatData((prev) => [
-                        ...prev,
-                        {
-                          id: Date.now().toString(),
-                          type: "request",
-                          direction: "from-user",
-                          username: currentUser.name,
-                          avatar: currentUser.avatar,
-                          timestamp: "10:02AM",
-                        },
-                      ]);
-                      startRequestFlow();
-                    }
-                  }}
-                >
-                  <Text
-                    style={[
-                      styles.rezultsButtonText,
-                      chatState.hasShared && styles.rezultsButtonTextActive,
-                    ]}
-                  >
-                    {otherUserState.hasShared
-                      ? "View Rezults"
-                      : chatState.hasRequested
-                      ? "Rezults Requested"
-                      : "Request Rezults"}
-                  </Text>
-                </TouchableOpacity>
-              )
-            )}
-          </View>
-        </BlurView>
+    {!isBlocked && (
+  isDemoChat ? (
+    <ZultsButton
+      label="View Rezults"
+      type="brand"          // 👈 purple pill
+      size="medium"
+      pill
+      fullWidth={false}
+      onPress={() => {
+        navigation.navigate("Rezults", {
+          username: user.name,
+          avatar: user.image || fallbackAvatar,
+          realName: user.realName || user.name,
+          providerName: "Sexual Health London",
+          testDate: "25 Sep 2025",
+          showExpand: true,
+        });
+      }}
+    />
+  ) : (
+        // ✅ Real user chat cleaned with RezultsActionButton
+        <RezultsActionButton
+          status={
+            otherUserState.hasShared
+              ? "view"
+              : chatState.hasRequested
+              ? "requested"
+              : "request"
+          }
+          onPress={() => {
+            if (otherUserState.hasShared) {
+              navigation.navigate("Rezults", {
+                username: user.name,
+                avatar: user.image || fallbackAvatar,
+                realName: user.realName || user.name,
+                providerName:
+                  user.name === "Binkey"
+                    ? "Planned Parenthood"
+                    : "Sexual Health London",
+                testDate: "25 Sep 2025",
+                showExpand: true,
+              });
+            } else if (!chatState.hasRequested) {
+              setChatState({ ...chatState, hasRequested: true });
+              setChatData((prev) => [
+                ...prev,
+                {
+                  id: Date.now().toString(),
+                  type: "request",
+                  direction: "from-user",
+                  username: currentUser.name,
+                  avatar: currentUser.avatar,
+                  timestamp: "10:02AM",
+                },
+              ]);
+              startRequestFlow();
+            }
+          }}
+        />
+      )
+    )}
+  </View>
+</BlurView>
 
         {/* Messages */}
         {isBlocked ? (
@@ -451,17 +449,23 @@ useEffect(() => {
   </View>
             ) : (
               <View style={styles.footer}>
-                <TextInput
-                  placeholder="Add note..."
-                  placeholderTextColor={colors.foreground.muted}
-                  value={message}
-                  onChangeText={setMessage}
-                  style={styles.input}
-                />
-                {rezultsCache.hasRezults ? (
-  <TouchableOpacity
-    style={styles.shareRezultsButton}   // ⬅️ use pill style
-    onPress={() => {
+  <TextInput
+    placeholder="Add note..."
+    placeholderTextColor={colors.foreground.muted}
+    value={message}
+    onChangeText={setMessage}
+    style={styles.input}
+  />
+
+  <ZultsButton
+  label="Share Rezults"
+  type={rezultsCache.hasRezults ? "brand" : "secondary"} // purple if can share, white otherwise
+  size="medium"        // 👈 unified size
+  pill
+  fullWidth={false}
+  onPress={() => {
+    if (rezultsCache.hasRezults) {
+      // ✅ share Rezults flow
       setChatState({ ...chatState, hasShared: true });
       setChatData((prev) => [
         ...prev,
@@ -475,18 +479,12 @@ useEffect(() => {
         },
       ]);
       startShareFlow();
-    }}
-  >
-    <Text style={styles.shareRezultsButtonText}>Share Rezults</Text>
-  </TouchableOpacity>
-) : (
-  <TouchableOpacity
-    style={styles.shareRezultsButton}   // ⬅️ same pill style
-    onPress={() => setShowNoRezultsModal(true)}
-  >
-    <Text style={styles.shareRezultsButtonText}>Share Rezults</Text>
-  </TouchableOpacity>
-)}
+    } else {
+      // ❌ no Rezults → open modal
+      setShowNoRezultsModal(true);
+    }
+  }}
+/>
 </View>
 )}
 </BlurView>
@@ -641,10 +639,10 @@ const styles = StyleSheet.create({
 },
 
   shareRezultsButtonText: {
-    ...typography.bodyMedium,
-    color: colors.neutral[0],
-    fontWeight: "600",
-  },
+  ...typography.buttonSmallRegular,   // 👈 match Request Rezults
+  color: colors.neutral[0],
+  fontWeight: "600",
+},
 
   // ✅ Circular chat footer send button
   sendButton: {
@@ -702,4 +700,7 @@ const styles = StyleSheet.create({
     ...typography.bodyMedium,
     color: colors.foreground.soft,
   },
+  text_small: {
+  ...typography.buttonSmallRegular,
+}
 });

@@ -6,10 +6,11 @@ import * as Haptics from "expo-haptics";
 
 export default function ZultsButton({
   label,
-  type = "primary",   // "primary" | "secondary" | "ghost"
-  size = "large",      // "large" (56px) | "small" (40px)
+  type = "primary",   // "primary" | "secondary" | "ghost" | "brand"
+  size = "large",      // "large" | "medium" | "small"
   fullWidth = true,
   disabled = false,
+  pill = false,        // 👈 NEW: force pill style
   onPress,
   style,
 }) {
@@ -18,6 +19,7 @@ export default function ZultsButton({
     styles[size],
     styles[`${type}${disabled ? "Disabled" : "Active"}`],
     fullWidth && { alignSelf: "stretch" },
+    pill && { borderRadius: 9999 }, // 👈 override with pill radius
     style,
   ];
 
@@ -42,8 +44,8 @@ export default function ZultsButton({
       activeOpacity={0.75}
     >
       <Text style={textStyles} allowFontScaling>
-  {label}
-</Text>
+        {label}
+      </Text>
     </TouchableOpacity>
   );
 }
@@ -55,22 +57,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 
- // Sizes
-large: {
-  height: 56,
-  paddingHorizontal: 20,
-  borderRadius: 12,
-},
-medium: {                          // ⬅️ added
-  height: 48,
-  paddingHorizontal: 20,
-  borderRadius: 10,
-},
-small: {
-  height: 40,
-  paddingHorizontal: 20,
-  borderRadius: 8,
-},
+  // Sizes
+  large: {
+    height: 56,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+  },
+  medium: {
+    height: 48,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+  },
+  small: {
+    height: 40,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
 
   // Variants
   primaryActive: {
@@ -81,7 +83,7 @@ small: {
   },
 
   secondaryActive: {
-    backgroundColor: "#292929",
+    backgroundColor: "#292929", // dark gray
   },
   secondaryDisabled: {
     backgroundColor: "#292929",
@@ -94,19 +96,27 @@ small: {
     backgroundColor: "transparent",
   },
 
+  // NEW: Brand purple variant
+  brandActive: {
+    backgroundColor: colors.brand.purple1, // ✅ brand purple
+  },
+  brandDisabled: {
+    backgroundColor: "#7B7B7B",
+  },
+
   // Text
-textBase: {
-  textAlign: "center",
-},
-text_large: {
-  ...typography.buttonLargeRegular,
-},
-text_medium: {                     // ⬅️ added
-  ...typography.buttonMediumRegular,
-},
-text_small: {
-  ...typography.buttonSmallRegular,
-},
+  textBase: {
+    textAlign: "center",
+  },
+  text_large: {
+    ...typography.buttonLargeRegular,
+  },
+  text_medium: {
+    ...typography.buttonMediumRegular,
+  },
+  text_small: {
+    ...typography.buttonSmallRegular,
+  },
 
   // Text colors per variant
   text_primaryActive: {
@@ -115,17 +125,27 @@ text_small: {
   text_primaryDisabled: {
     color: "#404040",
   },
+
   text_secondaryActive: {
     color: "#D5D5D5",
   },
   text_secondaryDisabled: {
     color: "#5D5D5D",
   },
+
   text_ghostActive: {
     color: "#C2C2C2",
     fontFamily: "ZultsDiatype-Medium",
   },
   text_ghostDisabled: {
     color: "#5D5D5D",
+  },
+
+  // Text colors for brand
+  text_brandActive: {
+    color: colors.neutral[0], // white text on purple
+  },
+  text_brandDisabled: {
+    color: "#404040",
   },
 });
