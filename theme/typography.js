@@ -160,4 +160,14 @@ export const typography = {
     fontSize: 14,
     lineHeight: 18,
   },
+   buttonMediumMedium: {
+    fontFamily: fonts.medium,
+    fontSize: 15,     // in-between 16 (large) and 14 (small)
+    lineHeight: 20,
+  },
+  buttonMediumRegular: {
+    fontFamily: fonts.regular,
+    fontSize: 15,
+    lineHeight: 20,
+  },
 };

@@ -10,8 +10,6 @@ const cardWidth = screenWidth - 32; // 16px padding on each side
 const cardHeight = cardWidth / 1.586; // classic credit card ratio
 
 export default function RezultsCardPlaceholder() {
-  const navigation = useNavigation();
-
   return (
     <View style={[styles.wrapper, { width: cardWidth, height: cardHeight }]}>
       <Svg height={cardHeight} width={cardWidth} style={StyleSheet.absoluteFill}>
@@ -39,16 +37,12 @@ export default function RezultsCardPlaceholder() {
       </Svg>
 
       <View style={styles.content}>
-        <Text style={styles.title}>No Rezults yet</Text>
-        <Text style={styles.subtitle}>Turn your STI results into Rezults</Text>
-
-        <ZultsButton
-          label="Get started!"
-          type="primary"
-          size="medium"
-          fullWidth={false}
-          onPress={() => navigation.navigate('GetRezultsProvider')}
-        />
+        <Text style={styles.title} allowFontScaling>
+          No Rezults yet
+        </Text>
+        <Text style={styles.subtitle} allowFontScaling>
+          Tap here to get started!
+        </Text>
       </View>
     </View>
   );
@@ -68,12 +62,12 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   title: {
-    ...typography.bodyMedium,
-    color: colors.foreground.default,
-  },
-  subtitle: {
-    ...typography.captionSmallRegular,
-    color: colors.foreground.soft,
-    textAlign: 'center',
-  },
+  ...typography.bodyMedium, // ✅ this one’s usually fine
+  color: colors.foreground.default,
+},
+subtitle: {
+  ...typography.bodyRegular, // ⬅️ swap from captionSmallRegular
+  color: colors.foreground.soft,
+  textAlign: 'center',
+},
 });

@@ -41,7 +41,7 @@ export default function ZultsButton({
       disabled={disabled}
       activeOpacity={0.75}
     >
-      <Text style={textStyles}>
+      <Text style={textStyles} allowFontScaling>
   {label}
 </Text>
     </TouchableOpacity>
@@ -55,17 +55,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 
-  // Sizes
-  large: {
-    height: 56,
-    paddingHorizontal: 20,
-    borderRadius: 12,
-  },
-  small: {
-    height: 40,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-  },
+ // Sizes
+large: {
+  height: 56,
+  paddingHorizontal: 20,
+  borderRadius: 12,
+},
+medium: {                          // ⬅️ added
+  height: 48,
+  paddingHorizontal: 20,
+  borderRadius: 10,
+},
+small: {
+  height: 40,
+  paddingHorizontal: 20,
+  borderRadius: 8,
+},
 
   // Variants
   primaryActive: {
@@ -90,15 +95,18 @@ const styles = StyleSheet.create({
   },
 
   // Text
-  textBase: {
-    textAlign: "center",
-  },
-  text_large: {
-    ...typography.buttonLargeRegular, // 16px
-  },
-  text_small: {
-    ...typography.buttonSmallRegular, // 14px
-  },
+textBase: {
+  textAlign: "center",
+},
+text_large: {
+  ...typography.buttonLargeRegular,
+},
+text_medium: {                     // ⬅️ added
+  ...typography.buttonMediumRegular,
+},
+text_small: {
+  ...typography.buttonSmallRegular,
+},
 
   // Text colors per variant
   text_primaryActive: {

@@ -93,36 +93,41 @@ export default function MainUnverifiedNoRezults({ onLinkPress, onSharePress }) {
 
   return (
     <ScreenWrapper>
-      <StatusBar
-        barStyle="light-content"
-        backgroundColor={colors.background.surface1}
-      />
-      <UserProfileHeader hideVerification />
+  <StatusBar barStyle="light-content" backgroundColor={colors.background.surface1} />
+  <UserProfileHeader hideVerification />
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <RezultsCardPlaceholder />
+  <ScrollView contentContainerStyle={styles.scrollContent}>
+    {/* Tappable placeholder card → Get Rezults pathway */}
+    <TouchableOpacity
+      activeOpacity={0.85}
+      onPress={() => navigation.navigate('GetRezultsProvider')}
+    >
+      <RezultsCardPlaceholder />
+    </TouchableOpacity>
 
-        <ZultsButton
-          label="Share"
-          type="primary"
-          size="large"
-          onPress={onSharePress}
-        />
+    {/* Share is still available even with no Rezults */}
+    <ZultsButton
+      label="Share"
+      type="primary"
+      size="large"
+      onPress={onSharePress ?? (() => navigation.navigate('Share'))}
+      // fullWidth defaults to true in your ZultsButton
+    />
 
-        {/* Activities Section */}
-        <View style={{ marginTop: 15 }}>
-          <Text style={styles.sectionTitle}>Activities</Text>
-          <View style={styles.activitiesCard}>
-            {renderAvatars()}
-            <TouchableOpacity onPress={() => navigation.navigate('Activities')}>
-              <Text style={styles.viewAllText}>View All</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+    {/* Activities Section */}
+    <View style={{ marginTop: 15 }}>
+      <Text style={styles.sectionTitle}>Activities</Text>
+      <View style={styles.activitiesCard}>
+        {renderAvatars()}
+        <TouchableOpacity onPress={() => navigation.navigate('Activities')}>
+          <Text style={styles.viewAllText}>View All</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
 
-        <NotificationCard />
-      </ScrollView>
-    </ScreenWrapper>
+    <NotificationCard />
+  </ScrollView>
+</ScreenWrapper>
   );
 }
 

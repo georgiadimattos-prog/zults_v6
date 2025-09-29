@@ -408,7 +408,7 @@ useEffect(() => {
             {isDemoChat ? (
   <View style={styles.footer}>
     <TextInput
-      placeholder="Ask me anything about sexual health..."
+      placeholder="Ask me..."
       placeholderTextColor={colors.foreground.muted}
       value={message}
       onChangeText={setMessage}
@@ -452,7 +452,7 @@ useEffect(() => {
             ) : (
               <View style={styles.footer}>
                 <TextInput
-                  placeholder="Add note to your Rezults..."
+                  placeholder="Add note..."
                   placeholderTextColor={colors.foreground.muted}
                   value={message}
                   onChangeText={setMessage}
