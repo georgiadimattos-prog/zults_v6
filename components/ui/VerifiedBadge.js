@@ -18,22 +18,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.info.container,
-    height: 24,
-    width: 120,
-    borderRadius: 17,
-    paddingHorizontal: 10,
-    width: 88,
+    borderRadius: 20,
+    paddingHorizontal: 12,   // ⬅️ increased
+    paddingVertical: 4,      // ⬅️ added vertical padding
   },
   icon: {
-    width: 16,
-    height: 16,
-    marginRight: 6,
+    width: 18,   // ⬅️ slightly bigger
+    height: 18,
+    marginRight: 8, // ⬅️ more space between icon and text
   },
   text: {
-    ...typography.caption,
+    ...typography.captionSmallRegular, // ⬅️ use smaller, balanced style
     color: colors.info.onContainer,
     letterSpacing: -0.06,
-    includeFontPadding: false, // Native-only
-    maxWidth: '100%',
+    includeFontPadding: false,
   },
 });

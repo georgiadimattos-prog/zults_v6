@@ -75,11 +75,11 @@ export default function ShareScreen({ navigation }) {
   }, [searchFocused, activeTab]);
 
   const users = [
-    { name: 'TomasB.', image: tomas, isVerified: false },
-    { name: 'Binkey', image: melany, isVerified: true },
-    { name: 'DJordan', image: madman, isVerified: false },
-    { name: 'AdamReed', image: goodguy, isVerified: false },
-    { id: 'zults-demo', name: 'Zults (Demo)', image: zultsImage, isBot: true },
+    { id: 'zults-demo', name: 'Zults Bot', image: zultsImage, isBot: true },
+    { name: 'Demo1', image: melany, isVerified: true },
+     { name: 'Demo2', image: tomas, isVerified: false },
+    { name: 'Demo3', image: madman, isVerified: false },
+    { name: 'Demo4', image: goodguy, isVerified: false },
   ];
 
   const filteredUsers = users.filter((u) =>

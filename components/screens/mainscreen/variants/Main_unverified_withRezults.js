@@ -64,7 +64,7 @@ export default function MainUnverifiedWithRezults({ onLinkPress, onSharePress })
   users = [
     {
       id: demoId,
-      name: "Zults (Demo)",
+      name: "Zults Bot",
       avatar: zultsLogo,
       lastTimestamp: "Now",
     },

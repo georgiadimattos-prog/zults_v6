@@ -22,7 +22,7 @@ import AddRezultsCardScreen from "./components/screens/getrezults/AddRezultsCard
 import PolicyScreen from "./components/screens/getrezults/PolicyScreen";
 
 // Share Screens
-import ShareScreen from "./components/screens/share/ShareScreen"; // ✅ SMS is now inside here
+import ShareScreen from "./components/screens/share/ShareScreen";
 import ReviewSMSRequest from "./components/screens/share/sms/ReviewSMSRequest";
 import SMSRequestSent from "./components/screens/share/sms/SMSRequestSent";
 import LinkScreenShareSheet from "./components/screens/share/link/LinkScreen_ShareSheet";
@@ -31,6 +31,9 @@ import LinkScreenSuccess from "./components/screens/share/link/LinkScreen_Succes
 // Chat + Rezults
 import UserChatScreen from "./components/screens/usersearch/UserChatScreen";
 import RezultsScreen from "./components/screens/RezultsScreen";
+
+// Intro Video
+import IntroVideoScreen from "./components/screens/intro/IntroVideoScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -63,17 +66,24 @@ export default function App() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <NavigationContainer>
         <Stack.Navigator
-          initialRouteName="MainScreen"
+          initialRouteName="IntroVideo" // ✅ Start with video
           screenOptions={{
             headerShown: false,
-            animation: "slide_from_right", // default for all screens
+            animation: "slide_from_right",
           }}
         >
+          {/* Intro Video */}
+          <Stack.Screen
+            name="IntroVideo"
+            component={IntroVideoScreen}
+            options={{ animation: "fade" }}
+          />
+
           {/* Main */}
           <Stack.Screen
             name="MainScreen"
             component={MainScreen}
-            options={{ animation: "fade" }} // 👈 override: fade for MainScreen
+            options={{ animation: "fade" }}
           />
           <Stack.Screen name="Settings" component={SettingsScreen} />
 
@@ -97,10 +107,7 @@ export default function App() {
             name="GetRezultsHowToFindLink"
             component={GetRezults_HowToFindLinkScreen}
           />
-          <Stack.Screen
-            name="AddRezultsCard"
-            component={AddRezultsCardScreen}
-          />
+          <Stack.Screen name="AddRezultsCard" component={AddRezultsCardScreen} />
           <Stack.Screen name="PolicyScreen" component={PolicyScreen} />
 
           {/* Share */}

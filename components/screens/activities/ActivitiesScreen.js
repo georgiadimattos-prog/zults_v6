@@ -77,7 +77,7 @@ if (data.length === 0) {
   // If no chats exist at all, create an empty demo chat in cache
   if (!chatCache["zults-demo"]) {
     chatCache["zults-demo"] = {
-      user: { id: "zults-demo", name: "Zults (Demo)", image: zultsLogo, isBot: true },
+      user: { id: "zults-demo", name: "Zults Bot", image: zultsLogo, isBot: true },
       chatData: [],
       chatState: { hasShared: false, hasRequested: false },
       otherUserState: { hasShared: false, hasRequested: false },
@@ -87,7 +87,7 @@ if (data.length === 0) {
 
   data.push({
     id: "zults-demo",
-    name: "Zults (Demo)",
+    name: "Zults Bot",
     avatar: zultsLogo,
     lastText: chatCache["zults-demo"].chatData.slice(-1)[0]?.text || "No activity yet",
     lastTimestamp: chatCache["zults-demo"].chatData.slice(-1)[0]?.timestamp || "",
@@ -142,7 +142,7 @@ if (data.length === 0) {
   });
 } else {
   navigation.navigate("UserChat", {
-    user: { id: "zults-demo", name: "Zults (Demo)", image: zultsLogo, isBot: true },
+    user: { id: "zults-demo", name: "Zults Bot", image: zultsLogo, isBot: true },
     from: "Activities",
   });
 }

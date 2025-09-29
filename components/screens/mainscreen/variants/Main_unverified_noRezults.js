@@ -45,7 +45,7 @@ export default function MainUnverifiedNoRezults({ onLinkPress, onSharePress }) {
   const demoId = "zults-demo";
 
   chatCache[demoId] = {
-    user: { id: demoId, name: "Zults (Demo)", image: zultsLogo, isBot: true },
+    user: { id: demoId, name: "Zults Bot", image: zultsLogo, isBot: true },
     chatData: [], // ⬅️ no hardcoded messages anymore
     chatState: { hasShared: false, hasRequested: false },
     otherUserState: { hasShared: false, hasRequested: false },
@@ -55,7 +55,7 @@ export default function MainUnverifiedNoRezults({ onLinkPress, onSharePress }) {
   users = [
     {
       id: demoId,
-      name: "Zults (Demo)",
+      name: "Zults Bot",
       avatar: zultsLogo,
       lastTimestamp: "Now",
     },

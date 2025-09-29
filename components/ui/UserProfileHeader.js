@@ -4,8 +4,11 @@ import { colors, typography } from '../../theme';
 import settingsIcon from '../../assets/images/settings.png';
 import tomas from '../../assets/images/tomas.png';
 import GetVerifiedBadge from '../ui/GetVerifiedBadge';
+import { useNavigation } from "@react-navigation/native";
 
 export default function UserProfileHeader({ hideVerification = false }) {
+  const navigation = useNavigation(); // ✅ hook for navigation
+
   return (
     <View style={styles.header}>
       <Image source={tomas} style={styles.avatar} />
@@ -14,7 +17,10 @@ export default function UserProfileHeader({ hideVerification = false }) {
         {/* ✅ Only show the badge if not hidden */}
         {!hideVerification && <GetVerifiedBadge />}
       </View>
-      <TouchableOpacity style={styles.settingsButton}>
+      <TouchableOpacity
+        style={styles.settingsButton}
+        onPress={() => navigation.navigate("Settings")} // ✅ go to SettingsScreen
+      >
         <View style={styles.settingsIconContainer}>
           <Image
             source={settingsIcon}
@@ -35,7 +41,7 @@ const styles = StyleSheet.create({
     zIndex: 10,
     paddingBottom: 24,
     paddingTop: 24,
-     paddingHorizontal: 16,
+    paddingHorizontal: 16,
   },
   avatar: {
     width: 48,
