@@ -47,31 +47,26 @@ export default function AddRezultsCardScreen() {
 >
   {/* Page title + subtitle */}
   <View style={styles.headerBlock}>
-    <Text allowFontScaling={false} style={styles.pageTitle}>
-      Your Rezults
-    </Text>
-    <Text allowFontScaling={false} style={styles.subtitle}>
-      By clicking Add Rezults, you confirm this information is your own and accurate.{' '}
-      <Text
-        style={styles.link}
-        onPress={() => navigation.navigate('PolicyScreen')}
-      >
-        Review our policy.
-      </Text>
-    </Text>
-  </View>
-
-  {/* Rezults card preview */}
-  <RezultsCard
-    userName="John Doe"
-    providerName="Sexual Health London"
-    testDate="12 Dec 2025"
-  />
-
-  {/* Helper text */}
-  <Text allowFontScaling={false} style={styles.flipHint}>
-    Tap the card to view the reverse.
+  <Text style={styles.pageTitle}>
+    Your Rezults
   </Text>
+  <Text style={styles.subtitle}>
+    By clicking Add Rezults, you confirm this information is your own and accurate.{' '}
+    <Text
+      style={styles.link}
+      onPress={() => navigation.navigate('PolicyScreen')}
+    >
+      Review our policy.
+    </Text>
+  </Text>
+</View>
+
+<RezultsCard
+  userName="John Doe"
+  providerName="Sexual Health London"
+  testDate="12 Dec 2025"
+/>
+
 </ScrollView>
 
   {/* ✅ Footer actions (inside ScreenFooter, no absolute positioning) */}
@@ -112,16 +107,10 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   subtitle: {
-    ...typography.bodyRegular,
-    color: colors.foreground.soft,
-    marginBottom: 24,
-  },
-  flipHint: {
-    ...typography.captionSmallRegular,
-    color: colors.foreground.soft,
-    marginTop: 16,
-    textAlign: "center",
-  },
+  ...typography.bodyRegular,
+  color: colors.foreground.soft,
+  marginBottom: 24,
+},
   link: {
     textDecorationLine: 'underline',
     color: colors.brand.primary,

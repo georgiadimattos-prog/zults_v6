@@ -41,9 +41,9 @@ export default function ZultsButton({
       disabled={disabled}
       activeOpacity={0.75}
     >
-      <Text style={textStyles} allowFontScaling={false}>
-        {label}
-      </Text>
+      <Text style={textStyles}>
+  {label}
+</Text>
     </TouchableOpacity>
   );
 }

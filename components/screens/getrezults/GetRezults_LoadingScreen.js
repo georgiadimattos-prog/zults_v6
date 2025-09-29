@@ -19,9 +19,9 @@ const cardWidth = screenWidth - 32;
 const cardHeight = cardWidth / 1.586;
 
 const STATUS_MESSAGES = [
-  'Connecting securely to your provider',
-  'Encrypting and transferring your results',
-  'Creating your Rezults',
+  'Connecting…',
+  'Syncing results…',
+  'Creating your Rezults…',
 ];
 
 export default function GetRezults_LoadingScreen() {
@@ -138,9 +138,6 @@ export default function GetRezults_LoadingScreen() {
 
               {/* Status text */}
               <Text style={styles.titleText}>{STATUS_MESSAGES[step]}</Text>
-              <Text style={styles.captionText}>
-                Your information is always private and encrypted.
-              </Text>
             </View>
           </BlurView>
         </View>
@@ -151,11 +148,11 @@ export default function GetRezults_LoadingScreen() {
 
 const styles = StyleSheet.create({
   scrollContent: {
-  flexGrow: 1,
-  justifyContent: 'center',
-  alignItems: 'center',
-  paddingBottom: 120,  // ✅ align with rest of flow
-},
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingBottom: 120,  // ✅ align with rest of flow
+  },
   cardWrapper: {
     width: cardWidth,
     height: cardHeight,
@@ -201,13 +198,6 @@ const styles = StyleSheet.create({
   titleText: {
     ...typography.bodyMedium,
     color: colors.neutral[0],
-    textAlign: 'center',
-    marginTop: 4,
-    paddingHorizontal: 16,
-  },
-  captionText: {
-    ...typography.captionSmallRegular,
-    color: colors.foreground.soft,
     textAlign: 'center',
     marginTop: 4,
     paddingHorizontal: 16,

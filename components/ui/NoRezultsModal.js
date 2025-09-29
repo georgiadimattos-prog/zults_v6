@@ -4,13 +4,13 @@ import {
   Modal,
   View,
   Text,
-  TouchableOpacity,
   TouchableWithoutFeedback,
   StyleSheet,
 } from "react-native";
 import { BlurView } from "expo-blur";
 import { useNavigation } from "@react-navigation/native";
 import { colors, typography } from "../../theme";
+import ZultsButton from "./ZultsButton";
 
 export default function NoRezultsModal({ visible, onClose }) {
   const navigation = useNavigation();
@@ -38,20 +38,27 @@ export default function NoRezultsModal({ visible, onClose }) {
               </Text>
 
               {/* Primary → Go to provider selection */}
-              <TouchableOpacity
-                style={styles.primaryButton}
+              <ZultsButton
+                label="Get Rezults"
+                type="primary"
+                size="large"
+                fullWidth
                 onPress={() => {
                   onClose?.();
                   navigation.navigate("GetRezultsProvider"); // ✅ provider picker
                 }}
-              >
-                <Text style={styles.primaryText}>Get Rezults</Text>
-              </TouchableOpacity>
+              />
+
+              <View style={{ height: 12 }} />
 
               {/* Secondary → Dismiss */}
-              <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
-                <Text style={styles.cancelText}>Maybe Later</Text>
-              </TouchableOpacity>
+              <ZultsButton
+                label="Maybe Later"
+                type="ghost"
+                size="large"
+                fullWidth
+                onPress={onClose}
+              />
             </View>
           </TouchableWithoutFeedback>
         </BlurView>
@@ -82,29 +89,5 @@ const styles = StyleSheet.create({
     ...typography.bodyRegular,
     color: colors.foreground.soft,
     marginBottom: 24,
-  },
-  primaryButton: {
-    width: "100%",
-    height: 56,
-    borderRadius: 16,
-    backgroundColor: colors.neutral[0],
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  primaryText: {
-    ...typography.buttonLargeRegular,
-    color: colors.button.activeLabelPrimary,
-  },
-  cancelButton: {
-    width: "100%",
-    height: 56,
-    borderRadius: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 12,
-  },
-  cancelText: {
-    ...typography.buttonLargeRegular,
-    color: colors.foreground.default,
   },
 });

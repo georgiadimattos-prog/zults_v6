@@ -89,17 +89,11 @@ export default function ShareScreen({ navigation }) {
   const NAVBAR_HEIGHT = 30;
 
   const handleUserPress = (user) => {
-  navigation.navigate('UserChat', { 
-    user: { 
-      ...user, 
-      isBot: user.isBot === true // ✅ preserve the flag 
-    } 
-  });
+  navigation.navigate('UserChat', { user }); // ✅ passes full object including isBot
 };
 
   const renderTabContent = () => {
     if (activeTab === 'Users') {
-      if (!searchFocused) return null;
 
       const listToShow = search.trim().length === 0 ? users : filteredUsers;
 
@@ -139,148 +133,144 @@ export default function ShareScreen({ navigation }) {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ScreenWrapper topPadding={0}>
-          <StatusBar barStyle="light-content" backgroundColor={colors.background.surface1} />
+  style={{ flex: 1, backgroundColor: colors.background.surface1 }}
+  behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+>
+  <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+    <ScreenWrapper topPadding={0}>
+      <StatusBar barStyle="light-content" backgroundColor={colors.background.surface1} />
 
-          <NavbarBackRightText
-  rightText={searchFocused && activeTab === 'Users' ? 'Cancel' : 'Invite'}
-  onRightPress={() => {
-    if (searchFocused && activeTab === 'Users') {
-      setSearch('');
-      setSearchFocused(false);
-      Keyboard.dismiss();
-    } else {
-      sendInvite(); // ✅ reuse hook, no need to duplicate code
-    }
-  }}
-/>
+      <NavbarBackRightText
+        rightText={searchFocused && activeTab === 'Users' ? 'Cancel' : 'Invite'}
+        onRightPress={() => {
+          if (searchFocused && activeTab === 'Users') {
+            setSearch('');
+            setSearchFocused(false);
+            Keyboard.dismiss();
+          } else {
+            sendInvite(); // ✅ reuse hook
+          }
+        }}
+      />
 
-          {/* Tabs + header */}
-          <Animated.View
-            style={{
-              opacity: fadeAnim,
-              transform: [
-                {
-                  translateY: fadeAnim.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [-20, 0],
-                  }),
-                },
-              ],
-            }}
-          >
-            <View style={styles.tabsContainer}>
-              {['Users', 'Link', 'SMS'].map((tab) => (
-                <TouchableOpacity
-                  key={tab}
-                  style={activeTab === tab ? styles.tabActive : styles.tabInactive}
-                  onPress={() => {
-                    setActiveTab(tab);
-                    setSearch('');
-                    setSearchFocused(false);
-                  }}
-                >
-                  <Text
-                    style={
-                      activeTab === tab ? styles.tabActiveText : styles.tabInactiveText
-                    }
-                  >
-                    {tab}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+      {/* Large title */}
+      <Text style={styles.pageTitle}>Share</Text>
 
-            <View style={[styles.headerBlock, styles.content]}>
-              <Text style={styles.pageTitle}>
-                {activeTab === 'Users'
-                  ? 'Users'
-                  : activeTab === 'Link'
-                  ? 'Link'
-                  : 'SMS'}
-              </Text>
-              <Text style={styles.subtitle}>
-                {activeTab === 'Users'
-                  ? 'Share or request Rezults with other users.'
-                  : activeTab === 'Link'
-                  ? 'Create a shareable Rezults link so anyone without the app can view it.'
-                  : 'Send someone an anonymous nudge to get tested.'}
-              </Text>
-            </View>
-
-            {activeTab === 'Users' && (
-              <View style={styles.content}>
-                <SearchBar
-                  value={search}
-                  onChangeText={setSearch}
-                  onCancel={() => {
-                    setSearch('');
-                    setSearchFocused(false);
-                  }}
-                  onFocus={() => setSearchFocused(true)}
-                />
-              </View>
-            )}
-
-            {renderTabContent()}
-          </Animated.View>
-
-          {/* Search takeover for Users */}
-          {activeTab === 'Users' && (
-            <Animated.View
-              style={{
-                position: 'absolute',
-                top: NAVBAR_HEIGHT,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                opacity: takeoverAnim,
-                transform: [
-                  {
-                    translateY: takeoverAnim.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [20, 0],
-                    }),
-                  },
-                ],
+      {/* Tabs under the large title */}
+      <Animated.View
+        style={{
+          opacity: fadeAnim,
+          transform: [
+            {
+              translateY: fadeAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [-20, 0],
+              }),
+            },
+          ],
+        }}
+      >
+        <View style={styles.tabsContainer}>
+          {['Users', 'Link', 'SMS'].map((tab) => (
+            <TouchableOpacity
+              key={tab}
+              style={activeTab === tab ? styles.tabActive : styles.tabInactive}
+              onPress={() => {
+                setActiveTab(tab);
+                setSearch('');
+                setSearchFocused(false);
               }}
             >
-              <View style={{ flex: 1, paddingHorizontal: 16, marginTop: 40 }}>
-                <SearchBar
-                  value={search}
-                  onChangeText={setSearch}
-                  onCancel={() => {
-                    setSearch('');
-                    setSearchFocused(false);
-                  }}
-                  onFocus={() => setSearchFocused(true)}
-                />
-                {renderTabContent()}
-              </View>
-            </Animated.View>
-          )}
-        </ScreenWrapper>
-      </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
+              <Text
+                style={
+                  activeTab === tab ? styles.tabActiveText : styles.tabInactiveText
+                }
+              >
+                {tab}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* Subtitle for each share method */}
+        <View style={styles.content}>
+          <Text style={styles.subtitle}>
+            {activeTab === 'Users'
+              ? 'Send or request Rezults with users.'
+              : activeTab === 'Link'
+              ? 'Someone without the app can view it.'
+              : 'Anonymous SMS nudge to get tested.'}
+          </Text>
+        </View>
+
+        {activeTab === 'Users' && (
+          <View style={styles.content}>
+            <SearchBar
+              value={search}
+              onChangeText={setSearch}
+              onCancel={() => {
+                setSearch('');
+                setSearchFocused(false);
+              }}
+              onFocus={() => setSearchFocused(true)}
+            />
+          </View>
+        )}
+
+        {renderTabContent()}
+      </Animated.View>
+
+      {/* Search takeover for Users */}
+      {activeTab === 'Users' && (
+        <Animated.View
+          style={{
+            position: 'absolute',
+            top: NAVBAR_HEIGHT,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            opacity: takeoverAnim,
+            transform: [
+              {
+                translateY: takeoverAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [20, 0],
+                }),
+              },
+            ],
+          }}
+        >
+          <View style={{ flex: 1, paddingHorizontal: 16, marginTop: 40 }}>
+            <SearchBar
+              value={search}
+              onChangeText={setSearch}
+              onCancel={() => {
+                setSearch('');
+                setSearchFocused(false);
+              }}
+              onFocus={() => setSearchFocused(true)}
+            />
+            {renderTabContent()}
+          </View>
+        </Animated.View>
+      )}
+    </ScreenWrapper>
+  </TouchableWithoutFeedback>
+</KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   tabsContainer: {
-    flexDirection: 'row',
-    backgroundColor: colors.background.surface2,
-    borderRadius: 18,
-    height: 36,
-    padding: 4,
-    marginTop: 16,
-    marginBottom: 24,
-    alignSelf: 'stretch',
-    marginHorizontal: 16,   // ✅ add equal side padding
-  },
+  flexDirection: "row",
+  backgroundColor: colors.background.surface2,
+  borderRadius: 18,
+  height: 36,
+  padding: 4,
+  marginTop: 8,          // remove extra padding
+  marginBottom: 16,
+  marginHorizontal: 16,
+},
   tabActive: {
     flex: 1,
     backgroundColor: colors.foreground.default,
@@ -306,16 +296,18 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   pageTitle: {
-    ...typography.largeTitleMedium,
-    color: colors.foreground.default,
-    marginBottom: 6,
-  },
+  ...typography.largeTitleMedium,
+  color: colors.foreground.default,
+  marginTop: 8,          // same as Activities
+  marginHorizontal: 16,
+  marginBottom: 12,      // same as Activities
+},
   subtitle: {
-    ...typography.bodyRegular,
-    color: colors.foreground.soft,
-    marginBottom: 24,
-    lineHeight: 20,
-  },
+  ...typography.bodyRegular,
+  color: colors.foreground.soft,
+  marginBottom: 24,
+  marginHorizontal: 16,  // align with title + tabs
+},
   userList: {
     marginTop: 8,
   },

@@ -253,10 +253,10 @@ useEffect(() => {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-      keyboardVerticalOffset={0}
-    >
+  style={{ flex: 1, backgroundColor: colors.background.surface1 }}
+  behavior={Platform.OS === "ios" ? "padding" : undefined}
+  keyboardVerticalOffset={0}
+>
       <View style={styles.root}>
         {/* Header */}
         <BlurView intensity={40} tint="dark" style={styles.topBlur}>

@@ -18,15 +18,10 @@ export default function LinkScreenSuccess() {
       {/* ✅ standardized navbar */}
       <Navbar title="Link" />
 
-      {/* ✅ subtitle with consistent spacing */}
-      <Text style={styles.subtitle}>
-        Send your Rezults link to someone or add it to your dating profile. Even someone without
-        the app can view it.
-      </Text>
 
       <View style={styles.linkCard}>
         <View style={styles.linkRow}>
-          <Text style={styles.linkLabel}>Share-link</Text>
+          <Text style={styles.linkLabel}>Rezults-link</Text>
           <Text style={styles.linkStatus}>● Online</Text>
         </View>
 

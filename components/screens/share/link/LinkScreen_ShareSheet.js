@@ -27,10 +27,6 @@ export default function LinkScreenShareSheet() {
       <Navbar />
 
       <View style={styles.content}>
-        <Text style={styles.subtitle}>
-          Send your Rezults link to someone or add it to your dating profile. 
-          Even someone without the app can view it.
-        </Text>
 
         <ZultsButton
           label="Share Link"

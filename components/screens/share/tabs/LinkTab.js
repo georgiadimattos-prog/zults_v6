@@ -97,7 +97,7 @@ export default function LinkTab() {
       {/* Share-link card */}
       <View style={styles.card}>
         <View style={styles.cardHeader}>
-          <Text style={styles.cardTitle}>Share-link</Text>
+          <Text style={styles.cardTitle}>Rezults-link</Text>
           <View style={styles.statusPill}>
             <Animated.View
               style={[

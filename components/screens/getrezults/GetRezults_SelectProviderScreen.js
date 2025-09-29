@@ -58,13 +58,13 @@ export default function GetRezults_SelectProviderScreen() {
 >
         {/* Page title + subtitle */}
         <View style={styles.headerBlock}>
-          <Text allowFontScaling={false} style={styles.pageTitle}>
-            Add Rezults
-          </Text>
-          <Text allowFontScaling={false} style={styles.subtitle}>
-            Select your test provider to continue.
-          </Text>
-        </View>
+  <Text style={styles.pageTitle}>
+    Add Rezults
+  </Text>
+  <Text style={styles.subtitle}>
+    Select your test provider to continue.
+  </Text>
+</View>
 
         {/* Horizontal Carousel */}
         <ScrollView
@@ -160,11 +160,10 @@ const styles = StyleSheet.create({
   marginBottom: 6,
 },
   subtitle: {
-    ...typography.bodyRegular,
-    fontSize: 16,
-    color: colors.foreground.soft,
-    marginBottom: 0,
-  },
+  ...typography.bodyRegular,   // ✅ keep responsive sizing
+  color: colors.foreground.soft,
+  marginBottom: 0,
+},
   carousel: {
     paddingRight: 8,
   },

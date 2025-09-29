@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -56,6 +56,20 @@ export default function RezultsCard({
     iconRotate.value = withTiming(next ? 180 : 0, { duration: 300 });
   };
 
+  // 👇 Auto-flip once on mount
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      // Flip forward
+      rotate.value = withTiming(180, { duration: 600 });
+      setTimeout(() => {
+        // Flip back
+        rotate.value = withTiming(0, { duration: 600 });
+      }, 1200);
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   const frontAnimatedStyle = useAnimatedStyle(() => ({
     transform: [{ rotateY: `${interpolate(rotate.value, [0, 180], [0, 180])}deg` }],
     opacity: interpolate(rotate.value, [0, 90, 180], [1, 0, 0]),
@@ -90,10 +104,7 @@ export default function RezultsCard({
             <View>
               {realName === "Melany J Rabideau" ? (
                 <Text style={styles.name}>{realName}</Text>
-              ) : (
-                // For MadMan / TomasB → no name at all
-                null
-              )}
+              ) : null}
               <Text style={styles.provider}>{providerName}</Text>
             </View>
             <Text style={styles.link}>Show Rezults</Text>

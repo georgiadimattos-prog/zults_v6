@@ -16,10 +16,10 @@ export default function RezultsHeaderContainer({ onAdd, onDelete }) {
         {/* Delete button */}
         <TouchableOpacity style={styles.iconButton} onPress={onDelete}>
           <Image
-            source={deleteIcon}
-            style={styles.iconSmall}
-            resizeMode="contain"
-          />
+  source={deleteIcon}
+  style={[styles.iconSmall, { tintColor: colors.neutral[0] }]} // 👈 white
+  resizeMode="contain"
+/>
         </TouchableOpacity>
 
         {/* Add button */}
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     color: "#141414",
   },
   iconSmall: {
-    width: 16,
-    height: 16,
+    width: 20,
+    height: 20,
   },
 });

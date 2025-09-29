@@ -11,7 +11,7 @@ import {
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { Swipeable } from "react-native-gesture-handler";
 import { colors, typography } from "../../../theme";
-import { NavbarBackRightText } from "../../ui/Navbar";   // ✅ consistent Navbar
+import Navbar from "../../ui/Navbar";
 import ScreenWrapper from "../../ui/ScreenWrapper";
 
 import { chatCache, hasSeededDemo, markDemoSeeded } from "../../../cache/chatCache";
@@ -178,11 +178,11 @@ if (data.length === 0) {
 
   return (
     <ScreenWrapper>
-      {/* ✅ Consistent Navbar (arrow + Invite on the right) */}
-      <NavbarBackRightText
-        rightText="Invite"
-        onRightPress={() => console.log("Invite pressed")}
-      />
+      {/* Back arrow only */}
+    <Navbar />
+
+    {/* Large title */}
+    <Text style={styles.pageTitle}>Activities</Text>
 
       {/* Segmented control for filters */}
       <View style={styles.tabsContainer}>
@@ -301,4 +301,11 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "600",
   },
+  pageTitle: {
+  ...typography.largeTitleMedium,
+  color: colors.foreground.default,
+  marginTop: 8,
+  marginHorizontal: 16,
+  marginBottom: 12,
+},
 });
