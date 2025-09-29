@@ -567,30 +567,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  rezultsButton: {
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: colors.foreground.default,
-    backgroundColor: colors.background.surface1,
-  },
-
-  rezultsButtonActive: {
-    backgroundColor: colors.brand.purple1,
-    borderColor: colors.brand.purple1,
-  },
-
-  rezultsButtonText: {
-    ...typography.bodyMedium,
-    color: colors.foreground.default,
-  },
-
-  rezultsButtonTextActive: {
-    color: colors.neutral[0],
-    fontWeight: "600",
-  },
-
   typingBubble: {
     backgroundColor: colors.background.surface2,
     borderRadius: 16,
@@ -628,21 +604,21 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.surface1,
   },
 
-  // ✅ Rectangular "Share Rezults" button
+  // ✅ Rectangular "Share Rezults" button (footer only, until migrated fully)
   shareRezultsButton: {
-  backgroundColor: colors.brand.purple1,
-  height: 38,              // match input height
-  borderRadius: 19,        // half of height → pill shape
-  paddingHorizontal: 14,   // keep width spacing
-  alignItems: "center",
-  justifyContent: "center",
-},
+    backgroundColor: colors.brand.purple1,
+    height: 38,              // match input height
+    borderRadius: 19,        // half of height → pill shape
+    paddingHorizontal: 14,   // keep width spacing
+    alignItems: "center",
+    justifyContent: "center",
+  },
 
   shareRezultsButtonText: {
-  ...typography.buttonSmallRegular,   // 👈 match Request Rezults
-  color: colors.neutral[0],
-  fontWeight: "600",
-},
+    ...typography.buttonSmallRegular,   // 👈 match Request Rezults
+    color: colors.neutral[0],
+    fontWeight: "600",
+  },
 
   // ✅ Circular chat footer send button
   sendButton: {
@@ -700,7 +676,8 @@ const styles = StyleSheet.create({
     ...typography.bodyMedium,
     color: colors.foreground.soft,
   },
+
   text_small: {
-  ...typography.buttonSmallRegular,
-}
+    ...typography.buttonSmallRegular,
+  },
 });
