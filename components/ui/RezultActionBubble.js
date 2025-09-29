@@ -1,28 +1,35 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, Image, StyleSheet, Animated } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { colors, typography } from '../../theme';
 import fallbackAvatar from '../../assets/images/melany.png';
 
 function TypingIndicator({ avatar }) {
-  const opacity = useRef(new Animated.Value(0.3)).current;
+  const dot1 = useRef(new Animated.Value(0)).current;
+  const dot2 = useRef(new Animated.Value(0)).current;
+  const dot3 = useRef(new Animated.Value(0)).current;
+
+  const animateDot = (dot, delay) => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(dot, { toValue: -4, duration: 300, delay, useNativeDriver: true }),
+        Animated.timing(dot, { toValue: 0, duration: 300, useNativeDriver: true }),
+      ])
+    ).start();
+  };
 
   useEffect(() => {
-    const loop = Animated.loop(
-      Animated.sequence([
-        Animated.timing(opacity, { toValue: 1, duration: 600, useNativeDriver: true }),
-        Animated.timing(opacity, { toValue: 0.3, duration: 600, useNativeDriver: true }),
-      ])
-    );
-    loop.start();
-    return () => loop.stop();
-  }, [opacity]);
+    animateDot(dot1, 0);
+    animateDot(dot2, 150);
+    animateDot(dot3, 300);
+  }, []);
 
   return (
     <View style={[styles.container, styles.leftAlign]}>
       <Image source={avatar || fallbackAvatar} style={styles.avatar} />
       <View style={styles.typingBubble}>
-        <Animated.Text style={[styles.dot, { opacity }]}>● ● ●</Animated.Text>
+        <Animated.Text style={[styles.dot, { transform: [{ translateY: dot1 }] }]} allowFontScaling>●</Animated.Text>
+        <Animated.Text style={[styles.dot, { transform: [{ translateY: dot2 }] }]} allowFontScaling>●</Animated.Text>
+        <Animated.Text style={[styles.dot, { transform: [{ translateY: dot3 }] }]} allowFontScaling>●</Animated.Text>
       </View>
     </View>
   );
@@ -43,26 +50,28 @@ export default function RezultActionBubble(props) {
   const isSystemMessage = type === 'cancel-request' || type === 'stop-share';
 
   // --- Typing bubble ---
-  if (type === 'typing') {
-    return <TypingIndicator avatar={avatar} />;
-  }
+  if (type === 'typing') return <TypingIndicator avatar={avatar} />;
 
-  // --- Note bubble ---
+  // --- Note bubble (user text) ---
   if (type === 'note' || type === 'text') {
     return (
       <View style={[styles.container, isFromUser && styles.rightAlign, isFromOther && styles.leftAlign]}>
         {isFromOther && <Image source={avatar || fallbackAvatar} style={styles.avatar} />}
         <View style={styles.contentBlock}>
-          {isFromUser ? (
-            <LinearGradient colors={[colors.brand.purple1, '#9D8CFF']} style={[styles.bubble, styles.bubbleRight]}>
-              <Text style={styles.noteText}>{text}</Text>
-            </LinearGradient>
-          ) : (
-            <View style={[styles.bubble, styles.bubbleLeft]}>
-              <Text style={styles.noteText}>{text}</Text>
-            </View>
-          )}
-          <Text style={styles.timestamp}>{timestamp}</Text>
+          <View style={[styles.bubble, isFromUser ? styles.bubbleRight : styles.bubbleLeft]}>
+            <Text
+              style={isFromUser ? styles.messageTextUser : styles.messageTextOther}
+              allowFontScaling
+            >
+              {text}
+            </Text>
+          </View>
+          <Text
+            style={isFromUser ? styles.timestampRight : styles.timestampLeft}
+            allowFontScaling
+          >
+            {timestamp}
+          </Text>
         </View>
         {isFromUser && <Image source={avatar || fallbackAvatar} style={styles.avatar} />}
       </View>
@@ -75,46 +84,73 @@ export default function RezultActionBubble(props) {
   if (type === 'cancel-request') {
     label = 'Request Cancelled';
   } else if (type === 'request') {
-    label = 'Rezults Requested';
-    subtext = 'Asking to view your Rezults';
+    label = 'Requested Rezults';
+    subtext = 'Requested access to view your Rezults';
   } else if (type === 'share') {
-    label = 'Sharing';
-    subtext = 'You can view my Rezults now!';
+    label = 'Sharing Rezults';
+    subtext = 'Rezults available to view';
   } else if (type === 'stop-share') {
     label = 'Sharing Ended';
   }
 
-  const labelColor = isFromUser ? '#FFFFFF' : colors.brand.purple1;
-
   return (
-    <View style={[styles.container, isSystemMessage && styles.centerAlign, isFromUser && styles.rightAlign, isFromOther && styles.leftAlign]}>
+    <View
+      style={[
+        styles.container,
+        isSystemMessage && styles.centerAlign,
+        isFromUser && styles.rightAlign,
+        isFromOther && styles.leftAlign,
+      ]}
+    >
       {isFromOther && !isSystemMessage && (
         <Image source={avatar || fallbackAvatar} style={styles.avatar} />
       )}
 
       <View style={styles.contentBlock}>
         {!isSystemMessage && (
-          <Text style={[styles.username, isFromUser ? styles.usernameRight : styles.usernameLeft]}>
+          <Text
+            style={[styles.username, isFromUser ? styles.usernameRight : styles.usernameLeft]}
+            allowFontScaling
+          >
             {username}
           </Text>
         )}
 
-        {isFromUser ? (
-          <LinearGradient
-            colors={[colors.brand.purple1, '#9D8CFF']}
-            style={[styles.bubble, styles.bubbleRight, isSystemMessage && styles.systemBubble]}
+        <View
+          style={[
+            styles.bubble,
+            isFromUser ? styles.bubbleRight : styles.bubbleLeft,
+            isSystemMessage && styles.systemBubble,
+          ]}
+        >
+          <Text
+            style={
+              isSystemMessage
+                ? styles.systemText
+                : isFromOther
+                ? styles.labelOther
+                : styles.label
+            }
+            allowFontScaling
           >
-            <Text style={[styles.label, { color: labelColor }]}>{label}</Text>
-            {!!subtext && <Text style={styles.subtext}>{subtext}</Text>}
-          </LinearGradient>
-        ) : (
-          <View style={[styles.bubble, styles.bubbleLeft, isSystemMessage && styles.systemBubble]}>
-            <Text style={[styles.label, { color: labelColor }]}>{label}</Text>
-            {!!subtext && <Text style={styles.subtext}>{subtext}</Text>}
-          </View>
-        )}
+            {label}
+          </Text>
 
-        {!isSystemMessage && <Text style={styles.timestamp}>{timestamp}</Text>}
+          {!!subtext && !isSystemMessage && (
+            <Text
+              style={isFromOther ? styles.subtextOther : styles.subtext}
+              allowFontScaling
+            >
+              {subtext}
+            </Text>
+          )}
+        </View>
+
+        {!isSystemMessage && (
+          <Text style={styles.timestamp} allowFontScaling>
+            {timestamp}
+          </Text>
+        )}
       </View>
 
       {isFromUser && !isSystemMessage && (
@@ -127,8 +163,8 @@ export default function RezultActionBubble(props) {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    marginBottom: 12,
-    paddingHorizontal: 8, // reduced so bubbles sit closer to the edges
+    marginBottom: 6,       // reduced because timestamp now has its own margin
+    paddingHorizontal: 8,
     alignItems: 'flex-start',
   },
   leftAlign: { justifyContent: 'flex-start' },
@@ -143,31 +179,46 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
 
-  contentBlock: {
-    maxWidth: '85%',
-    flexShrink: 1,
-  },
+  contentBlock: { maxWidth: '85%', flexShrink: 1 },
 
   username: {
+    ...typography.chatMeta,
     fontWeight: '500',
-    fontSize: 14,
-    color: '#fff',
     marginBottom: 4,
   },
   usernameLeft: { textAlign: 'left', alignSelf: 'flex-start' },
   usernameRight: { textAlign: 'right', alignSelf: 'flex-end' },
 
-  bubble: { padding: 12, borderRadius: 16 },
+  bubble: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 18,
+  },
+
+  // System / status bubbles
   systemBubble: {
     alignSelf: 'center',
-    backgroundColor: '#2C2C2C',
-    padding: 12,
-    minWidth: '60%',
-    minHeight: 40,
+    backgroundColor: '#3A3A3C', // neutral grey pill
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 14,
+    minHeight: 32,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    shadowOffset: { width: 0, height: 1 },
   },
+  systemText: {
+    ...typography.chatMeta,
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#FFFFFF',
+    textAlign: 'center',
+  },
+
+  // Other person’s message bubble
   bubbleLeft: {
     backgroundColor: colors.background.surface2,
     alignSelf: 'flex-start',
@@ -176,25 +227,100 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 16,
     borderBottomLeftRadius: 16,
   },
+
+  // User’s message bubble
   bubbleRight: {
+    backgroundColor: '#E9E3F6', // soft lavender brand tint
     alignSelf: 'flex-end',
     borderTopRightRadius: 0,
     borderTopLeftRadius: 16,
     borderBottomLeftRadius: 16,
     borderBottomRightRadius: 16,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 3,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2, // Android
   },
 
-  label: { fontSize: 14, fontWeight: '600', color: '#FFFFFF', marginBottom: 2 },
-  subtext: { fontSize: 14, color: '#ccc' },
-  timestamp: { fontSize: 10, color: '#666', marginTop: 6, textAlign: 'right' },
-  noteText: { ...typography.bodyRegular, color: '#fff' },
+  // Default text inside bubbles
+  messageTextUser: {
+    ...typography.chatMessage,
+    color: '#2C2C2C',
+  },
+  messageTextOther: {
+    ...typography.chatMessage,
+    color: '#FFFFFF',
+  },
 
-  // typing bubble
+  // Labels
+  label: {
+    ...typography.chatMessageBold,
+    marginBottom: 2,
+    color: '#2C2C2C',
+  },
+  labelOther: {
+    ...typography.chatMessageBold,
+    marginBottom: 2,
+    color: '#FFFFFF',
+  },
+
+  // Subtext
+  subtext: {
+    ...typography.chatMessage,
+    fontSize: 14,
+    color: '#6E6E6E',
+  },
+  subtextOther: {
+    ...typography.chatMessage,
+    fontSize: 14,
+    color: '#A1A1A1',
+  },
+
+  // Timestamps
+  timestampLeft: {
+    ...typography.chatMeta,
+    marginTop: 6,
+    marginBottom: 6,        // ✅ spacing after timestamp
+    fontSize: 11,
+    color: colors.foreground.muted,
+    alignSelf: 'flex-start',
+  },
+  timestampRight: {
+    ...typography.chatMeta,
+    marginTop: 6,
+    marginBottom: 6,        // ✅ spacing after timestamp
+    fontSize: 11,
+    color: colors.foreground.muted,
+    alignSelf: 'flex-end',
+  },
+  timestamp: {
+    ...typography.chatMeta,
+    marginTop: 6,
+    marginBottom: 6,        // ✅ spacing after timestamp
+    fontSize: 11,
+    color: colors.foreground.muted,
+    textAlign: 'right',     // for action bubbles
+  },
+
+  // Typing bubble
   typingBubble: {
-    backgroundColor: colors.background.surface2,
-    borderRadius: 16,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+    backgroundColor: '#F1F1F1',
+    borderRadius: 18,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    shadowColor: '#000',
+    shadowOpacity: 0.06,
+    shadowRadius: 2,
+    shadowOffset: { width: 0, height: 1 },
+    elevation: 1,
   },
-  dot: { color: colors.foreground.muted, fontSize: 12, letterSpacing: 2 },
+  dot: {
+    fontSize: 8,
+    lineHeight: 10,
+    color: '#8E8E93',
+  },
 });

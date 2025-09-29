@@ -107,6 +107,8 @@ export default function UserChatScreen() {
 
   const { seedDemoChat } = useDemoChat();
 
+  const inputRef = useRef(null);
+
   const [footerHeight, setFooterHeight] = useState(0);
 
   const currentUser = { name: "TomasB.", avatar: TomasAvatar };
@@ -369,29 +371,30 @@ useEffect(() => {
         ) : (
           <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
             <FlatList
-              ref={flatListRef}
-              data={chatData}
-              keyExtractor={(item) => item.id}
-              renderItem={renderMessage}
-              keyboardShouldPersistTaps="handled"
-              showsVerticalScrollIndicator={false}
-              contentInsetAdjustmentBehavior="automatic"
-              contentContainerStyle={{ paddingHorizontal: 8, paddingTop: 180 }}
-              ListFooterComponent={
-                isDemoChat
-                  ? <View style={{ height: footerHeight + 50 }} />
-                  : <View style={{ height: 140 }} />
-              }
-              onScroll={handleScroll}
-              scrollEventThrottle={16}
-              onContentSizeChange={() => {
-                if (isAtBottom) {
-                  requestAnimationFrame(() => {
-                    flatListRef.current?.scrollToEnd({ animated: true });
-                  });
-                }
-              }}
-            />
+  ref={flatListRef}
+  data={chatData}
+  keyExtractor={(item) => item.id}
+  renderItem={renderMessage}
+  keyboardShouldPersistTaps="handled"
+  showsVerticalScrollIndicator={false}
+  contentInsetAdjustmentBehavior="automatic"
+  contentContainerStyle={{ paddingHorizontal: 8, paddingTop: 180 }}
+  ListFooterComponent={
+    isDemoChat
+      ? <View style={{ height: footerHeight + 50 }} />
+      : <View style={{ height: 140 }} />
+  }
+  ItemSeparatorComponent={() => <View style={{ height: 16 }} />}   // ✅ NEW
+  onScroll={handleScroll}
+  scrollEventThrottle={16}
+  onContentSizeChange={() => {
+    if (isAtBottom) {
+      requestAnimationFrame(() => {
+        flatListRef.current?.scrollToEnd({ animated: true });
+      });
+    }
+  }}
+/>
           </TouchableWithoutFeedback>
         )}
 
@@ -447,16 +450,47 @@ useEffect(() => {
       <Image source={require("../../../assets/images/send-arrow.png")} style={styles.sendIcon} />
     </TouchableOpacity>
   </View>
-            ) : (
+) : (
+  chatState.hasShared ? (
+    <RezultsActionButton
+      status="stop"
+      onPress={() => {
+        setChatState((prev) => ({ ...prev, hasShared: false }));
+        setChatData((prev) => [
+          ...prev,
+          {
+            id: Date.now().toString(),
+            type: "stop-share",
+            direction: "from-user",
+            username: currentUser.name,
+            avatar: currentUser.avatar,
+            timestamp: "Now",
+          },
+        ]);
+        // clear timers
+        shareTimers.current.forEach((t) => clearTimeout(t));
+        requestTimers.current.forEach((t) => clearTimeout(t));
+        shareTimers.current = [];
+        requestTimers.current = [];
+        removeTyping();
+      }}
+    />
+  ) : (
               <View style={styles.footer}>
   <TextInput
-    placeholder="Add note..."
-    placeholderTextColor={colors.foreground.muted}
-    value={message}
-    onChangeText={setMessage}
-    style={styles.input}
-  />
-
+  ref={inputRef}
+  placeholder="Add note..."
+  placeholderTextColor={colors.foreground.muted}
+  value={message}
+  onChangeText={setMessage}
+  style={styles.input}
+  onFocus={() => {
+    if (!rezultsCache.hasRezults) {
+      inputRef.current?.blur();        // ✅ close keyboard instantly
+      setShowNoRezultsModal(true);     // ✅ show modal only
+    }
+  }}
+/>
   <ZultsButton
   label="Share Rezults"
   type={rezultsCache.hasRezults ? "brand" : "secondary"} // purple if can share, white otherwise
@@ -502,9 +536,10 @@ useEffect(() => {
     }
   }}
 />
-</View>
-)}
-</BlurView>
+ </View>
+      )
+    )}
+  </BlurView>
 )}
 
         {/* Block / Unblock Modal */}
@@ -608,17 +643,17 @@ const styles = StyleSheet.create({
 
   footer: { flexDirection: "row", alignItems: "center" },
 
+  // ✅ unified input style
   input: {
     flex: 1,
-    height: 38,
-    borderRadius: 19,
-    borderWidth: 1,
+    height: 44,
+    borderRadius: 22,
     borderColor: colors.foreground.muted,
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
     marginRight: 8,
-    ...typography.bodyRegular,
-    color: colors.foreground.default,
-    backgroundColor: colors.background.surface1,
+    backgroundColor: colors.background.surface2,
+    color: colors.foreground.default, // dark text
+    ...typography.chatMessage,        // use chat font
   },
 
   // ✅ Circular chat footer send button
