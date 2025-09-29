@@ -460,24 +460,41 @@ useEffect(() => {
   <ZultsButton
   label="Share Rezults"
   type={rezultsCache.hasRezults ? "brand" : "secondary"} // purple if can share, white otherwise
-  size="medium"        // 👈 unified size
+  size="medium"        // unified size
   pill
   fullWidth={false}
   onPress={() => {
     if (rezultsCache.hasRezults) {
       // ✅ share Rezults flow
       setChatState({ ...chatState, hasShared: true });
-      setChatData((prev) => [
-        ...prev,
-        {
-          id: Date.now().toString(),
-          type: "share",
-          direction: "from-user",
-          username: currentUser.name,
-          avatar: currentUser.avatar,
-          timestamp: "Now",
-        },
-      ]);
+
+      const shareMsg = {
+        id: Date.now().toString(),
+        type: "share",
+        direction: "from-user",
+        username: currentUser.name,
+        avatar: currentUser.avatar,
+        timestamp: "Now",
+      };
+
+      const noteMsg =
+        message.trim().length > 0
+          ? {
+              id: (Date.now() + 1).toString(),
+              type: "text",
+              direction: "from-user",
+              username: currentUser.name,
+              avatar: currentUser.avatar,
+              text: message,      // 👈 note text from input
+              timestamp: "Now",
+            }
+          : null;
+
+      setChatData((prev) => [...prev, shareMsg, ...(noteMsg ? [noteMsg] : [])]);
+
+      // clear the input after sending
+      setMessage("");
+
       startShareFlow();
     } else {
       // ❌ no Rezults → open modal
