@@ -604,22 +604,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.surface1,
   },
 
-  // ✅ Rectangular "Share Rezults" button (footer only, until migrated fully)
-  shareRezultsButton: {
-    backgroundColor: colors.brand.purple1,
-    height: 38,              // match input height
-    borderRadius: 19,        // half of height → pill shape
-    paddingHorizontal: 14,   // keep width spacing
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  shareRezultsButtonText: {
-    ...typography.buttonSmallRegular,   // 👈 match Request Rezults
-    color: colors.neutral[0],
-    fontWeight: "600",
-  },
-
   // ✅ Circular chat footer send button
   sendButton: {
     backgroundColor: colors.brand.purple1,
