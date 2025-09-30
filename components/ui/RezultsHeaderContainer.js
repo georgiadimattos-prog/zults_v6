@@ -4,8 +4,9 @@ import { colors, typography } from "../../theme";
 
 import addIcon from "../../assets/images/add.png";
 import deleteIcon from "../../assets/images/delete-icon.png";
+import walletIcon from "../../assets/images/wallet-icon.png"; // 👈 new
 
-export default function RezultsHeaderContainer({ onAdd, onDelete }) {
+export default function RezultsHeaderContainer({ onAdd, onDelete, onWallet }) {
   return (
     <View style={styles.container}>
       {/* Left Title */}
@@ -16,10 +17,19 @@ export default function RezultsHeaderContainer({ onAdd, onDelete }) {
         {/* Delete button */}
         <TouchableOpacity style={styles.iconButton} onPress={onDelete}>
           <Image
-  source={deleteIcon}
-  style={[styles.iconSmall, { tintColor: colors.neutral[0] }]} // 👈 white
-  resizeMode="contain"
-/>
+            source={deleteIcon}
+            style={[styles.iconSmall, { tintColor: colors.neutral[0] }]}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
+
+        {/* Wallet button */}
+        <TouchableOpacity style={styles.iconButton} onPress={onWallet}>
+          <Image
+            source={walletIcon}
+            style={[styles.iconSmall, { tintColor: colors.neutral[0] }]}
+            resizeMode="contain"
+          />
         </TouchableOpacity>
 
         {/* Add button */}

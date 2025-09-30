@@ -108,17 +108,26 @@ const styles = StyleSheet.create({
   container: { alignItems: "center", marginTop: 20 },
 
   walletButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: colors.background.surface1,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 12,
-  },
-  walletIcon: { width: 22, height: 22, marginRight: 8 },
-  walletText: {
-    color: colors.foreground.default,
-  },
+  flexDirection: "row",
+  alignItems: "center",
+  backgroundColor: "transparent",              // 👈 remove fill
+  borderWidth: 1,                              // 👈 add subtle outline
+  borderColor: "rgba(255,255,255,0.15)",       // 👈 faint border
+  paddingHorizontal: 14,
+  paddingVertical: 8,
+  borderRadius: 16,                            // 👈 rounder button feel
+},
+walletText: {
+  ...typography.buttonMediumRegular,
+  color: colors.foreground.muted,              // 👈 softer text
+},
+walletIcon: {
+  width: 18,
+  height: 18,
+  marginRight: 6,
+  tintColor: colors.foreground.muted,          // 👈 icon matches muted text
+},
+
 
   modalOverlay: {
     flex: 1,

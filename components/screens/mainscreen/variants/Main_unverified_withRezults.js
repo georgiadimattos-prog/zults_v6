@@ -146,78 +146,85 @@ export default function MainUnverifiedWithRezults({ onLinkPress, onSharePress })
         <RezultsHeaderContainer
           onAdd={() => setShowAddModal(true)}
           onDelete={() => setShowDeleteModal(true)}
+          onWallet={() => navigation.navigate("AddToWallet")} // 👈 wire it here
         />
 
         {/* Animated Rezults card */}
         <Animated.View
-          style={{
-            opacity: fadeAnim,
-            transform: [{ scale: fadeAnim }],
-          }}
-        >
-          <RezultsCard
-            userName={rezultsCache.card?.userName || "Unknown User"}
-            providerName={rezultsCache.card?.providerName || "Unknown Provider"}
-            testDate={rezultsCache.card?.testDate || "Unknown Date"}
-          />
-          <ExpireContainer expiryDate="29 Sep 2025" daysLeft={43} />
-        </Animated.View>
+  style={{
+    opacity: fadeAnim,
+    transform: [{ scale: fadeAnim }],
+  }}
+>
+  <RezultsCard
+    userName={rezultsCache.card?.userName || "Unknown User"}
+    providerName={rezultsCache.card?.providerName || "Unknown Provider"}
+    testDate={rezultsCache.card?.testDate || "Unknown Date"}
+  />
+  <View style={{ marginTop: 12 }}>
+    <ExpireContainer expiryDate="29 Sep 2025" daysLeft={43} />
+  </View>
+</Animated.View>
 
-        {/* ✅ Actions */}
-        <ZultsButton
-          label="Share"
-          type="primary"
-          size="large"
-          onPress={onSharePress}
-        />
+<ZultsButton
+  label="Share"
+  type="primary"
+  size="large"
+  onPress={onSharePress}
+  style={{ marginTop: 16 }}   // 👈 spacing below expiry
+/>
 
-        <ZultsButton
-          label="Add to Wallet"
-          type="ghost"
-          size="large"
-          icon={require("../../../../assets/images/add.png")}
-          onPress={() => navigation.navigate("AddToWallet")}
-        />
+{/* Activities Section */}
+<View style={{ marginTop: 24 }}>
+  <View style={styles.activitiesHeader}>
+    <Text style={styles.sectionTitle}>Activities</Text>
+    <TouchableOpacity
+      onPress={() => navigation.navigate("Activities")}
+      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+    >
+      <Text style={styles.viewAll}>View All</Text>
+    </TouchableOpacity>
+  </View>
 
-        {/* Activities Section */}
-        <View style={{ marginTop: 15 }}>
-          <Text style={styles.sectionTitle}>Activities</Text>
-          <View style={styles.activitiesCard}>
-  {recentUsers.length > 0 ? (
-    <View style={styles.row}>
-      {/* Avatars aligned left */}
-      <View style={styles.avatarRow}>
-        {recentUsers.slice(0, 3).map((user, index) => (
-          <Image
-            key={user.id}
-            source={user.avatar}
-            style={[styles.avatar, { marginLeft: index === 0 ? 0 : -12 }]}
-          />
-        ))}
-        {recentUsers.length > 3 && (
-          <View style={[styles.avatar, styles.extraAvatar]}>
-            <Text style={styles.extraText}>+{recentUsers.length - 3}</Text>
-          </View>
-        )}
-      </View>
-
-      {/* Info aligned right */}
-      <Text style={styles.activityText}>
-        {unreadUsers.length > 0
-          ? `${unreadUsers.length} unread message${unreadUsers.length > 1 ? "s" : ""}`
-          : "No activity yet"}
-      </Text>
-    </View>
-  ) : (
-    <View>
-      <Text style={styles.emptyTitle}>No activity yet</Text>
-      <Text style={styles.emptySubtitle}>
-        You’ll see Rezults shared here
-      </Text>
-    </View>
-  )}
-</View>
+  <TouchableOpacity
+    style={styles.activitiesCard}
+    activeOpacity={0.8}
+    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+    onPress={() => navigation.navigate("Activities")}
+  >
+    {recentUsers.length > 0 ? (
+      <View style={styles.row}>
+        <View style={styles.avatarRow}>
+          {recentUsers.slice(0, 3).map((user, index) => (
+            <Image
+              key={user.id}
+              source={user.avatar}
+              style={[styles.avatar, { marginLeft: index === 0 ? 0 : -12 }]}
+            />
+          ))}
+          {recentUsers.length > 3 && (
+            <View style={[styles.avatar, styles.extraAvatar]}>
+              <Text style={styles.extraText}>+{recentUsers.length - 3}</Text>
+            </View>
+          )}
         </View>
+
+        <Text style={styles.activityText}>
+          {unreadUsers.length > 0
+            ? `${unreadUsers.length} unread message${unreadUsers.length > 1 ? "s" : ""}`
+            : "No recent activity"}
+        </Text>
+      </View>
+    ) : (
+      <View>
+        <Text style={styles.emptyTitle}>No recent activity</Text>
+        <Text style={styles.emptySubtitle}>
+          You’ll see Rezults shared here
+        </Text>
+      </View>
+    )}
+  </TouchableOpacity>
+</View>
 
         <NotificationCard />
       </ScrollView>
@@ -249,22 +256,20 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 16,
     paddingBottom: 32,
-    gap: 24,
+    gap: 20,   // 👈 section rhythm, was 24
   },
   sectionTitle: {
-    ...typography.bodyMedium,
-    color: colors.foreground.default,
-    marginBottom: 8,
-  },
+  ...typography.headlineMedium,
+  color: colors.foreground.default,
+},
   activitiesCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    backgroundColor: colors.background.surface2,
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
+  backgroundColor: colors.background.surface2,
+  borderRadius: 16,
+  paddingHorizontal: 16,
+  paddingVertical: 16,  // 👈 reduced from 20 → 16 for balance
+  alignItems: "center",
+  justifyContent: "center",
+},
   avatarRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -287,12 +292,17 @@ const styles = StyleSheet.create({
     color: colors.foreground.default,
     fontWeight: "600",
   },
-  viewAllText: {
-    ...typography.bodyMedium,
-    fontSize: 16,
-    color: colors.brand.purple1,
-    fontWeight: "600",
+  activitiesHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginHorizontal: 4,
+    marginBottom: 12,  // 👈 bumped from 8 → 12 for cleaner rhythm
   },
+  viewAll: {
+  ...typography.captionSmallRegular,   // 👈 lighter, smaller
+  color: colors.brand.accent,
+},
   row: {
   flexDirection: "row",
   alignItems: "center",
@@ -301,7 +311,7 @@ const styles = StyleSheet.create({
 },
 activityText: {
   ...typography.subheadlineRegular,
-  color: colors.foreground.soft, // make text lighter than avatars
+  color: colors.foreground.soft,   // 👈 lighter than default
   marginLeft: 12,
 },
 emptyTitle: {

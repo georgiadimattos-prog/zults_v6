@@ -14,41 +14,42 @@ export default function ActivityCard({ user, onPress, onToggleFavorite }) {
         <View style={styles.textSection}>
           <View style={styles.topRow}>
             <Text style={styles.name}>{user.name}</Text>
-            <Text style={styles.date}>{user.date}</Text>
+
+            {/* 👇 Right-side cluster */}
+            <View style={styles.rightCluster}>
+              <Text style={styles.date}>{user.date}</Text>
+              {user.unreadCount > 0 && (
+                <View style={styles.unreadBadge}>
+                  <Text style={styles.unreadText}>{user.unreadCount}</Text>
+                </View>
+              )}
+              {onToggleFavorite && (
+                <TouchableOpacity
+                  onPress={onToggleFavorite}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  style={styles.starButton}
+                >
+                  <Image
+                    source={user.favorite ? starFilled : star}
+                    style={[
+                      styles.starIcon,
+                      {
+                        tintColor: user.favorite
+                          ? colors.brand.purple1
+                          : colors.foreground.muted,
+                      },
+                    ]}
+                  />
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
 
           <Text style={styles.message} numberOfLines={1}>
             {user.message}
           </Text>
         </View>
-
-        {user.unreadCount > 0 && (
-          <View style={styles.unreadBadge}>
-            <Text style={styles.unreadText}>{user.unreadCount}</Text>
-          </View>
-        )}
       </TouchableOpacity>
-
-      {/* ⭐ Favorite star — isolated pressable */}
-{onToggleFavorite && (
-  <TouchableOpacity
-    onPress={onToggleFavorite}
-    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }} // 👈 bigger invisible touch area
-    style={styles.starButton}
-  >
-    <Image
-      source={user.favorite ? starFilled : star}
-      style={[
-        styles.starIcon,
-        {
-          tintColor: user.favorite
-            ? colors.brand.purple1
-            : colors.foreground.muted,
-        },
-      ]}
-    />
-  </TouchableOpacity>
-)}
     </View>
   );
 }
@@ -57,9 +58,9 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.background.surface2,
+    paddingVertical: 20,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: "rgba(255,255,255,0.1)", // 👈 softer divider
   },
   avatar: {
     width: 48,
@@ -73,7 +74,13 @@ const styles = StyleSheet.create({
   topRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 4,
+    alignItems: "center",
+    marginBottom: 6,
+  },
+  rightCluster: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8, // 👈 equal spacing
   },
   name: {
     ...typography.bodyMedium,
@@ -85,32 +92,33 @@ const styles = StyleSheet.create({
   },
   message: {
     ...typography.bodyRegular,
-    color: colors.foreground.soft,
+    color: colors.foreground.muted, // 👈 lighter preview text
+    lineHeight: typography.bodyRegular.fontSize + 4,
   },
   unreadBadge: {
     backgroundColor: colors.brand.purple1,
-    borderRadius: 12,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
+    minWidth: 20,
+    height: 20,
+    borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
-    marginLeft: 8,
   },
   unreadText: {
     color: "#FFFFFF",
     fontSize: 12,
     fontWeight: "600",
+    textAlign: "center",
   },
   starIcon: {
     width: 20,
     height: 20,
   },
   starButton: {
-  padding: 8, // ✅ easier touch target
-},
-mainContent: {
-  flexDirection: "row",
-  alignItems: "center",
-  flex: 1, // ✅ take all space except for the star
-},
+    padding: 4,
+  },
+  mainContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
 });

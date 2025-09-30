@@ -1,5 +1,12 @@
 import { fonts } from './fonts';
 
+// 📝 Zults Design System button rules
+// - Pill buttons → ONLY inside chat screen (e.g. "Share Rezults", "Request Rezults")
+// - Standard ZultsButton (square/rounded corners) → everywhere else
+// - Use size="medium" inside cards (e.g. NotificationCard, Activities)
+// - Use size="large" for primary CTAs (e.g. Share, Get Rezults)
+
+
 export const typography = {
   // Large Titles
   largeTitleMedium: {

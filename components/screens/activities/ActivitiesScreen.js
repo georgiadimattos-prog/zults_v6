@@ -5,7 +5,8 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  Image,   // 👈 add this back
+  Image,
+   Animated,
 } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { Swipeable } from "react-native-gesture-handler";
@@ -112,21 +113,42 @@ export default function ActivitiesScreen() {
     delete chatCache[id];
   };
 
-  const renderRightActions = (id) => (
-  <TouchableOpacity
-    style={styles.deleteButton}
-    onPress={() => handleDelete(id)}
-    activeOpacity={0.7}
-  >
-    <Image
-      source={require("../../../assets/images/close-cross.png")}
-      style={styles.deleteIcon}
-    />
-  </TouchableOpacity>
-);
+  const renderRightActions = (progress, dragX, id) => {
+  const scale = dragX.interpolate({
+    inputRange: [-120, -80, 0],
+    outputRange: [1.05, 1, 0.8], // 👈 overshoot a bit at -120
+    extrapolate: "clamp",
+  });
+
+  const opacity = dragX.interpolate({
+    inputRange: [-100, -20, 0],
+    outputRange: [1, 0.9, 0],
+    extrapolate: "clamp",
+  });
+
+  return (
+    <Animated.View
+      style={[
+        styles.deleteButton,
+        { transform: [{ scale }], opacity },
+      ]}
+    >
+      <TouchableOpacity onPress={() => handleDelete(id)} activeOpacity={0.8}>
+        <Image
+          source={require("../../../assets/images/close-cross.png")}
+          style={styles.deleteIcon}
+        />
+      </TouchableOpacity>
+    </Animated.View>
+  );
+};
 
   const renderItem = ({ item }) => (
-  <Swipeable renderRightActions={() => renderRightActions(item.id)}>
+  <Swipeable
+  renderRightActions={(progress, dragX) =>
+    renderRightActions(progress, dragX, item.id)
+  }
+>
     <ActivityCard
       user={{
         id: item.id,

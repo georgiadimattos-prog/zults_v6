@@ -157,10 +157,13 @@ export default function MainUnverifiedNoRezults({ onLinkPress, onSharePress }) {
         />
 
         {/* Activities Section */}
-<View style={{ marginTop: 15 }}>
+<View style={{ marginTop: 24 }}>
   <View style={styles.activitiesHeader}>
     <Text style={styles.sectionTitle}>Activities</Text>
-    <TouchableOpacity onPress={() => navigation.navigate("Activities")}>
+    <TouchableOpacity
+      onPress={() => navigation.navigate("Activities")}
+      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+    >
       <Text style={styles.viewAll}>View All</Text>
     </TouchableOpacity>
   </View>
@@ -168,7 +171,7 @@ export default function MainUnverifiedNoRezults({ onLinkPress, onSharePress }) {
   <TouchableOpacity
     style={styles.activitiesCard}
     activeOpacity={0.8}
-    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }} // 👈 bigger touch target
+    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
     onPress={() => navigation.navigate("Activities")}
   >
     {recentUsers.length > 0 ? (
@@ -191,13 +194,15 @@ export default function MainUnverifiedNoRezults({ onLinkPress, onSharePress }) {
         <Text style={styles.activityText}>
           {unreadUsers.length > 0
             ? `${unreadUsers.length} unread message${unreadUsers.length > 1 ? "s" : ""}`
-            : "No activity yet"}
+            : "No recent activity"}
         </Text>
       </View>
     ) : (
       <View>
-        <Text style={styles.emptyTitle}>No activity yet</Text>
-        <Text style={styles.emptySubtitle}>You’ll see Rezults shared here</Text>
+        <Text style={styles.emptyTitle}>No recent activity</Text>
+        <Text style={styles.emptySubtitle}>
+          You’ll see Rezults shared here
+        </Text>
       </View>
     )}
   </TouchableOpacity>
@@ -218,32 +223,31 @@ const styles = StyleSheet.create({
 
   // Section title
   sectionTitle: {
-    ...typography.headlineMedium,   // bump from bodyMedium → headline
-    color: colors.foreground.default,
-  },
+  ...typography.headlineMedium,
+  color: colors.foreground.default,
+},
 
   // Header row (title + View All link)
   activitiesHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginHorizontal: 4,
-    marginBottom: 8,
-  },
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "center",
+  marginHorizontal: 4,
+  marginBottom: 8,
+},
   viewAll: {
-    ...typography.subheadlineRegular, // smaller than title
-    color: colors.brand.accent,       // #4D4CFF
-  },
+  ...typography.captionSmallRegular,   // 👈 lighter, smaller
+  color: colors.brand.accent,
+},
 
-  // Card container
   activitiesCard: {
-    backgroundColor: colors.background.surface2,
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 20,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+  backgroundColor: colors.background.surface2,
+  borderRadius: 16,
+  paddingHorizontal: 16,
+  paddingVertical: 16,  // 👈 reduced from 20 → 16 for balance
+  alignItems: "center",
+  justifyContent: "center",
+},
 
   // Avatars
   avatarRow: {
@@ -281,7 +285,7 @@ const styles = StyleSheet.create({
 },
 activityText: {
   ...typography.subheadlineRegular,
-  color: colors.foreground.default,
+  color: colors.foreground.soft,   // 👈 lighter than default
   marginLeft: 12,
 },
 
