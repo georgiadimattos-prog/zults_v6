@@ -29,7 +29,7 @@ export default function RezultsHeaderContainer({ onAdd, onDelete }) {
             style={styles.iconSmall}
             resizeMode="contain"
           />
-          <Text style={styles.addText}>Add</Text>
+          <Text style={styles.addText}>New</Text>
         </TouchableOpacity>
       </View>
     </View>

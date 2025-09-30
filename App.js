@@ -9,6 +9,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 // Main Screens
 import MainScreen from "./components/screens/mainscreen/MainScreen";
 import SettingsScreen from "./components/screens/settings/SettingsScreen";
+import AddToWalletScreen from "./components/screens/wallet/AddToWalletScreen";
 
 // Activities
 import ActivitiesScreen from "./components/screens/activities/ActivitiesScreen";
@@ -86,6 +87,15 @@ export default function App() {
             options={{ animation: "fade" }}
           />
           <Stack.Screen name="Settings" component={SettingsScreen} />
+          <Stack.Screen
+  name="AddToWallet"
+  component={AddToWalletScreen}
+  options={{
+    presentation: "transparentModal",
+    animation: "fade",
+    headerShown: false,
+  }}
+/>
 
           {/* Activities */}
           <Stack.Screen name="Activities" component={ActivitiesScreen} />

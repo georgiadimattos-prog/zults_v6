@@ -31,14 +31,12 @@ export default function RezultsCardTransferring() {
     <View style={[styles.wrapper, { width: cardWidth, height: cardHeight }]}>
       <Svg height={cardHeight} width={cardWidth} style={StyleSheet.absoluteFill}>
         <Defs>
-          <LinearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <Stop offset="19%" stopColor="#4817B2" />
-            <Stop offset="36%" stopColor="#3FDBEA" />
-            <Stop offset="49%" stopColor="#775DEC" />
-            <Stop offset="63%" stopColor="#F200F3" />
-            <Stop offset="77%" stopColor="#FA5F21" />
-          </LinearGradient>
-        </Defs>
+  <LinearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+    <Stop offset="0%" stopColor="#FFCEB2" />
+    <Stop offset="50%" stopColor="#FC8CFF" />
+    <Stop offset="100%" stopColor="#4D4CFF" />
+  </LinearGradient>
+</Defs>
         <Rect
           x="1"
           y="1"

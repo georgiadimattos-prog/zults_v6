@@ -1,50 +1,96 @@
-import React from 'react';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import React, { useRef, useEffect } from 'react';
+import { View, Text, StyleSheet, Dimensions, Animated, Pressable } from 'react-native';
 import Svg, { Rect, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { useNavigation } from '@react-navigation/native';
 import { colors, typography } from '../../theme';
-import ZultsButton from './ZultsButton';
+
+const AnimatedRect = Animated.createAnimatedComponent(Rect);
 
 const screenWidth = Dimensions.get('window').width;
-const cardWidth = screenWidth - 32; // 16px padding on each side
-const cardHeight = cardWidth / 1.586; // classic credit card ratio
+const cardWidth = screenWidth - 32;
+const cardHeight = cardWidth / 1.586;
 
 export default function RezultsCardPlaceholder() {
-  return (
-    <View style={[styles.wrapper, { width: cardWidth, height: cardHeight }]}>
-      <Svg height={cardHeight} width={cardWidth} style={StyleSheet.absoluteFill}>
-        <Defs>
-          <LinearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <Stop offset="19%" stopColor="#4817B2" />
-            <Stop offset="36%" stopColor="#3FDBEA" />
-            <Stop offset="49%" stopColor="#775DEC" />
-            <Stop offset="63%" stopColor="#F200F3" />
-            <Stop offset="77%" stopColor="#FA5F21" />
-          </LinearGradient>
-        </Defs>
-        <Rect
-          x="1"
-          y="1"
-          rx="20"
-          ry="20"
-          width={cardWidth - 2}
-          height={cardHeight - 2}
-          fill="none"
-          stroke="url(#gradient)"
-          strokeWidth="2"
-          strokeDasharray="10,10"
-        />
-      </Svg>
+  const navigation = useNavigation();
+  const glowAnim = useRef(new Animated.Value(0.4)).current;
+  const scaleAnim = useRef(new Animated.Value(1)).current;
 
-      <View style={styles.content}>
-        <Text style={styles.title} allowFontScaling>
-          No Rezults yet
-        </Text>
-        <Text style={styles.subtitle} allowFontScaling>
-          Tap here to get started!
-        </Text>
-      </View>
-    </View>
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(glowAnim, {
+          toValue: 1,
+          duration: 1200,
+          useNativeDriver: false,
+        }),
+        Animated.timing(glowAnim, {
+          toValue: 0.4,
+          duration: 1200,
+          useNativeDriver: false,
+        }),
+      ])
+    ).start();
+  }, []);
+
+  const handlePressIn = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 0.98,
+      useNativeDriver: true,
+      speed: 40,
+      bounciness: 0,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 20,
+      bounciness: 6,
+    }).start();
+  };
+
+  return (
+    <Pressable
+      onPress={() => navigation.navigate('GetRezultsProvider')} // 👈 hardcoded
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+      style={{ alignItems: 'center' }}
+    >
+      <Animated.View
+        style={[
+          styles.wrapper,
+          { width: cardWidth, height: cardHeight, transform: [{ scale: scaleAnim }] },
+        ]}
+      >
+        <Svg height={cardHeight} width={cardWidth} style={StyleSheet.absoluteFill}>
+          <Defs>
+            <LinearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <Stop offset="0%" stopColor="#FFCEB2" />
+              <Stop offset="50%" stopColor="#FC8CFF" />
+              <Stop offset="100%" stopColor="#4D4CFF" />
+            </LinearGradient>
+          </Defs>
+          <AnimatedRect
+            x="1"
+            y="1"
+            rx="20"
+            ry="20"
+            width={cardWidth - 2}
+            height={cardHeight - 2}
+            fill="none"
+            stroke="url(#gradient)"
+            strokeWidth="2"
+            strokeDasharray="10,10"
+            strokeOpacity={glowAnim} // 👈 animated pulse
+          />
+        </Svg>
+
+        <View style={styles.content}>
+          <Text style={styles.title}>Tap to add your Rezults  ›</Text>
+        </View>
+      </Animated.View>
+    </Pressable>
   );
 }
 
@@ -57,17 +103,14 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   content: {
-    paddingHorizontal: 24,
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: 12,
+    paddingHorizontal: 24,
   },
   title: {
-  ...typography.bodyMedium, // ✅ this one’s usually fine
-  color: colors.foreground.default,
-},
-subtitle: {
-  ...typography.bodyRegular, // ⬅️ swap from captionSmallRegular
-  color: colors.foreground.soft,
-  textAlign: 'center',
-},
+    ...typography.headlineMedium,
+    color: colors.foreground.default,
+    textAlign: 'center',
+  },
 });

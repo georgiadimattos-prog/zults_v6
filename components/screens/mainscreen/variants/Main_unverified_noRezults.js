@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   View,
   ScrollView,
@@ -7,22 +7,27 @@ import {
   TouchableOpacity,
   Text,
   Image,
-} from 'react-native';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { colors, typography } from '../../../../theme';
-import UserProfileHeader from '../../../ui/UserProfileHeader';
-import RezultsCardPlaceholder from '../../../ui/RezultsCardPlaceholder';
-import NotificationCard from '../../../ui/NotificationCard';
-import ZultsButton from '../../../ui/ZultsButton';
-import ScreenWrapper from '../../../ui/ScreenWrapper';
+  DeviceEventEmitter,   // ✅ bring in emitter directly
+} from "react-native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import { colors, typography } from "../../../../theme";
+import UserProfileHeader from "../../../ui/UserProfileHeader";
+import RezultsCardPlaceholder from "../../../ui/RezultsCardPlaceholder";
+import NotificationCard from "../../../ui/NotificationCard";
+import ZultsButton from "../../../ui/ZultsButton";
+import ScreenWrapper from "../../../ui/ScreenWrapper";
 
-// import chatCache to show live recent users
-import { chatCache, hasSeededDemo, markDemoSeeded } from '../../../../cache/chatCache';
-import zultsLogo from '../../../../assets/images/zults.png';
+import {
+  chatCache,
+  hasSeededDemo,
+  markDemoSeeded,
+} from "../../../../cache/chatCache";
+import zultsLogo from "../../../../assets/images/zults.png";
 
 export default function MainUnverifiedNoRezults({ onLinkPress, onSharePress }) {
   const navigation = useNavigation();
   const [recentUsers, setRecentUsers] = useState([]);
+  const [headerHeight, setHeaderHeight] = useState(0);
 
   // 🔄 refresh whenever screen is focused
   useFocusEffect(
@@ -35,39 +40,61 @@ export default function MainUnverifiedNoRezults({ onLinkPress, onSharePress }) {
             id: username,
             name: username,
             avatar: chat.user?.image || zultsLogo,
-            lastTimestamp: lastMsg ? lastMsg.timestamp : '',
+            lastTimestamp: lastMsg ? lastMsg.timestamp : "",
           };
         })
         .sort((a, b) => (a.lastTimestamp < b.lastTimestamp ? 1 : -1));
 
-      // ✅ only seed demo once
       if (users.length === 0 && !hasSeededDemo()) {
-  const demoId = "zults-demo";
+        const demoId = "zults-demo";
+        chatCache[demoId] = {
+          user: {
+            id: demoId,
+            name: "Zults Bot",
+            image: zultsLogo,
+            isBot: true,
+          },
+          chatData: [],
+          chatState: { hasShared: false, hasRequested: false },
+          otherUserState: { hasShared: false, hasRequested: false },
+          blocked: false,
+        };
+        users = [
+          {
+            id: demoId,
+            name: "Zults Bot",
+            avatar: zultsLogo,
+            lastTimestamp: "Now",
+          },
+        ];
+        markDemoSeeded();
+      }
 
-  chatCache[demoId] = {
-    user: { id: demoId, name: "Zults Bot", image: zultsLogo, isBot: true },
-    chatData: [], // ⬅️ no hardcoded messages anymore
-    chatState: { hasShared: false, hasRequested: false },
-    otherUserState: { hasShared: false, hasRequested: false },
-    blocked: false,
-  };
-
-  users = [
-    {
-      id: demoId,
-      name: "Zults Bot",
-      avatar: zultsLogo,
-      lastTimestamp: "Now",
-    },
-  ];
-
-  markDemoSeeded();
-}
-
-      console.log("🔄 [MainUnverifiedNoRezults] Rebuilt from chatCache:", chatCache);
       setRecentUsers(users);
     }, [])
   );
+
+  useEffect(() => {
+  const sub = DeviceEventEmitter.addListener("chat-updated", () => {
+    let users = Object.keys(chatCache)
+      .map((username) => {
+        const chat = chatCache[username] || {};
+        const lastMsg = chat.chatData?.[chat.chatData.length - 1];
+        return {
+          id: username,
+          name: username,
+          avatar: chat.user?.image || zultsLogo,
+          lastTimestamp: lastMsg ? lastMsg.timestamp : "",
+          hasUnread: chat.hasUnread || false,
+        };
+      })
+      .sort((a, b) => (a.lastTimestamp < b.lastTimestamp ? 1 : -1));
+
+    setRecentUsers(users);
+  });
+
+  return () => sub.remove();
+}, []);
 
   const renderAvatars = () => {
     const display = recentUsers.slice(0, 4);
@@ -91,44 +118,95 @@ export default function MainUnverifiedNoRezults({ onLinkPress, onSharePress }) {
     );
   };
 
+  // ✅ declare unreadUsers right here, before return
+  const unreadUsers = recentUsers.filter((u) => u.hasUnread);
+
   return (
     <ScreenWrapper>
-  <StatusBar barStyle="light-content" backgroundColor={colors.background.surface1} />
-  <UserProfileHeader hideVerification />
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor="transparent"
+        translucent
+      />
+      <UserProfileHeader
+        hideVerification
+        onLayout={(e) => setHeaderHeight(e.nativeEvent.layout.height)}
+      />
 
-  <ScrollView contentContainerStyle={styles.scrollContent}>
-    {/* Tappable placeholder card → Get Rezults pathway */}
-    <TouchableOpacity
-      activeOpacity={0.85}
-      onPress={() => navigation.navigate('GetRezultsProvider')}
-    >
-      <RezultsCardPlaceholder />
-    </TouchableOpacity>
-
-    {/* Share is still available even with no Rezults */}
-    <ZultsButton
-      label="Share"
-      type="primary"
-      size="large"
-      onPress={onSharePress ?? (() => navigation.navigate('Share'))}
-      // fullWidth defaults to true in your ZultsButton
-    />
-
-    {/* Activities Section */}
-    <View style={{ marginTop: 15 }}>
-      <Text style={styles.sectionTitle}>Activities</Text>
-      <View style={styles.activitiesCard}>
-        {renderAvatars()}
-        <TouchableOpacity onPress={() => navigation.navigate('Activities')}>
-          <Text style={styles.viewAllText}>View All</Text>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingTop: headerHeight },
+        ]}
+      >
+        {/* Tappable placeholder card → Get Rezults pathway */}
+        <TouchableOpacity
+          activeOpacity={0.85}
+          onPress={() => navigation.navigate("GetRezultsProvider")}
+        >
+          <RezultsCardPlaceholder />
         </TouchableOpacity>
-      </View>
-    </View>
 
-    <NotificationCard />
-  </ScrollView>
+        {/* Share button */}
+        <ZultsButton
+          label="Share"
+          type="primary"
+          size="large"
+          onPress={onSharePress ?? (() => navigation.navigate("Share"))}
+        />
+
+        {/* Activities Section */}
+<View style={{ marginTop: 15 }}>
+  <View style={styles.activitiesHeader}>
+    <Text style={styles.sectionTitle}>Activities</Text>
+    <TouchableOpacity onPress={() => navigation.navigate("Activities")}>
+      <Text style={styles.viewAll}>View All</Text>
+    </TouchableOpacity>
+  </View>
+
+  <TouchableOpacity
+    style={styles.activitiesCard}
+    activeOpacity={0.8}
+    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }} // 👈 bigger touch target
+    onPress={() => navigation.navigate("Activities")}
+  >
+    {recentUsers.length > 0 ? (
+      <View style={styles.row}>
+        <View style={styles.avatarRow}>
+          {recentUsers.slice(0, 3).map((user, index) => (
+            <Image
+              key={user.id}
+              source={user.avatar}
+              style={[styles.avatar, { marginLeft: index === 0 ? 0 : -12 }]}
+            />
+          ))}
+          {recentUsers.length > 3 && (
+            <View style={[styles.avatar, styles.extraAvatar]}>
+              <Text style={styles.extraText}>+{recentUsers.length - 3}</Text>
+            </View>
+          )}
+        </View>
+
+        <Text style={styles.activityText}>
+          {unreadUsers.length > 0
+            ? `${unreadUsers.length} unread message${unreadUsers.length > 1 ? "s" : ""}`
+            : "No activity yet"}
+        </Text>
+      </View>
+    ) : (
+      <View>
+        <Text style={styles.emptyTitle}>No activity yet</Text>
+        <Text style={styles.emptySubtitle}>You’ll see Rezults shared here</Text>
+      </View>
+    )}
+  </TouchableOpacity>
+</View>
+
+<NotificationCard />
+</ScrollView>
 </ScreenWrapper>
-  );
+);
 }
 
 const styles = StyleSheet.create({
@@ -137,46 +215,85 @@ const styles = StyleSheet.create({
     paddingBottom: 32,
     gap: 24,
   },
+
+  // Section title
   sectionTitle: {
-    ...typography.bodyMedium,
+    ...typography.headlineMedium,   // bump from bodyMedium → headline
     color: colors.foreground.default,
+  },
+
+  // Header row (title + View All link)
+  activitiesHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginHorizontal: 4,
     marginBottom: 8,
   },
+  viewAll: {
+    ...typography.subheadlineRegular, // smaller than title
+    color: colors.brand.accent,       // #4D4CFF
+  },
+
+  // Card container
   activitiesCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
     backgroundColor: colors.background.surface2,
     borderRadius: 16,
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 20,
+    alignItems: "center",
+    justifyContent: "center",
   },
+
+  // Avatars
   avatarRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   avatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     borderWidth: 2,
     borderColor: colors.background.surface1,
   },
   extraAvatar: {
     marginLeft: -12,
-    backgroundColor: colors.background.surface1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: colors.background.surface3,
+    justifyContent: "center",
+    alignItems: "center",
   },
   extraText: {
     ...typography.captionSmallRegular,
     color: colors.foreground.default,
-    fontWeight: '600',
-  },
-  viewAllText: {
-    ...typography.bodyMedium,
-    fontSize: 16,
-    color: colors.brand.purple1,
     fontWeight: "600",
   },
+
+  // Empty state text
+  empty: {
+    ...typography.subheadlineRegular,
+    color: colors.foreground.muted,
+    textAlign: "center",
+  },
+  row: {
+  flexDirection: "row",
+  alignItems: "center",
+},
+activityText: {
+  ...typography.subheadlineRegular,
+  color: colors.foreground.default,
+  marginLeft: 12,
+},
+
+emptyTitle: {
+  ...typography.subheadlineMedium,
+  color: colors.foreground.default,
+  textAlign: "center",
+  marginBottom: 4,
+},
+emptySubtitle: {
+  ...typography.subheadlineRegular,
+  color: colors.foreground.muted,
+  textAlign: "center",
+},
 });

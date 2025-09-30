@@ -1,4 +1,3 @@
-// components/settings/SettingsScreen.js
 import React from "react";
 import {
   View,
@@ -23,115 +22,96 @@ import tomas from "../../../assets/images/tomas.png";
 import VerifiedBadge from "../../ui/VerifiedBadge";
 import UnverifiedBadge from "../../ui/UnverifiedBadge";
 
-
 export default function SettingsScreen({ navigation }) {
   return (
     <ScreenWrapper>
-  {/* ✅ Navbar at the top with back arrow */}
-  <Navbar onBackPress={() => navigation.goBack()} />
+      {/* ✅ Navbar at the top with back arrow */}
+      <Navbar onBackPress={() => navigation.goBack()} />
 
-  {/* Profile header */}
-  <View style={styles.header}>
-  <View style={styles.headerLeft}>
-  
-{/* ✅ use new photo */}
-<Image source={tomas} style={styles.avatar} />
-    <View style={styles.profileText}>
-      <Text style={styles.username}>Jonster</Text>
-      <UnverifiedBadge />
-    </View>
-  </View>
+      {/* ✅ Profile header (centered layout) */}
+      <View style={styles.headerCentered}>
+        <Image source={tomas} style={styles.avatarLarge} />
+        <Text style={styles.usernameCentered}>Jonster</Text>
 
-    <ZultsButton
-      label="Get Full Access"
-      type="primary"
-      size="small"
-      pill
-      fullWidth={false}
-      onPress={() => console.log("Get Full Access")}
-    />
-  </View>
+        {/* ✅ Use badge component from ui */}
+        <UnverifiedBadge />
+        {/* <VerifiedBadge /> if verified */}
+      </View>
 
-  {/* Scrollable content */}
-  <ScrollView contentContainerStyle={styles.scrollContent}>
-    {/* Grid of cards */}
-    <View style={styles.grid}>
-      <TouchableOpacity style={styles.card}>
-        <View style={styles.iconBox}>
-          <Image source={userIcon} style={styles.icon} resizeMode="contain" />
+      {/* Scrollable content */}
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.grid}>
+          <TouchableOpacity style={styles.card}>
+            <View style={styles.iconBox}>
+              <Image source={userIcon} style={styles.icon} resizeMode="contain" />
+            </View>
+            <Text style={styles.cardLabel}>Personal details</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.card}>
+            <View style={styles.iconBox}>
+              <Image source={keyIcon} style={styles.icon} resizeMode="contain" />
+            </View>
+            <Text style={styles.cardLabel}>Privacy settings</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.card}>
+            <View style={styles.iconBox}>
+              <Image source={infoIcon} style={styles.icon} resizeMode="contain" />
+            </View>
+            <Text style={styles.cardLabel}>Legal info</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.card}>
+            <View style={styles.iconBox}>
+              <Image
+                source={supportIcon}
+                style={styles.icon}
+                resizeMode="contain"
+              />
+            </View>
+            <Text style={styles.cardLabel}>Support</Text>
+          </TouchableOpacity>
         </View>
-        <Text style={styles.cardLabel}>Personal details</Text>
-      </TouchableOpacity>
+      </ScrollView>
 
-      <TouchableOpacity style={styles.card}>
-        <View style={styles.iconBox}>
-          <Image source={keyIcon} style={styles.icon} resizeMode="contain" />
-        </View>
-        <Text style={styles.cardLabel}>Privacy settings</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.card}>
-        <View style={styles.iconBox}>
-          <Image source={infoIcon} style={styles.icon} resizeMode="contain" />
-        </View>
-        <Text style={styles.cardLabel}>Legal info</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.card}>
-        <View style={styles.iconBox}>
-          <Image source={supportIcon} style={styles.icon} resizeMode="contain" />
-        </View>
-        <Text style={styles.cardLabel}>Support</Text>
-      </TouchableOpacity>
-    </View>
-  </ScrollView>
-
-  {/* ✅ Sticky footer (always at bottom) */}
-  <ScreenFooter>
-    <ZultsButton
-      label="Log Out"
-      type="secondary"
-      size="large"
-      fullWidth
-      onPress={() => console.log("Log Out")}
-    />
-    <Text style={styles.version}>Version 2.0.0</Text>
-  </ScreenFooter>
-</ScreenWrapper>
+      {/* ✅ Sticky footer */}
+      <ScreenFooter>
+        <ZultsButton
+          label="Log Out"
+          type="secondary"
+          size="large"
+          fullWidth
+          onPress={() => console.log("Log Out")}
+        />
+        <Text style={styles.version}>Version 2.0.0</Text>
+      </ScreenFooter>
+    </ScreenWrapper>
   );
 }
 
 const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 16,
-    paddingBottom: 120, // leaves room above footer
+    paddingBottom: 120,
   },
 
-  // Header
-  header: {
-    flexDirection: "row",
+  /// ✅ Centered header
+  headerCentered: {
     alignItems: "center",
-    justifyContent: "space-between", // button pushed right
-    paddingHorizontal: 16,
-    marginTop: 12,
-    marginBottom: 24,
+    marginTop: 24,
+    marginBottom: 32,
   },
-  headerLeft: {
-    flexDirection: "row",
-    alignItems: "center",
+  avatarLarge: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    marginBottom: 12,
   },
-  avatar: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-  },
-  profileText: {
-    marginLeft: 12,
-  },
-  username: {
-    ...typography.bodyLargeMedium,
+  usernameCentered: {
+    ...typography.title3Medium, // ✅ same as ProfileHeader
     color: colors.foreground.default,
-    marginBottom: 4,
+    marginBottom: 12,
   },
 
   // Grid

@@ -1,3 +1,4 @@
+// components/screens/mainscreen/variants/MainUnverifiedWithRezults.js
 import React, { useState, useRef } from "react";
 import {
   View,
@@ -16,7 +17,11 @@ import RezultsCard from "../../../ui/RezultsCard";
 import NotificationCard from "../../../ui/NotificationCard";
 import ZultsButton from "../../../ui/ZultsButton";
 import ScreenWrapper from "../../../ui/ScreenWrapper";
-import { chatCache, hasSeededDemo, markDemoSeeded } from "../../../../cache/chatCache";
+import {
+  chatCache,
+  hasSeededDemo,
+  markDemoSeeded,
+} from "../../../../cache/chatCache";
 import zultsLogo from "../../../../assets/images/zults.png";
 import { rezultsCache } from "../../../../cache/rezultsCache";
 import ExpireContainer from "../../../ui/ExpireContainer";
@@ -29,6 +34,7 @@ export default function MainUnverifiedWithRezults({ onLinkPress, onSharePress })
   const [recentUsers, setRecentUsers] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [headerHeight, setHeaderHeight] = useState(0); // ✅ dynamic header height
 
   // 🔄 animation controller for RezultsCard
   const fadeAnim = useRef(new Animated.Value(1)).current;
@@ -42,38 +48,36 @@ export default function MainUnverifiedWithRezults({ onLinkPress, onSharePress })
           const lastMsg = chat.chatData?.[chat.chatData.length - 1];
           return {
             id: username,
-            name: username,
+            name: chat.user?.name || username,
             avatar: chat.user?.image || zultsLogo,
             lastTimestamp: lastMsg ? lastMsg.timestamp : "",
           };
         })
         .sort((a, b) => (a.lastTimestamp < b.lastTimestamp ? 1 : -1));
 
-      // ✅ only seed demo once
       if (users.length === 0 && !hasSeededDemo()) {
-  const demoId = "zults-demo";
+        const demoId = "zults-demo";
 
-  chatCache[demoId] = {
-    user: { id: demoId, name: "Zults (Demo)", image: zultsLogo, isBot: true },
-    chatData: [], // ⬅️ no hardcoded messages anymore
-    chatState: { hasShared: false, hasRequested: false },
-    otherUserState: { hasShared: false, hasRequested: false },
-    blocked: false,
-  };
+        chatCache[demoId] = {
+          user: { id: demoId, name: "Zults Bot", image: zultsLogo, isBot: true },
+          chatData: [],
+          chatState: { hasShared: false, hasRequested: false },
+          otherUserState: { hasShared: false, hasRequested: false },
+          blocked: false,
+        };
 
-  users = [
-    {
-      id: demoId,
-      name: "Zults Bot",
-      avatar: zultsLogo,
-      lastTimestamp: "Now",
-    },
-  ];
+        users = [
+          {
+            id: demoId,
+            name: "Zults Bot",
+            avatar: zultsLogo,
+            lastTimestamp: "Now",
+          },
+        ];
 
-  markDemoSeeded();
-}
+        markDemoSeeded();
+      }
 
-      console.log("🔄 [MainUnverifiedWithRezults] Rebuilt from chatCache:", chatCache);
       setRecentUsers(users);
     }, [])
   );
@@ -102,17 +106,14 @@ export default function MainUnverifiedWithRezults({ onLinkPress, onSharePress })
 
   // 🗑 handle Rezults deletion with animation
   const handleDeleteRezults = () => {
-    // animate RezultsCard fade + shrink
     Animated.timing(fadeAnim, {
       toValue: 0,
       duration: 300,
       useNativeDriver: true,
     }).start(() => {
-      // clear cache
       rezultsCache.hasRezults = false;
       rezultsCache.card = null;
 
-      // reset navigation → MainScreen will re-render into "no Rezults" state
       navigation.reset({
         index: 0,
         routes: [{ name: "MainScreen" }],
@@ -120,12 +121,28 @@ export default function MainUnverifiedWithRezults({ onLinkPress, onSharePress })
     });
   };
 
+  // ✅ declare unreadUsers right here, before return
+  const unreadUsers = recentUsers.filter((u) => u.hasUnread);
+
   return (
     <ScreenWrapper>
-      <StatusBar barStyle="light-content" backgroundColor={colors.background.surface1} />
-      <UserProfileHeader hideVerification />
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor="transparent"
+        translucent
+      />
+      <UserProfileHeader
+        hideVerification
+        onLayout={(e) => setHeaderHeight(e.nativeEvent.layout.height)}
+      />
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingTop: headerHeight }, // ✅ dynamic push-down
+        ]}
+      >
         <RezultsHeaderContainer
           onAdd={() => setShowAddModal(true)}
           onDelete={() => setShowDeleteModal(true)}
@@ -143,11 +160,10 @@ export default function MainUnverifiedWithRezults({ onLinkPress, onSharePress })
             providerName={rezultsCache.card?.providerName || "Unknown Provider"}
             testDate={rezultsCache.card?.testDate || "Unknown Date"}
           />
+          <ExpireContainer expiryDate="29 Sep 2025" daysLeft={43} />
         </Animated.View>
 
-        <ExpireContainer expiryDate="29 Sep 2025" daysLeft={43} />
-
-        {/* ✅ Share button now calls parent onSharePress */}
+        {/* ✅ Actions */}
         <ZultsButton
           label="Share"
           type="primary"
@@ -155,15 +171,52 @@ export default function MainUnverifiedWithRezults({ onLinkPress, onSharePress })
           onPress={onSharePress}
         />
 
+        <ZultsButton
+          label="Add to Wallet"
+          type="ghost"
+          size="large"
+          icon={require("../../../../assets/images/add.png")}
+          onPress={() => navigation.navigate("AddToWallet")}
+        />
+
         {/* Activities Section */}
         <View style={{ marginTop: 15 }}>
           <Text style={styles.sectionTitle}>Activities</Text>
           <View style={styles.activitiesCard}>
-            {renderAvatars()}
-            <TouchableOpacity onPress={() => navigation.navigate("Activities")}>
-              <Text style={styles.viewAllText}>View All</Text>
-            </TouchableOpacity>
+  {recentUsers.length > 0 ? (
+    <View style={styles.row}>
+      {/* Avatars aligned left */}
+      <View style={styles.avatarRow}>
+        {recentUsers.slice(0, 3).map((user, index) => (
+          <Image
+            key={user.id}
+            source={user.avatar}
+            style={[styles.avatar, { marginLeft: index === 0 ? 0 : -12 }]}
+          />
+        ))}
+        {recentUsers.length > 3 && (
+          <View style={[styles.avatar, styles.extraAvatar]}>
+            <Text style={styles.extraText}>+{recentUsers.length - 3}</Text>
           </View>
+        )}
+      </View>
+
+      {/* Info aligned right */}
+      <Text style={styles.activityText}>
+        {unreadUsers.length > 0
+          ? `${unreadUsers.length} unread message${unreadUsers.length > 1 ? "s" : ""}`
+          : "No activity yet"}
+      </Text>
+    </View>
+  ) : (
+    <View>
+      <Text style={styles.emptyTitle}>No activity yet</Text>
+      <Text style={styles.emptySubtitle}>
+        You’ll see Rezults shared here
+      </Text>
+    </View>
+  )}
+</View>
         </View>
 
         <NotificationCard />
@@ -240,4 +293,26 @@ const styles = StyleSheet.create({
     color: colors.brand.purple1,
     fontWeight: "600",
   },
+  row: {
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "space-between",
+  width: "100%",
+},
+activityText: {
+  ...typography.subheadlineRegular,
+  color: colors.foreground.soft, // make text lighter than avatars
+  marginLeft: 12,
+},
+emptyTitle: {
+  ...typography.subheadlineMedium,
+  color: colors.foreground.default,
+  textAlign: "center",
+  marginBottom: 4,
+},
+emptySubtitle: {
+  ...typography.subheadlineRegular,
+  color: colors.foreground.muted,
+  textAlign: "center",
+},
 });

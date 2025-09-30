@@ -2,7 +2,7 @@
   "expo": {
     "name": "Zults",
     "slug": "snack-56e4b4f5-f1e0-4ec3-b012-82d267abd500",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
@@ -14,7 +14,7 @@
     },
     "ios": {
   "bundleIdentifier": "com.ewellness.zults.v5demo",
-  "buildNumber": "4",
+  "buildNumber": "10",
   "supportsTablet": true,
   "infoPlist": {
   "ITSAppUsesNonExemptEncryption": false,

@@ -28,6 +28,7 @@ import { chatCache } from "../../../cache/chatCache";
 import { useDemoChat } from "../../ui/useDemoChat";
 import ZultsButton from "../../ui/ZultsButton";
 import RezultsActionButton from "../../ui/RezultsActionButton";
+import { DeviceEventEmitter } from "react-native";
 
 const TomasAvatar = require("../../../assets/images/tomas.png");
 
@@ -145,7 +146,7 @@ const hasSeededRef = useRef(false);
 
 // restore from cache or seed demo bot
 useEffect(() => {
-  const key = user.id || user.name || "default";
+  const key = user.id || `user-${user.name}`;
 
   // restore saved history if available
   if (chatCache[key] && chatCache[key].chatData?.length > 0) {
@@ -169,7 +170,7 @@ useEffect(() => {
 
   // persist to cache
   useEffect(() => {
-    const key = user.id || user.name || "default";
+    const key = user.id || `user-${user.name}`;
     const hasAction = chatData.length > 0;
     if (!hasAction && !isBlocked) return;
 
@@ -198,50 +199,199 @@ useEffect(() => {
 
   // 🔄 request/share flows restored
   const startRequestFlow = () => {
-    requestTimers.current.forEach((t) => clearTimeout(t));
-    requestTimers.current = [];
+  requestTimers.current.forEach((t) => clearTimeout(t));
+  requestTimers.current = [];
 
-    requestTimers.current.push(setTimeout(() => addTyping(), 3000));
-    requestTimers.current.push(setTimeout(() => {
-      if (chatStateRef.current.hasShared) { removeTyping(); return; }
+  requestTimers.current.push(setTimeout(() => addTyping(), 3000));
+  requestTimers.current.push(
+    setTimeout(() => {
+      if (chatStateRef.current.hasShared) {
+        removeTyping();
+        return;
+      }
       removeTyping();
       setOtherUserState({ hasRequested: true, hasShared: false });
-      setChatData((prev) => [...prev, { id: Date.now().toString(), type: "request", direction: "from-other", username: user.name, avatar: user.image || fallbackAvatar, timestamp: "10:07AM" }]);
-    }, 5000));
 
-    requestTimers.current.push(setTimeout(() => {
-      if (chatStateRef.current.hasShared) { removeTyping(); return; }
-      addTyping();
-      requestTimers.current.push(setTimeout(() => {
-        if (chatStateRef.current.hasShared) { removeTyping(); return; }
+      // 🔔 Other user requests Rezults
+      setChatData((prev) => {
+        const updated = [
+          ...prev,
+          {
+            id: Date.now().toString(),
+            type: "request",
+            direction: "from-other",
+            username: user.name,
+            avatar: user.image || fallbackAvatar,
+            timestamp: "10:07AM",
+          },
+        ];
+        chatCache[user.id] = {
+          ...(chatCache[user.id] || {}),
+          user,
+          chatData: updated,
+          hasUnread: true, // ✅ mark unread
+        };
+        setTimeout(() => {
+  DeviceEventEmitter.emit("chat-updated");
+}, 0);
+        return updated;
+      });
+    }, 5000)
+  );
+
+  requestTimers.current.push(
+    setTimeout(() => {
+      if (chatStateRef.current.hasShared) {
         removeTyping();
-        setOtherUserState({ hasRequested: false, hasShared: true });
-        setChatData((prev) => [...prev, { id: Date.now().toString(), type: "share", direction: "from-other", username: user.name, avatar: user.image || fallbackAvatar, timestamp: "10:12AM" }]);
-        requestTimers.current.push(setTimeout(() => {
-          setOtherUserState({ hasShared: false, hasRequested: false });
-          setChatState({ hasShared: chatStateRef.current.hasShared, hasRequested: false });
-          setChatData((prev) => [...prev, { id: Date.now().toString(), type: "stop-share", direction: "from-other", username: user.name, avatar: user.image || fallbackAvatar, timestamp: "10:27AM" }]);
-        }, 15000));
-      }, 2000));
-    }, 10000));
-  };
+        return;
+      }
+      addTyping();
+      requestTimers.current.push(
+        setTimeout(() => {
+          if (chatStateRef.current.hasShared) {
+            removeTyping();
+            return;
+          }
+          removeTyping();
+          setOtherUserState({ hasRequested: false, hasShared: true });
+
+          // 🔔 Other user shares Rezults
+          setChatData((prev) => {
+            const updated = [
+              ...prev,
+              {
+                id: Date.now().toString(),
+                type: "share",
+                direction: "from-other",
+                username: user.name,
+                avatar: user.image || fallbackAvatar,
+                timestamp: "10:12AM",
+              },
+            ];
+            chatCache[user.id] = {
+              ...(chatCache[user.id] || {}),
+              user,
+              chatData: updated,
+              hasUnread: true,
+            };
+            setTimeout(() => {
+  DeviceEventEmitter.emit("chat-updated");
+}, 0);
+            return updated;
+          });
+
+          requestTimers.current.push(
+            setTimeout(() => {
+              setOtherUserState({ hasShared: false, hasRequested: false });
+              setChatState({
+                hasShared: chatStateRef.current.hasShared,
+                hasRequested: false,
+              });
+
+              // 🔔 Other user stops sharing
+              setChatData((prev) => {
+                const updated = [
+                  ...prev,
+                  {
+                    id: Date.now().toString(),
+                    type: "stop-share",
+                    direction: "from-other",
+                    username: user.name,
+                    avatar: user.image || fallbackAvatar,
+                    timestamp: "10:27AM",
+                  },
+                ];
+                chatCache[user.id] = {
+                  ...(chatCache[user.id] || {}),
+                  user,
+                  chatData: updated,
+                  hasUnread: true,
+                };
+                setTimeout(() => {
+  DeviceEventEmitter.emit("chat-updated");
+}, 0);
+                return updated;
+              });
+            }, 15000)
+          );
+        }, 2000)
+      );
+    }, 10000)
+  );
+};
 
   const startShareFlow = () => {
-    shareTimers.current.forEach((t) => clearTimeout(t));
-    shareTimers.current = [];
+  shareTimers.current.forEach((t) => clearTimeout(t));
+  shareTimers.current = [];
 
-    shareTimers.current.push(setTimeout(() => addTyping(), 3000));
-    shareTimers.current.push(setTimeout(() => {
+  shareTimers.current.push(setTimeout(() => addTyping(), 3000));
+  shareTimers.current.push(
+    setTimeout(() => {
       removeTyping();
       setOtherUserState({ hasRequested: false, hasShared: true });
-      setChatData((prev) => [...prev, { id: Date.now().toString(), type: "share", direction: "from-other", username: user.name, avatar: user.image || fallbackAvatar, timestamp: "10:12AM" }]);
-      shareTimers.current.push(setTimeout(() => {
-        setOtherUserState({ hasShared: false, hasRequested: false });
-        setChatState({ hasShared: chatStateRef.current.hasShared, hasRequested: false });
-        setChatData((prev) => [...prev, { id: Date.now().toString(), type: "stop-share", direction: "from-other", username: user.name, avatar: user.image || fallbackAvatar, timestamp: "10:27AM" }]);
-      }, 15000));
-    }, 10000));
-  };
+
+      // when "other user" shares
+      setChatData((prev) => {
+        const updated = [
+          ...prev,
+          {
+            id: Date.now().toString(),
+            type: "share",
+            direction: "from-other",
+            username: user.name,
+            avatar: user.image || fallbackAvatar,
+            timestamp: "10:12AM",
+          },
+        ];
+        chatCache[user.id] = {
+          ...(chatCache[user.id] || {}),
+          user,
+          chatData: updated,
+          hasUnread: true, // ✅ mark unread because it’s from-other
+        };
+        setTimeout(() => {
+  DeviceEventEmitter.emit("chat-updated");
+}, 0);
+        return updated;
+      });
+
+      shareTimers.current.push(
+        setTimeout(() => {
+          setOtherUserState({ hasShared: false, hasRequested: false });
+          setChatState({
+            hasShared: chatStateRef.current.hasShared,
+            hasRequested: false,
+          });
+
+          // when "other user" stops sharing
+          setChatData((prev) => {
+            const updated = [
+              ...prev,
+              {
+                id: Date.now().toString(),
+                type: "stop-share",
+                direction: "from-other",
+                username: user.name,
+                avatar: user.image || fallbackAvatar,
+                timestamp: "10:27AM",
+              },
+            ];
+            chatCache[user.id] = {
+              ...(chatCache[user.id] || {}),
+              user,
+              chatData: updated,
+              hasUnread: true, // ✅ still counts as unread activity
+            };
+            setTimeout(() => {
+  DeviceEventEmitter.emit("chat-updated");
+}, 0);
+            return updated;
+          });
+        }, 15000)
+      );
+    }, 10000)
+  );
+};
 
   const handleDoubleLike = (item) => {
     const allowed = item.direction === "from-other" && (item.type === "share" || item.type === "request");
@@ -556,7 +706,7 @@ useEffect(() => {
             {
               label: isBlocked ? "Unblock" : "Block",
               onPress: () => {
-                const key = user.name || "default";
+                const key = user.id || `user-${user.name}`;
                 if (isBlocked) {
                   setIsBlocked(false);
                   setChatData([]);
