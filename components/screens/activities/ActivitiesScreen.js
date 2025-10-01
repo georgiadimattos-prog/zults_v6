@@ -10,18 +10,13 @@ import {
 } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { Swipeable } from "react-native-gesture-handler";
-import { DeviceEventEmitter } from "react-native";
 import { colors, typography } from "../../../theme";
 import Navbar from "../../ui/Navbar";
 import ScreenWrapper from "../../ui/ScreenWrapper";
 import ZultsButton from "../../ui/ZultsButton";
 import ActivityCard from "../../ui/ActivityCard";
 
-import {
-  chatCache,
-  hasSeededDemo,
-  markDemoSeeded,
-} from "../../../cache/chatCache";
+import { chatCache } from "../../../cache/chatCache";
 import zultsLogo from "../../../assets/images/zults.png";
 
 export default function ActivitiesScreen() {
@@ -34,10 +29,7 @@ export default function ActivitiesScreen() {
       item.id === id ? { ...item, favorite: !item.favorite } : item
     );
     setActivities(updated);
-
-    if (chatCache[id]) {
-      chatCache[id].favorite = !chatCache[id].favorite;
-    }
+    if (chatCache[id]) chatCache[id].favorite = !chatCache[id].favorite;
   };
 
   useFocusEffect(
@@ -47,14 +39,17 @@ export default function ActivitiesScreen() {
   );
 
   const buildActivities = () => {
-    const data = Object.keys(chatCache).map((key) => {
+    const keys = Object.keys(chatCache).filter((k) => {
+      const v = chatCache[k];
+      return v && typeof v === "object" && v.user; // ⬅️ skip meta like __activeKey
+    });
+
+    const data = keys.map((key) => {
       const chat = chatCache[key] || {};
       const lastMsg = chat.chatData?.[chat.chatData.length - 1];
 
       let lastText = "No activity yet";
-
       if (chat.user?.isBot && chat.user?.id === "zults-demo") {
-        // 👇 Rezy always static
         lastText = "Ask me anything about sexual health...";
       } else if (lastMsg) {
         if (lastMsg.type === "request") {
@@ -83,36 +78,35 @@ export default function ActivitiesScreen() {
         avatar: chat.user?.image,
         lastText,
         lastTimestamp: lastMsg ? lastMsg.timestamp : "",
-        hasUnread: chat.hasUnread || true,
+        hasUnread: chat.hasUnread ?? false, // ⬅️ correct default (was `|| true`)
         favorite: chat.favorite || false,
         isBot: chat.user?.isBot || false,
       };
     });
 
-    // Inject Rezy if missing
-if (data.length === 0) {
-  if (!chatCache["zults-demo"]) {
-    chatCache["zults-demo"] = {
-      user: { id: "zults-demo", name: "Rezy", image: zultsLogo, isBot: true },
-      chatData: [],
-      chatState: {},
-      otherUserState: {},
-      blocked: false,
-      hasUnread: true,   // ✅ mark as unread when seeded
-    };
-  }
-
-  data.push({
-    id: "zults-demo",
-    name: "Rezy",
-    avatar: zultsLogo,
-    lastText: "Ask me anything about sexual health...",
-    lastTimestamp: "",
-    hasUnread: true,     // ✅ so ActivityCard shows badge
-    favorite: false,
-    isBot: true,
-  });
-}
+    // Inject Rezy if nothing yet
+    if (data.length === 0) {
+      if (!chatCache["zults-demo"]) {
+        chatCache["zults-demo"] = {
+          user: { id: "zults-demo", name: "Rezy", image: zultsLogo, isBot: true },
+          chatData: [],
+          chatState: {},
+          otherUserState: {},
+          blocked: false,
+          hasUnread: true,
+        };
+      }
+      data.push({
+        id: "zults-demo",
+        name: "Rezy",
+        avatar: zultsLogo,
+        lastText: "Ask me anything about sexual health...",
+        lastTimestamp: "",
+        hasUnread: true,
+        favorite: false,
+        isBot: true,
+      });
+    }
 
     setActivities(data);
   };
@@ -136,25 +130,16 @@ if (data.length === 0) {
     });
 
     return (
-      <Animated.View
-        style={[styles.deleteButton, { transform: [{ scale }], opacity }]}
-      >
+      <Animated.View style={[styles.deleteButton, { transform: [{ scale }], opacity }]}>
         <TouchableOpacity onPress={() => handleDelete(id)} activeOpacity={0.8}>
-          <Image
-            source={require("../../../assets/images/close-cross.png")}
-            style={styles.deleteIcon}
-          />
+          <Image source={require("../../../assets/images/close-cross.png")} style={styles.deleteIcon} />
         </TouchableOpacity>
       </Animated.View>
     );
   };
 
   const renderItem = ({ item }) => (
-    <Swipeable
-      renderRightActions={(progress, dragX) =>
-        renderRightActions(progress, dragX, item.id)
-      }
-    >
+    <Swipeable renderRightActions={(progress, dragX) => renderRightActions(progress, dragX, item.id)}>
       <ActivityCard
         user={{
           id: item.id,
@@ -167,26 +152,12 @@ if (data.length === 0) {
           isBot: item.isBot,
         }}
         onPress={() => {
-          if (!item.isBot) {
-            if (chatCache[item.id]) {
-              chatCache[item.id].hasUnread = false;
-              DeviceEventEmitter.emit("chat-updated");
-            }
-            navigation.navigate("UserChat", {
-              user: chatCache[item.id]?.user,
-              from: "Activities",
-            });
-          } else {
-            navigation.navigate("UserChat", {
-              user: {
-                id: "zults-demo",
-                name: "Rezy",
-                image: zultsLogo,
-                isBot: true,
-              },
-              from: "Activities",
-            });
-          }
+          navigation.navigate("UserChat", {
+            user: item.isBot
+              ? { id: "zults-demo", name: "Rezy", image: zultsLogo, isBot: true }
+              : chatCache[item.id]?.user,
+            from: "Activities",
+          });
         }}
         onToggleFavorite={() => toggleFavorite(item.id)}
       />
@@ -196,11 +167,8 @@ if (data.length === 0) {
   return (
     <ScreenWrapper>
       <Navbar />
-      <Text style={styles.pageTitle} allowFontScaling={false}>
-        Activities
-      </Text>
+      <Text style={styles.pageTitle} allowFontScaling={false}>Activities</Text>
 
-      {/* Tabs */}
       <View style={styles.tabsContainer}>
         {["All", "Unread", "Favorites"].map((tab) => (
           <TouchableOpacity
@@ -213,11 +181,7 @@ if (data.length === 0) {
               ellipsizeMode="tail"
               adjustsFontSizeToFit
               minimumFontScale={0.85}
-              style={
-                filter === tab.toLowerCase()
-                  ? styles.tabActiveText
-                  : styles.tabInactiveText
-              }
+              style={filter === tab.toLowerCase() ? styles.tabActiveText : styles.tabInactiveText}
             >
               {tab}
             </Text>
@@ -225,34 +189,20 @@ if (data.length === 0) {
         ))}
       </View>
 
-      {/* List */}
       <FlatList
         data={activities.filter((item) =>
-          filter === "unread"
-            ? item.hasUnread
-            : filter === "favorites"
-            ? item.favorite
-            : true
+          filter === "unread" ? item.hasUnread : filter === "favorites" ? item.favorite : true
         )}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
-        contentContainerStyle={{
-          paddingTop: 16,
-          paddingHorizontal: 16,
-          paddingBottom: 160,
-        }}
+        contentContainerStyle={{ paddingTop: 16, paddingHorizontal: 16, paddingBottom: 160 }}
         ListEmptyComponent={
           <Text style={styles.empty}>
-            {filter === "all"
-              ? "No recent activity"
-              : filter === "unread"
-              ? "No unread chats"
-              : "No favorites yet"}
+            {filter === "all" ? "No recent activity" : filter === "unread" ? "No unread chats" : "No favorites yet"}
           </Text>
         }
       />
 
-      {/* Footer */}
       <View style={styles.footer}>
         <ZultsButton
           label="Get Full Access"
@@ -286,33 +236,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 6,
   },
-  tabInactive: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingVertical: 6,
-  },
-  tabActiveText: {
-    ...typography.bodyMedium,
-    color: colors.background.surface1,
-  },
-  tabInactiveText: {
-    ...typography.bodyMedium,
-    color: colors.foreground.soft,
-  },
-  pageTitle: {
-    ...typography.largeTitleMedium,
-    color: colors.foreground.default,
-    marginTop: 8,
-    marginHorizontal: 16,
-    marginBottom: 12,
-  },
-  empty: {
-    ...typography.subheadlineRegular,
-    textAlign: "center",
-    marginTop: 200,
-    color: colors.foreground.muted,
-  },
+  tabInactive: { flex: 1, justifyContent: "center", alignItems: "center", paddingVertical: 6 },
+  tabActiveText: { ...typography.bodyMedium, color: colors.background.surface1 },
+  tabInactiveText: { ...typography.bodyMedium, color: colors.foreground.soft },
+  pageTitle: { ...typography.largeTitleMedium, color: colors.foreground.default, marginTop: 8, marginHorizontal: 16, marginBottom: 12 },
+  empty: { ...typography.subheadlineRegular, textAlign: "center", marginTop: 200, color: colors.foreground.muted },
   deleteButton: {
     backgroundColor: colors.error.container,
     justifyContent: "center",
@@ -323,16 +251,6 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     marginVertical: 4,
   },
-  deleteIcon: {
-    width: 24,
-    height: 24,
-    tintColor: colors.error.onContainer,
-  },
-  footer: {
-    position: "absolute",
-    bottom: 40,
-    left: 0,
-    right: 0,
-    alignItems: "center",
-  },
+  deleteIcon: { width: 24, height: 24, tintColor: colors.error.onContainer },
+  footer: { position: "absolute", bottom: 40, left: 0, right: 0, alignItems: "center" },
 });
