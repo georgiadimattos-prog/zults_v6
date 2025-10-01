@@ -45,35 +45,35 @@ export default function GetRezults_HowToFindLinkScreen() {
       <Navbar />
 
       <ScrollView
-  contentContainerStyle={[styles.content, { flexGrow: 1, paddingBottom: 32 }]}
-  showsVerticalScrollIndicator={false}
-  keyboardShouldPersistTaps="handled"
->
-  {/* Page title + subtitle */}
-  <View style={styles.headerBlock}>
-    <Text allowFontScaling={false} style={styles.pageTitle}>
-      How to find your link
-    </Text>
-    <Text allowFontScaling={false} style={styles.subtitle}>
-      Follow these steps in your {providerName} account to find and copy your results link.
-    </Text>
-  </View>
+        contentContainerStyle={[styles.content, { flexGrow: 1, paddingBottom: 32 }]}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        {/* Page title + subtitle */}
+        <View style={styles.headerBlock}>
+          <Text style={styles.pageTitle} allowFontScaling={false}>
+            How to find your link
+          </Text>
+          <Text style={styles.subtitle}>
+            Follow these steps in your {providerName} account to find and copy your results link.
+          </Text>
+        </View>
 
-  {/* Steps */}
-  {steps.map((s, i) => (
-    <Text key={i} style={styles.step}>
-      {i + 1}. {s}
-    </Text>
-  ))}
+        {/* Steps */}
+        {steps.map((s, i) => (
+          <Text key={i} style={styles.step}>
+            {i + 1}. {s}
+          </Text>
+        ))}
 
-  {/* Video tutorial section */}
-  <View style={styles.videoContainer}>
-    <Text style={styles.tutorialTitle}>Watch the video tutorial</Text>
-    <View style={styles.tutorialBox}>
-      <Text style={styles.tutorialStub}>Video placeholder</Text>
-    </View>
-  </View>
-</ScrollView>
+        {/* Video tutorial section */}
+        <View style={styles.videoContainer}>
+          <Text style={styles.tutorialTitle}>Watch the video tutorial</Text>
+          <View style={styles.tutorialBox}>
+            <Text style={styles.tutorialStub}>Video placeholder</Text>
+          </View>
+        </View>
+      </ScrollView>
     </ScreenWrapper>
   );
 }
@@ -89,15 +89,15 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   subtitle: {
-    ...typography.bodyRegular,
+    ...typography.bodyRegular, // 👈 same as SelectProvider
     color: colors.foreground.soft,
     marginBottom: 24,
-    lineHeight: 20,
+    lineHeight: 22,
   },
   step: {
-    ...typography.bodyRegular,
+    ...typography.bodyRegular, // 👈 match subtitle size/weight
     color: colors.foreground.soft,
-    lineHeight: 20,
+    lineHeight: 22,
     marginBottom: 12,
   },
   videoContainer: {
@@ -123,6 +123,6 @@ const styles = StyleSheet.create({
     color: colors.foreground.soft,
   },
   content: {
-  paddingHorizontal: 16, // ✅ consistent Apple-style gutter
-},
+    paddingHorizontal: 16, // ✅ consistent gutter
+  },
 });

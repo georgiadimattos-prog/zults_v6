@@ -106,7 +106,7 @@ export default function UserChatScreen() {
   const navigation = useNavigation();
   const route = useRoute();
 
-  const { seedDemoChat } = useDemoChat();
+  const { seedDemoChat, handleUserMessage } = useDemoChat();
 
   const inputRef = useRef(null);
 
@@ -156,46 +156,77 @@ useEffect(() => {
     setOtherUserState(saved.otherUserState || { hasShared: false, hasRequested: false });
     if (saved.blocked) setIsBlocked(true);
 
+    // ✅ clear unread when opening this chat
+    chatCache[key].hasUnread = false;
+
     setTimeout(() => flatListRef.current?.scrollToEnd({ animated: false }), 0);
     return;
   }
 
-  // 🟣 seed welcome flow when first opening Zults Bot
+  // 🟣 seed welcome flow when first opening Rezy
   if (user.isBot && !hasSeededRef.current) {
     hasSeededRef.current = true;
     setChatData([]); // clear any stale cache
     seedDemoChat(user, setChatData, flatListRef);
+
+    // ✅ also clear unread when seeding Rezy
+    if (chatCache[key]) {
+      chatCache[key].hasUnread = false;
+    }
   }
 }, [user]);
 
-  // persist to cache
-  useEffect(() => {
-    const key = user.id || `user-${user.name}`;
-    const hasAction = chatData.length > 0;
-    if (!hasAction && !isBlocked) return;
+// persist to cache
+useEffect(() => {
+  const key = user.id || `user-${user.name}`;
+  const hasAction = chatData.length > 0;
+  if (!hasAction && !isBlocked) return;
 
+  // 👇 Skip persisting chatData for Rezy so Activities stays pinned
+  if (user.isBot && user.id === "zults-demo") {
     chatCache[key] = {
       ...(chatCache[key] || {}),
-      user: { id: user.id, name: user.name, image: user.image },
-      chatData,
+      user: { id: user.id, name: user.name, image: user.image, isBot: true },
+      // don’t save chatData → keeps "Ask me anything…" static
       chatState,
       otherUserState,
       blocked: isBlocked,
     };
-  }, [chatData, chatState, otherUserState, user, isBlocked]);
+    return;
+  }
 
-  const addTyping = () => {
-    if (typingIdRef.current) return;
-    typingIdRef.current = `typing-${Date.now()}`;
-    setChatData((prev) => [...prev, { id: typingIdRef.current, type: "typing", direction: "from-other", username: user.name, avatar: user.image || fallbackAvatar }]);
+  // normal users still persist chatData
+  chatCache[key] = {
+    ...(chatCache[key] || {}),
+    user: { id: user.id, name: user.name, image: user.image },
+    chatData,
+    chatState,
+    otherUserState,
+    blocked: isBlocked,
   };
+}, [chatData, chatState, otherUserState, user, isBlocked]);
 
-  const removeTyping = () => {
-    if (typingIdRef.current) {
-      setChatData((prev) => prev.filter((m) => m.id !== typingIdRef.current));
-      typingIdRef.current = null;
-    }
-  };
+const addTyping = () => {
+  if (typingIdRef.current) return;
+  typingIdRef.current = `typing-${Date.now()}`;
+  setChatData((prev) => [
+    ...prev,
+    {
+      id: typingIdRef.current,
+      type: "typing",
+      direction: "from-other",
+      username: user.name,
+      avatar: user.image || fallbackAvatar,
+    },
+  ]);
+};
+
+const removeTyping = () => {
+  if (typingIdRef.current) {
+    setChatData((prev) => prev.filter((m) => m.id !== typingIdRef.current));
+    typingIdRef.current = null;
+  }
+};
 
   // 🔄 request/share flows restored
   const startRequestFlow = () => {
@@ -447,7 +478,13 @@ useEffect(() => {
     </TouchableOpacity>
 
     <Image source={user.image || fallbackAvatar} style={styles.avatar} />
-    <Text style={styles.username}>{user.name}</Text>
+    <Text
+  style={styles.username}
+  numberOfLines={1}
+  ellipsizeMode="tail"
+>
+  {user.name}
+</Text>
 
     {!isBlocked && (
   isDemoChat ? (
@@ -566,39 +603,33 @@ useEffect(() => {
       style={styles.input}
     />
     <TouchableOpacity
-      style={styles.sendButton}
-      onPress={() => {
-        if (!message.trim()) return;
+  style={styles.sendButton}
+  onPress={() => {
+    if (!message.trim()) return;
 
-        const userMsg = {
-          id: Date.now().toString(),
-          type: "text",
-          direction: "from-user",
-          username: currentUser.name,
-          avatar: currentUser.avatar,
-          text: message,
-          timestamp: "Now",
-        };
-        setChatData((prev) => [...prev, userMsg]);
-        setMessage("");
+    const userMsg = {
+      id: Date.now().toString(),
+      type: "text",
+      direction: "from-user",
+      username: currentUser.name,
+      avatar: currentUser.avatar,
+      text: message,
+      timestamp: "Now",
+    };
+    setChatData((prev) => [...prev, userMsg]);
+    setMessage("");
 
-        // ✅ lighter reply for demo bot
-        setTimeout(() => {
-          const aiMsg = {
-            id: Date.now().toString() + "-ai",
-            type: "text",
-            direction: "from-other",
-            username: "Zults Bot",
-            avatar: user.image,
-            text: "Got it 👍 Ask me anything about Rezults or sexual health.",
-            timestamp: "Now",
-          };
-          setChatData((prev) => [...prev, aiMsg]);
-        }, 1200);
-      }}
-    >
-      <Image source={require("../../../assets/images/send-arrow.png")} style={styles.sendIcon} />
-    </TouchableOpacity>
+    // ✅ If demo chat, trigger FAQ-based bot reply
+    if (isDemoChat) {
+      handleUserMessage(user, setChatData, flatListRef, message);
+    }
+  }}
+>
+  <Image
+    source={require("../../../assets/images/send-arrow.png")}
+    style={styles.sendIcon}
+  />
+</TouchableOpacity>
   </View>
 ) : (
   chatState.hasShared ? (
@@ -764,10 +795,11 @@ const styles = StyleSheet.create({
   avatar: { width: 40, height: 40, borderRadius: 20 },
 
   username: {
-    ...typography.bodyMedium,
-    color: colors.foreground.default,
-    flex: 1,
-  },
+  ...typography.bodyMedium,
+  color: colors.foreground.default,
+  flex: 1,
+  includeFontPadding: false, // 👈 helps on Android
+},
 
   typingBubble: {
     backgroundColor: colors.background.surface2,

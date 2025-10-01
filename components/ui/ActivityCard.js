@@ -17,35 +17,45 @@ export default function ActivityCard({ user, onPress, onToggleFavorite }) {
 
             {/* 👇 Right-side cluster */}
             <View style={styles.rightCluster}>
-              <Text style={styles.date}>{user.date}</Text>
-              {user.unreadCount > 0 && (
-                <View style={styles.unreadBadge}>
-                  <Text style={styles.unreadText}>{user.unreadCount}</Text>
-                </View>
-              )}
-              {onToggleFavorite && (
-                <TouchableOpacity
-                  onPress={onToggleFavorite}
-                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                  style={styles.starButton}
-                >
-                  <Image
-                    source={user.favorite ? starFilled : star}
-                    style={[
-                      styles.starIcon,
-                      {
-                        tintColor: user.favorite
-                          ? colors.brand.purple1
-                          : colors.foreground.muted,
-                      },
-                    ]}
-                  />
-                </TouchableOpacity>
-              )}
-            </View>
+  <Text style={styles.date}>{user.date}</Text>
+
+  {user.unreadCount > 0 && (
+    <View style={styles.unreadBadge}>
+      <Text style={styles.unreadText}>{user.unreadCount}</Text>
+    </View>
+  )}
+
+  {user.isBot ? (
+    <Image
+      source={require("../../assets/images/pin-icon.png")} // add pin asset
+      style={[styles.starIcon, { tintColor: colors.brand.purple1 }]}
+    />
+  ) : (
+    onToggleFavorite && (
+      <TouchableOpacity
+        onPress={onToggleFavorite}
+        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        style={styles.starButton}
+      >
+        <Image
+          source={user.favorite ? starFilled : star}
+          style={[
+            styles.starIcon,
+            {
+              tintColor: user.favorite
+                ? colors.brand.purple1
+                : colors.foreground.muted,
+            },
+          ]}
+        />
+      </TouchableOpacity>
+    )
+  )}
+</View>
           </View>
 
-          <Text style={styles.message} numberOfLines={1}>
+          {/* 👇 message preview always truncates if too long */}
+          <Text style={styles.message} numberOfLines={1} ellipsizeMode="tail">
             {user.message}
           </Text>
         </View>
@@ -58,9 +68,10 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 20,
+    minHeight: 64,                               // 👈 ensures breathing room
+    paddingVertical: 12,                         // 👈 adapts better to large fonts
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "rgba(255,255,255,0.1)", // 👈 softer divider
+    borderBottomColor: "rgba(255,255,255,0.1)",  // softer divider
   },
   avatar: {
     width: 48,
@@ -102,6 +113,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
+    paddingHorizontal: 4, // 👈 makes sure 2-digit numbers fit
   },
   unreadText: {
     color: "#FFFFFF",

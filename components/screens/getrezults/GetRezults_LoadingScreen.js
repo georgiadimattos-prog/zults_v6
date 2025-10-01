@@ -60,7 +60,7 @@ export default function GetRezults_LoadingScreen() {
         clearInterval(interval);
         navigation.navigate('AddRezultsCard', { providerId, resultsLink });
       }
-    }, 3500);
+    }, 2000);
 
     return () => clearInterval(interval);
   }, [navigation, providerId, resultsLink]);
@@ -100,11 +100,11 @@ export default function GetRezults_LoadingScreen() {
           {/* Grey fill behind frosted glass */}
           <Animated.View style={[styles.progressFill, { width: fillWidth }]}>
             <LinearGradient
-              colors={['#3A3A3A', '#1C1C1C']}
-              start={{ x: 0, y: 0.5 }}
-              end={{ x: 1, y: 0.5 }}
-              style={StyleSheet.absoluteFill}
-            />
+  colors={[colors.background.surface1, "#1A1A1A"]}
+  start={{ x: 0, y: 0.5 }}
+  end={{ x: 1, y: 0.5 }}
+  style={StyleSheet.absoluteFill}
+/>
           </Animated.View>
 
           {/* Frosted glass layer */}
@@ -148,11 +148,10 @@ export default function GetRezults_LoadingScreen() {
 
 const styles = StyleSheet.create({
   scrollContent: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingBottom: 120,  // ✅ align with rest of flow
-  },
+  flexGrow: 1,
+  justifyContent: 'center',  // centers vertically
+  alignItems: 'center',      // centers horizontally
+},
   cardWrapper: {
     width: cardWidth,
     height: cardHeight,

@@ -101,24 +101,30 @@ export default function App() {
           <Stack.Screen name="Activities" component={ActivitiesScreen} />
 
           {/* Get Rezults Flow */}
-          <Stack.Screen
-            name="GetRezultsProvider"
-            component={GetRezults_SelectProviderScreen}
-          />
-          <Stack.Screen
-            name="GetRezultsLinkInput"
-            component={GetRezults_PasteLinkScreen}
-          />
-          <Stack.Screen
-            name="GetRezultsLoading"
-            component={GetRezults_LoadingScreen}
-          />
-          <Stack.Screen
-            name="GetRezultsHowToFindLink"
-            component={GetRezults_HowToFindLinkScreen}
-          />
-          <Stack.Screen name="AddRezultsCard" component={AddRezultsCardScreen} />
-          <Stack.Screen name="PolicyScreen" component={PolicyScreen} />
+<Stack.Screen
+  name="GetRezultsSelectProvider"   // 👈 entry point with 3 InfoCards
+  component={GetRezults_SelectProviderScreen}
+/>
+<Stack.Screen
+  name="GetRezultsPasteLink"        // 👈 merged carousel + paste link page
+  component={GetRezults_PasteLinkScreen}
+/>
+<Stack.Screen
+  name="GetRezultsLoading"
+  component={GetRezults_LoadingScreen}
+/>
+<Stack.Screen
+  name="GetRezultsHowToFindLink"
+  component={GetRezults_HowToFindLinkScreen}
+/>
+<Stack.Screen
+  name="AddRezultsCard"
+  component={AddRezultsCardScreen}
+/>
+<Stack.Screen
+  name="PolicyScreen"
+  component={PolicyScreen}
+/>
 
           {/* Share */}
           <Stack.Screen name="Share" component={ShareScreen} />

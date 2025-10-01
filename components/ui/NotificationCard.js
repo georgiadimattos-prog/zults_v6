@@ -43,7 +43,7 @@ export default function NotificationCard() {
         </TouchableOpacity>
       </View>
       <Text style={styles.text}>
-        Get notified when someone sends you their Rezults or requests for yours
+        Get notified when someone sends you their Rezults or requests yours.
       </Text>
 
       {/* ✅ Use standard Zults button */}

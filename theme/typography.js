@@ -97,11 +97,15 @@ export const typography = {
     fontFamily: fonts.medium,
     fontSize: 16,
     lineHeight: 20,
+    includeFontPadding: false,
+    allowFontScaling: true,
   },
   bodyRegular: {
     fontFamily: fonts.regular,
     fontSize: 16,
     lineHeight: 20,
+    includeFontPadding: false,
+    allowFontScaling: true,
   },
 
   // Subheadline
@@ -110,12 +114,16 @@ export const typography = {
     fontSize: 14,
     lineHeight: 18,
     letterSpacing: -0.07,
+    includeFontPadding: false,
+    allowFontScaling: true,
   },
   subheadlineRegular: {
     fontFamily: fonts.regular,
     fontSize: 14,
     lineHeight: 18,
     letterSpacing: -0.07,
+    includeFontPadding: false,
+    allowFontScaling: true,
   },
 
   // Caption Large
@@ -166,15 +174,21 @@ export const typography = {
     fontFamily: fonts.regular,
     fontSize: 14,
     lineHeight: 18,
+    includeFontPadding: false,
+    allowFontScaling: true,
   },
    buttonMediumMedium: {
     fontFamily: fonts.medium,
     fontSize: 15,     // in-between 16 (large) and 14 (small)
     lineHeight: 20,
+    includeFontPadding: false,
+    allowFontScaling: true,
   },
   buttonMediumRegular: {
-    fontFamily: fonts.regular,
-    fontSize: 15,
-    lineHeight: 20,
-  },
+  fontFamily: fonts.regular,
+  fontSize: 15,
+  lineHeight: 20,
+  includeFontPadding: false,  // Android cleanup
+  allowFontScaling: true,     // 👈 opt-in scaling
+}
 };

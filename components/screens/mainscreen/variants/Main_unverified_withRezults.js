@@ -56,27 +56,33 @@ export default function MainUnverifiedWithRezults({ onLinkPress, onSharePress })
         .sort((a, b) => (a.lastTimestamp < b.lastTimestamp ? 1 : -1));
 
       if (users.length === 0 && !hasSeededDemo()) {
-        const demoId = "zults-demo";
+  const demoId = "zults-demo";
+  chatCache[demoId] = {
+    user: {
+      id: demoId,
+      name: "Rezy",
+      image: zultsLogo,
+      isBot: true,
+    },
+    chatData: [],
+    chatState: { hasShared: false, hasRequested: false },
+    otherUserState: { hasShared: false, hasRequested: false },
+    blocked: false,
+    hasUnread: true,   // ✅ mark Rezy unread on seed
+  };
 
-        chatCache[demoId] = {
-          user: { id: demoId, name: "Zults Bot", image: zultsLogo, isBot: true },
-          chatData: [],
-          chatState: { hasShared: false, hasRequested: false },
-          otherUserState: { hasShared: false, hasRequested: false },
-          blocked: false,
-        };
+  users = [
+    {
+      id: demoId,
+      name: "Rezy",
+      avatar: zultsLogo,
+      lastTimestamp: "Now",
+      hasUnread: true,  // ✅ carry through to recentUsers
+    },
+  ];
 
-        users = [
-          {
-            id: demoId,
-            name: "Zults Bot",
-            avatar: zultsLogo,
-            lastTimestamp: "Now",
-          },
-        ];
-
-        markDemoSeeded();
-      }
+  markDemoSeeded();
+}
 
       setRecentUsers(users);
     }, [])

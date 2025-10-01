@@ -19,7 +19,7 @@ export default function PolicyScreen() {
           <Text allowFontScaling={false} style={styles.pageTitle}>
             Rezults Policy
           </Text>
-          <Text allowFontScaling={false} style={styles.subtitle}>
+          <Text style={styles.subtitle}>
             Rezults are private sexual health information. Misuse can cause
             serious harm. Always add only your own Rezults.
           </Text>
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   subtitle: {
-    ...typography.bodyRegular,
+    ...typography.bodyRegular,   // ✅ scalable, same as infoBlock
     color: colors.foreground.soft,
     marginBottom: 24,
     lineHeight: 20,
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   infoBlock: {
-    ...typography.bodyRegular,
+    ...typography.bodyRegular,   // ✅ same as subtitle
     color: colors.foreground.soft,
     marginBottom: 24,
     lineHeight: 20,

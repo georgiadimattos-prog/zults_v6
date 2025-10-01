@@ -6,7 +6,7 @@ import {
   FlatList,
   TouchableOpacity,
   Image,
-   Animated,
+  Animated,
 } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { Swipeable } from "react-native-gesture-handler";
@@ -15,9 +15,13 @@ import { colors, typography } from "../../../theme";
 import Navbar from "../../ui/Navbar";
 import ScreenWrapper from "../../ui/ScreenWrapper";
 import ZultsButton from "../../ui/ZultsButton";
-import ActivityCard from "../../ui/ActivityCard";   // ✅ new import
+import ActivityCard from "../../ui/ActivityCard";
 
-import { chatCache, hasSeededDemo, markDemoSeeded } from "../../../cache/chatCache";
+import {
+  chatCache,
+  hasSeededDemo,
+  markDemoSeeded,
+} from "../../../cache/chatCache";
 import zultsLogo from "../../../assets/images/zults.png";
 
 export default function ActivitiesScreen() {
@@ -25,7 +29,6 @@ export default function ActivitiesScreen() {
   const [activities, setActivities] = useState([]);
   const [filter, setFilter] = useState("all");
 
-  // ⭐ Add toggleFavorite here
   const toggleFavorite = (id) => {
     const updated = activities.map((item) =>
       item.id === id ? { ...item, favorite: !item.favorite } : item
@@ -33,11 +36,10 @@ export default function ActivitiesScreen() {
     setActivities(updated);
 
     if (chatCache[id]) {
-      chatCache[id].favorite = !chatCache[id].favorite; // keep cache in sync
+      chatCache[id].favorite = !chatCache[id].favorite;
     }
   };
 
-  // 🔄 reload activities every time screen is focused
   useFocusEffect(
     React.useCallback(() => {
       buildActivities();
@@ -50,7 +52,11 @@ export default function ActivitiesScreen() {
       const lastMsg = chat.chatData?.[chat.chatData.length - 1];
 
       let lastText = "No activity yet";
-      if (lastMsg) {
+
+      if (chat.user?.isBot && chat.user?.id === "zults-demo") {
+        // 👇 Rezy always static
+        lastText = "Ask me anything about sexual health...";
+      } else if (lastMsg) {
         if (lastMsg.type === "request") {
           lastText =
             lastMsg.direction === "from-user"
@@ -77,33 +83,36 @@ export default function ActivitiesScreen() {
         avatar: chat.user?.image,
         lastText,
         lastTimestamp: lastMsg ? lastMsg.timestamp : "",
-        hasUnread: chat.hasUnread || false,
+        hasUnread: chat.hasUnread || true,
         favorite: chat.favorite || false,
+        isBot: chat.user?.isBot || false,
       };
     });
 
-    // inject demo if nothing left
-    if (data.length === 0) {
-      if (!chatCache["zults-demo"]) {
-        chatCache["zults-demo"] = {
-          user: { id: "zults-demo", name: "Zults Bot", image: zultsLogo, isBot: true },
-          chatData: [],
-          chatState: { hasShared: false, hasRequested: false },
-          otherUserState: { hasShared: false, hasRequested: false },
-          blocked: false,
-        };
-      }
+    // Inject Rezy if missing
+if (data.length === 0) {
+  if (!chatCache["zults-demo"]) {
+    chatCache["zults-demo"] = {
+      user: { id: "zults-demo", name: "Rezy", image: zultsLogo, isBot: true },
+      chatData: [],
+      chatState: {},
+      otherUserState: {},
+      blocked: false,
+      hasUnread: true,   // ✅ mark as unread when seeded
+    };
+  }
 
-      data.push({
-        id: "zults-demo",
-        name: "Zults Bot",
-        avatar: zultsLogo,
-        lastText: chatCache["zults-demo"].chatData.slice(-1)[0]?.text || "No activity yet",
-        lastTimestamp: chatCache["zults-demo"].chatData.slice(-1)[0]?.timestamp || "",
-        hasUnread: false,
-        favorite: false,
-      });
-    }
+  data.push({
+    id: "zults-demo",
+    name: "Rezy",
+    avatar: zultsLogo,
+    lastText: "Ask me anything about sexual health...",
+    lastTimestamp: "",
+    hasUnread: true,     // ✅ so ActivityCard shows badge
+    favorite: false,
+    isBot: true,
+  });
+}
 
     setActivities(data);
   };
@@ -114,82 +123,82 @@ export default function ActivitiesScreen() {
   };
 
   const renderRightActions = (progress, dragX, id) => {
-  const scale = dragX.interpolate({
-    inputRange: [-120, -80, 0],
-    outputRange: [1.05, 1, 0.8], // 👈 overshoot a bit at -120
-    extrapolate: "clamp",
-  });
+    const scale = dragX.interpolate({
+      inputRange: [-120, -80, 0],
+      outputRange: [1.05, 1, 0.8],
+      extrapolate: "clamp",
+    });
 
-  const opacity = dragX.interpolate({
-    inputRange: [-100, -20, 0],
-    outputRange: [1, 0.9, 0],
-    extrapolate: "clamp",
-  });
+    const opacity = dragX.interpolate({
+      inputRange: [-100, -20, 0],
+      outputRange: [1, 0.9, 0],
+      extrapolate: "clamp",
+    });
 
-  return (
-    <Animated.View
-      style={[
-        styles.deleteButton,
-        { transform: [{ scale }], opacity },
-      ]}
-    >
-      <TouchableOpacity onPress={() => handleDelete(id)} activeOpacity={0.8}>
-        <Image
-          source={require("../../../assets/images/close-cross.png")}
-          style={styles.deleteIcon}
-        />
-      </TouchableOpacity>
-    </Animated.View>
-  );
-};
+    return (
+      <Animated.View
+        style={[styles.deleteButton, { transform: [{ scale }], opacity }]}
+      >
+        <TouchableOpacity onPress={() => handleDelete(id)} activeOpacity={0.8}>
+          <Image
+            source={require("../../../assets/images/close-cross.png")}
+            style={styles.deleteIcon}
+          />
+        </TouchableOpacity>
+      </Animated.View>
+    );
+  };
 
   const renderItem = ({ item }) => (
-  <Swipeable
-  renderRightActions={(progress, dragX) =>
-    renderRightActions(progress, dragX, item.id)
-  }
->
-    <ActivityCard
-      user={{
-        id: item.id,
-        name: item.name,
-        avatar: item.avatar,
-        date: item.lastTimestamp,
-        message: item.lastText,
-        unreadCount: item.hasUnread ? 1 : 0,
-        favorite: item.favorite, // 👈 current favorite state (true/false)
-      }}
-      onPress={() => {
-        if (item.id !== "zults-demo") {
-          if (chatCache[item.id]) {
-            chatCache[item.id].hasUnread = false;
-            DeviceEventEmitter.emit("chat-updated");
+    <Swipeable
+      renderRightActions={(progress, dragX) =>
+        renderRightActions(progress, dragX, item.id)
+      }
+    >
+      <ActivityCard
+        user={{
+          id: item.id,
+          name: item.name,
+          avatar: item.avatar,
+          date: item.lastTimestamp,
+          message: item.lastText,
+          unreadCount: item.hasUnread ? 1 : 0,
+          favorite: item.favorite,
+          isBot: item.isBot,
+        }}
+        onPress={() => {
+          if (!item.isBot) {
+            if (chatCache[item.id]) {
+              chatCache[item.id].hasUnread = false;
+              DeviceEventEmitter.emit("chat-updated");
+            }
+            navigation.navigate("UserChat", {
+              user: chatCache[item.id]?.user,
+              from: "Activities",
+            });
+          } else {
+            navigation.navigate("UserChat", {
+              user: {
+                id: "zults-demo",
+                name: "Rezy",
+                image: zultsLogo,
+                isBot: true,
+              },
+              from: "Activities",
+            });
           }
-          navigation.navigate("UserChat", {
-            user: chatCache[item.id]?.user,
-            from: "Activities",
-          });
-        } else {
-          navigation.navigate("UserChat", {
-            user: {
-              id: "zults-demo",
-              name: "Zults Bot",
-              image: zultsLogo,
-              isBot: true,
-            },
-            from: "Activities",
-          });
-        }
-      }}
-      onToggleFavorite={() => toggleFavorite(item.id)} // 👈 toggles heart
-    />
-  </Swipeable>
-);
+        }}
+        onToggleFavorite={() => toggleFavorite(item.id)}
+      />
+    </Swipeable>
+  );
 
   return (
     <ScreenWrapper>
       <Navbar />
-      <Text style={styles.pageTitle}>Activities</Text>
+      <Text style={styles.pageTitle} allowFontScaling={false}>
+        Activities
+      </Text>
 
       {/* Tabs */}
       <View style={styles.tabsContainer}>
@@ -199,7 +208,17 @@ export default function ActivitiesScreen() {
             style={filter === tab.toLowerCase() ? styles.tabActive : styles.tabInactive}
             onPress={() => setFilter(tab.toLowerCase())}
           >
-            <Text style={filter === tab.toLowerCase() ? styles.tabActiveText : styles.tabInactiveText}>
+            <Text
+              numberOfLines={1}
+              ellipsizeMode="tail"
+              adjustsFontSizeToFit
+              minimumFontScale={0.85}
+              style={
+                filter === tab.toLowerCase()
+                  ? styles.tabActiveText
+                  : styles.tabInactiveText
+              }
+            >
               {tab}
             </Text>
           </TouchableOpacity>
@@ -209,21 +228,29 @@ export default function ActivitiesScreen() {
       {/* List */}
       <FlatList
         data={activities.filter((item) =>
-          filter === "unread" ? item.hasUnread : filter === "favorites" ? item.favorite : true
+          filter === "unread"
+            ? item.hasUnread
+            : filter === "favorites"
+            ? item.favorite
+            : true
         )}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
-        contentContainerStyle={{ paddingTop: 16, paddingHorizontal: 16, paddingBottom: 160 }}
+        contentContainerStyle={{
+          paddingTop: 16,
+          paddingHorizontal: 16,
+          paddingBottom: 160,
+        }}
         ListEmptyComponent={
           <Text style={styles.empty}>
-    {filter === "all"
-      ? "No recent activity"
-      : filter === "unread"
-      ? "No unread chats"
-      : "No favorites yet"}
-  </Text>
-}
-/>
+            {filter === "all"
+              ? "No recent activity"
+              : filter === "unread"
+              ? "No unread chats"
+              : "No favorites yet"}
+          </Text>
+        }
+      />
 
       {/* Footer */}
       <View style={styles.footer}>
@@ -245,11 +272,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     backgroundColor: colors.background.surface2,
     borderRadius: 18,
-    height: 36,
     padding: 4,
     marginTop: 8,
     marginBottom: 16,
     marginHorizontal: 16,
+    minHeight: 36,
   },
   tabActive: {
     flex: 1,
@@ -257,11 +284,13 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     justifyContent: "center",
     alignItems: "center",
+    paddingVertical: 6,
   },
   tabInactive: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    paddingVertical: 6,
   },
   tabActiveText: {
     ...typography.bodyMedium,
@@ -272,33 +301,33 @@ const styles = StyleSheet.create({
     color: colors.foreground.soft,
   },
   pageTitle: {
-  ...typography.largeTitleMedium,
-  color: colors.foreground.default,
-  marginTop: 8,
-  marginHorizontal: 16,
-  marginBottom: 12,
+    ...typography.largeTitleMedium,
+    color: colors.foreground.default,
+    marginTop: 8,
+    marginHorizontal: 16,
+    marginBottom: 12,
   },
   empty: {
-  ...typography.subheadlineRegular,   // 👈 lighter, smaller than before
-  textAlign: "center",
-  marginTop: 200,
-  color: colors.foreground.muted,
-},
+    ...typography.subheadlineRegular,
+    textAlign: "center",
+    marginTop: 200,
+    color: colors.foreground.muted,
+  },
   deleteButton: {
-  backgroundColor: colors.error.container,
-  justifyContent: "center",
-  alignItems: "center",
-  width: 72,
-  height: "90%",              // slightly shorter, more “button” feel
-  borderRadius: 20,           // round all corners
-  alignSelf: "center",        // center vertically in the row
-  marginVertical: 4,          // little breathing space
-},
-deleteIcon: {
-  width: 24,
-  height: 24,
-  tintColor: colors.error.onContainer,
-},
+    backgroundColor: colors.error.container,
+    justifyContent: "center",
+    alignItems: "center",
+    width: 72,
+    height: "90%",
+    borderRadius: 20,
+    alignSelf: "center",
+    marginVertical: 4,
+  },
+  deleteIcon: {
+    width: 24,
+    height: 24,
+    tintColor: colors.error.onContainer,
+  },
   footer: {
     position: "absolute",
     bottom: 40,

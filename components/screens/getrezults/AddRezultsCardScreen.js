@@ -5,7 +5,7 @@ import { colors, typography } from "../../../theme";
 import ScreenWrapper from "../../ui/ScreenWrapper";
 import RezultsCard from "../../ui/RezultsCard";
 import ZultsButton from "../../ui/ZultsButton";
-import Navbar from '../../ui/Navbar';
+import Navbar from "../../ui/Navbar";
 import ScreenFooter from "../../ui/ScreenFooter";
 
 // ✅ import the cache
@@ -25,69 +25,85 @@ export default function AddRezultsCardScreen() {
       testDate: "12 Dec 2025",
     };
 
-    // ✅ Back to MainScreen
-    navigation.navigate("MainScreen");
+    // ✅ Reset stack back to MainScreen
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "MainScreen" }],
+    });
   };
 
   const handleCancel = () => {
-    // ✅ Reset cache and go back
+    // ✅ Reset cache
     rezultsCache.hasRezults = false;
     rezultsCache.card = null;
-    navigation.navigate("MainScreen");
+
+    // ✅ Reset stack back to MainScreen
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "MainScreen" }],
+    });
   };
 
   return (
     <ScreenWrapper topPadding={0}>
-  {/* Navbar with back arrow */}
-  <Navbar onBackPress={() => navigation.navigate('GetRezultsProvider')} />
-
-  <ScrollView
-  contentContainerStyle={styles.scrollContent}
-  showsVerticalScrollIndicator={false}
->
-  {/* Page title + subtitle */}
-  <View style={styles.headerBlock}>
-  <Text style={styles.pageTitle}>
-    Your Rezults
-  </Text>
-  <Text style={styles.subtitle}>
-    By clicking Add Rezults, you confirm this information is your own and accurate.{' '}
-    <Text
-      style={styles.link}
-      onPress={() => navigation.navigate('PolicyScreen')}
-    >
-      Review our policy.
-    </Text>
-  </Text>
-</View>
-
-<RezultsCard
-  userName="John Doe"
-  providerName="Sexual Health London"
-  testDate="12 Dec 2025"
+      {/* Navbar with back arrow (just pops stack) */}
+      <Navbar
+  onBackPress={() =>
+    navigation.reset({
+      index: 1,
+      routes: [
+        { name: "MainScreen" },
+        { name: "GetRezultsSelectProvider" },
+      ],
+    })
+  }
 />
 
-</ScrollView>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Page title + subtitle */}
+        <View style={styles.headerBlock}>
+          <Text style={styles.pageTitle} allowFontScaling={false}>
+  Your Rezults
+</Text>
+          <Text style={styles.subtitle}>
+            By clicking Add Rezults, you confirm this information is your own and accurate.{" "}
+            <Text
+              style={styles.link}
+              onPress={() => navigation.navigate("PolicyScreen")}
+            >
+              Review our policy.
+            </Text>
+          </Text>
+        </View>
 
-  {/* ✅ Footer actions (inside ScreenFooter, no absolute positioning) */}
-<ScreenFooter>
-  <ZultsButton
-    label="Add Rezults"
-    type="primary"
-    size="large"
-    fullWidth
-    onPress={handleAddRezults}
-  />
-  <ZultsButton
-    label="Cancel"
-    type="secondary"
-    size="large"
-    fullWidth
-    onPress={handleCancel}
-  />
-</ScreenFooter>
-</ScreenWrapper>
+        <RezultsCard
+          userName="John Doe"
+          providerName="Sexual Health London"
+          testDate="12 Dec 2025"
+        />
+      </ScrollView>
 
+      {/* Footer actions */}
+      <ScreenFooter>
+        <ZultsButton
+          label="Add Rezults"
+          type="primary"
+          size="large"
+          fullWidth
+          onPress={handleAddRezults}
+        />
+        <ZultsButton
+          label="Cancel"
+          type="secondary"
+          size="large"
+          fullWidth
+          onPress={handleCancel}
+        />
+      </ScreenFooter>
+    </ScreenWrapper>
   );
 }
 
@@ -95,7 +111,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     paddingBottom: 120,
-    paddingHorizontal: 16,   // ✅ consistent inset
+    paddingHorizontal: 16,
   },
   headerBlock: {
     marginTop: 32,
@@ -107,12 +123,12 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   subtitle: {
-  ...typography.bodyRegular,
-  color: colors.foreground.soft,
-  marginBottom: 24,
-},
+    ...typography.bodyRegular,
+    color: colors.foreground.soft,
+    marginBottom: 24,
+  },
   link: {
-    textDecorationLine: 'underline',
+    textDecorationLine: "underline",
     color: colors.brand.primary,
   },
 });

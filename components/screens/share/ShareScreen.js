@@ -75,7 +75,7 @@ export default function ShareScreen({ navigation }) {
   }, [searchFocused, activeTab]);
 
   const users = [
-  { id: 'zults-demo', name: 'Zults Bot', image: zultsImage, isBot: true },
+  { id: 'zults-demo', name: 'Rezy', image: zultsImage, isBot: true },
   { id: 'demo1', name: 'Demo1', image: melany, isVerified: true },
   { id: 'demo2', name: 'Demo2', image: tomas, isVerified: false },
   { id: 'demo3', name: 'Demo3', image: madman, isVerified: false },
@@ -106,7 +106,15 @@ export default function ShareScreen({ navigation }) {
               onPress={() => handleUserPress(user)}
             >
               <Image source={user.image} style={styles.avatar} />
-              <Text style={styles.username}>{user.name}</Text>
+              <Text
+  style={styles.username}
+  numberOfLines={1}
+  ellipsizeMode="tail"
+  adjustsFontSizeToFit
+  minimumFontScale={0.9}
+>
+  {user.name}
+</Text>
               <Image source={arrowRight} style={styles.arrow} />
             </TouchableOpacity>
           ))}
@@ -171,26 +179,28 @@ export default function ShareScreen({ navigation }) {
         }}
       >
         <View style={styles.tabsContainer}>
-          {['Users', 'Link', 'SMS'].map((tab) => (
-            <TouchableOpacity
-              key={tab}
-              style={activeTab === tab ? styles.tabActive : styles.tabInactive}
-              onPress={() => {
-                setActiveTab(tab);
-                setSearch('');
-                setSearchFocused(false);
-              }}
-            >
-              <Text
-                style={
-                  activeTab === tab ? styles.tabActiveText : styles.tabInactiveText
-                }
-              >
-                {tab}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+  {['Users', 'Link', 'SMS'].map((tab) => (
+    <TouchableOpacity
+      key={tab}
+      style={activeTab === tab ? styles.tabActive : styles.tabInactive}
+      onPress={() => {
+        setActiveTab(tab);
+        setSearch('');
+        setSearchFocused(false);
+      }}
+    >
+      <Text
+  numberOfLines={1}
+  ellipsizeMode="tail"
+  adjustsFontSizeToFit
+  minimumFontScale={0.9}
+  style={activeTab === tab ? styles.tabActiveText : styles.tabInactiveText}
+>
+  {tab}
+</Text>
+    </TouchableOpacity>
+  ))}
+</View>
 
         {/* Subtitle for each share method */}
         <View style={styles.content}>
@@ -265,28 +275,30 @@ const styles = StyleSheet.create({
   flexDirection: "row",
   backgroundColor: colors.background.surface2,
   borderRadius: 18,
-  height: 36,
   padding: 4,
-  marginTop: 8,          // remove extra padding
+  marginTop: 8,
   marginBottom: 16,
   marginHorizontal: 16,
+  minHeight: 36,     // 👈 instead of fixed height
 },
   tabActive: {
-    flex: 1,
-    backgroundColor: colors.foreground.default,
-    borderRadius: 14,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  flex: 1,
+  backgroundColor: colors.foreground.default,
+  borderRadius: 14,
+  justifyContent: "center",
+  alignItems: "center",
+  paddingVertical: 6, // 👈 gives breathing room when fonts grow
+},
   tabActiveText: {
     ...typography.bodyMedium,
     color: colors.background.surface1,
   },
   tabInactive: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  flex: 1,
+  justifyContent: "center",
+  alignItems: "center",
+  paddingVertical: 6,
+},
   tabInactiveText: {
     ...typography.bodyMedium,
     color: colors.foreground.soft,
@@ -325,10 +337,12 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   username: {
-    flex: 1,
-    ...typography.bodyMedium,
-    color: colors.foreground.default,
-  },
+  flex: 1,
+  ...typography.bodyMedium,
+  color: colors.foreground.default,
+  includeFontPadding: false,   // Android cleanup
+  textAlignVertical: "center", // ensures centered
+},
   arrow: {
     width: 24,
     height: 24,

@@ -1,5 +1,11 @@
 import React from 'react';
-import { View, TextInput, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import {
+  View,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+} from 'react-native';
 import { colors, typography } from '../../theme';
 import searchIcon from '../../assets/images/search-icon.png';
 import closeIcon from '../../assets/images/close-cross.png'; // reuse your existing cross
@@ -18,6 +24,7 @@ export default function SearchBar({ value, onChangeText, onCancel, onFocus }) {
         placeholder="Search by username"
         placeholderTextColor={colors.neutralText.subtext}
         onFocus={onFocus}
+        allowFontScaling // 👈 system handles Dynamic Type
       />
 
       {/* Clear button only when typing */}
@@ -37,8 +44,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.surface2, // ✅ subtle pill bg
     borderRadius: 12,
     paddingHorizontal: 10,
+    paddingVertical: 8,   // 👈 allows breathing room
     marginBottom: 16,
-    height: 40,
+    minHeight: 40,        // 👈 grows with larger fonts
   },
   icon: {
     width: 16,
@@ -48,9 +56,13 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    ...typography.bodyRegular,
+    fontFamily: typography.bodyRegular.fontFamily,
+    fontSize: 16,               // 👈 base brand size
+    lineHeight: 20,
     color: colors.foreground.default,
-    paddingVertical: 0, // ✅ centers text vertically like iOS
+    paddingVertical: 0,         // centers text vertically
+    includeFontPadding: false,  // Android cleanup
+    textAlignVertical: 'center',
   },
   clearIcon: {
     width: 16,

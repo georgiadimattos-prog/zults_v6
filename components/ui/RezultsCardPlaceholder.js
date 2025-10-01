@@ -52,7 +52,7 @@ export default function RezultsCardPlaceholder() {
 
   return (
     <Pressable
-      onPress={() => navigation.navigate('GetRezultsProvider')} // 👈 hardcoded
+      onPress={() => navigation.navigate('GetRezultsSelectProvider')}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       style={{ alignItems: 'center' }}
