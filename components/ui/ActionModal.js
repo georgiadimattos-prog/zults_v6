@@ -31,11 +31,21 @@ export default function ActionModal({
           <TouchableWithoutFeedback>
             <View style={styles.container}>
               {/* Title */}
-              <Text style={styles.title}>{title}</Text>
+              <Text
+                style={styles.title}
+                allowFontScaling={false} // 🚫 keep title fixed
+              >
+                {title}
+              </Text>
 
               {/* Description */}
               {description ? (
-                <Text style={styles.description}>{description}</Text>
+                <Text
+                  style={styles.description}
+                  maxFontSizeMultiplier={1.2} // ✅ allow scaling but capped
+                >
+                  {description}
+                </Text>
               ) : null}
 
               {/* Action buttons */}
@@ -85,12 +95,12 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   title: {
-    ...typography.title1Medium,
+    ...typography.largeTitleMedium, // ✅ same as screen titles
     color: colors.foreground.default,
     marginBottom: 16,
   },
   description: {
-    ...typography.bodyRegular,
+    ...typography.bodyRegular, // ✅ same as subtitles
     color: colors.foreground.soft,
     marginBottom: 24,
   },

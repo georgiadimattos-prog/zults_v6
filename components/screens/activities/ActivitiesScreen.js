@@ -41,7 +41,7 @@ export default function ActivitiesScreen() {
   const buildActivities = () => {
     const keys = Object.keys(chatCache).filter((k) => {
       const v = chatCache[k];
-      return v && typeof v === "object" && v.user; // ⬅️ skip meta like __activeKey
+      return v && typeof v === "object" && v.user;
     });
 
     const data = keys.map((key) => {
@@ -78,13 +78,12 @@ export default function ActivitiesScreen() {
         avatar: chat.user?.image,
         lastText,
         lastTimestamp: lastMsg ? lastMsg.timestamp : "",
-        hasUnread: chat.hasUnread ?? false, // ⬅️ correct default (was `|| true`)
+        hasUnread: chat.hasUnread ?? false,
         favorite: chat.favorite || false,
         isBot: chat.user?.isBot || false,
       };
     });
 
-    // Inject Rezy if nothing yet
     if (data.length === 0) {
       if (!chatCache["zults-demo"]) {
         chatCache["zults-demo"] = {
@@ -132,7 +131,10 @@ export default function ActivitiesScreen() {
     return (
       <Animated.View style={[styles.deleteButton, { transform: [{ scale }], opacity }]}>
         <TouchableOpacity onPress={() => handleDelete(id)} activeOpacity={0.8}>
-          <Image source={require("../../../assets/images/close-cross.png")} style={styles.deleteIcon} />
+          <Image
+            source={require("../../../assets/images/close-cross.png")}
+            style={styles.deleteIcon}
+          />
         </TouchableOpacity>
       </Animated.View>
     );
@@ -167,7 +169,13 @@ export default function ActivitiesScreen() {
   return (
     <ScreenWrapper>
       <Navbar />
-      <Text style={styles.pageTitle} allowFontScaling={false}>Activities</Text>
+
+      {/* Header Block */}
+      <View style={styles.headerBlock}>
+        <Text style={styles.pageTitle} allowFontScaling={false}>
+          Activities
+        </Text>
+      </View>
 
       <View style={styles.tabsContainer}>
         {["All", "Unread", "Favorites"].map((tab) => (
@@ -198,7 +206,11 @@ export default function ActivitiesScreen() {
         contentContainerStyle={{ paddingTop: 16, paddingHorizontal: 16, paddingBottom: 160 }}
         ListEmptyComponent={
           <Text style={styles.empty}>
-            {filter === "all" ? "No recent activity" : filter === "unread" ? "No unread chats" : "No favorites yet"}
+            {filter === "all"
+              ? "No recent activity"
+              : filter === "unread"
+              ? "No unread chats"
+              : "No favorites yet"}
           </Text>
         }
       />
@@ -218,12 +230,20 @@ export default function ActivitiesScreen() {
 }
 
 const styles = StyleSheet.create({
+  headerBlock: {
+    marginTop: 32,
+    marginBottom: 16,
+    paddingHorizontal: 16, // ✅ unified with other screens
+  },
+  pageTitle: {
+    ...typography.largeTitleMedium,
+    color: colors.foreground.default,
+  },
   tabsContainer: {
     flexDirection: "row",
     backgroundColor: colors.background.surface2,
     borderRadius: 18,
     padding: 4,
-    marginTop: 8,
     marginBottom: 16,
     marginHorizontal: 16,
     minHeight: 36,
@@ -236,11 +256,26 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 6,
   },
-  tabInactive: { flex: 1, justifyContent: "center", alignItems: "center", paddingVertical: 6 },
-  tabActiveText: { ...typography.bodyMedium, color: colors.background.surface1 },
-  tabInactiveText: { ...typography.bodyMedium, color: colors.foreground.soft },
-  pageTitle: { ...typography.largeTitleMedium, color: colors.foreground.default, marginTop: 8, marginHorizontal: 16, marginBottom: 12 },
-  empty: { ...typography.subheadlineRegular, textAlign: "center", marginTop: 200, color: colors.foreground.muted },
+  tabInactive: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 6,
+  },
+  tabActiveText: {
+    ...typography.bodyMedium,
+    color: colors.background.surface1,
+  },
+  tabInactiveText: {
+    ...typography.bodyMedium,
+    color: colors.foreground.soft,
+  },
+  empty: {
+    ...typography.subheadlineRegular,
+    textAlign: "center",
+    marginTop: 200,
+    color: colors.foreground.muted,
+  },
   deleteButton: {
     backgroundColor: colors.error.container,
     justifyContent: "center",

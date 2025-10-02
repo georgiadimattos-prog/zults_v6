@@ -149,6 +149,8 @@ export default function MainUnverifiedWithRezults({ onLinkPress, onSharePress })
           { paddingTop: headerHeight }, // ✅ dynamic push-down
         ]}
       >
+        {/* Rezults block (actions + card + expiry) */}
+<View style={{ marginBottom: 12 }}></View>
         <RezultsHeaderContainer
           onAdd={() => setShowAddModal(true)}
           onDelete={() => setShowDeleteModal(true)}

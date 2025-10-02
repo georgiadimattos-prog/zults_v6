@@ -14,7 +14,7 @@ const CONTAINER_WIDTH = screenWidth - 32; // ✅ match RezultsCard + Share butto
 export default function ExpireContainer({
   expiryDate = "29 Sep 2025",
 }) {
-  const daysLeft = 43; // ✅ force demo lock
+  const daysLeft = 43; // ✅ demo lock
   const percentLeft = daysLeft / 90;
 
   // animate fill
@@ -30,8 +30,12 @@ export default function ExpireContainer({
   return (
     <View style={styles.wrapper}>
       <View style={styles.row}>
-        <Text style={styles.label}>Expires</Text>
-        <Text style={styles.date}>{expiryDate}</Text>
+        <Text style={styles.label} maxFontSizeMultiplier={1.2}>
+          Expires
+        </Text>
+        <Text style={styles.date} maxFontSizeMultiplier={1.2}>
+          {expiryDate}
+        </Text>
       </View>
 
       <View style={styles.progressWrapper}>
@@ -45,7 +49,9 @@ export default function ExpireContainer({
           />
         </Animated.View>
         <View style={styles.progressLabelWrapper}>
-          <Text style={styles.progressText}>{daysLeft} days left</Text>
+          <Text style={styles.progressText} maxFontSizeMultiplier={1.2}>
+            {daysLeft} days left
+          </Text>
         </View>
       </View>
     </View>
@@ -54,12 +60,12 @@ export default function ExpireContainer({
 
 const styles = StyleSheet.create({
   wrapper: {
-    width: CONTAINER_WIDTH,       // ✅ exactly same width as card
+    width: CONTAINER_WIDTH,
     borderRadius: 20,
     backgroundColor: colors.background.surface2,
     padding: 16,
-    alignSelf: "center",          // ✅ keep it centered
-    marginTop: 16,                // ✅ controlled gap below card
+    alignSelf: "center",
+    marginTop: 16,
     gap: 12,
   },
   row: {
@@ -68,15 +74,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   label: {
-    ...typography.bodyMedium,
-    fontSize: 18,
+    ...typography.bodyMedium,     // ✅ body size (scales to 1.2)
     fontWeight: "500",
     color: colors.foreground.default,
   },
   date: {
-    ...typography.bodyRegular,
-    fontSize: 14,
-    fontWeight: "400",
+    ...typography.bodyRegular,    // ✅ subtitle baseline
     color: colors.foreground.default,
   },
   progressWrapper: {
@@ -105,9 +108,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   progressText: {
-    ...typography.captionSmallRegular,
-    fontSize: 12,
-    fontWeight: "400",
+    ...typography.subheadlineRegular,  // ✅ smaller, but scales to 1.2
     color: "#FFF",
     opacity: 0.8,
   },

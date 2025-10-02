@@ -146,6 +146,7 @@ export default function ShareScreen({ navigation }) {
   contentContainerStyle={styles.scrollContent}
   showsVerticalScrollIndicator={false}
 >
+  <Animated.View style={{ opacity: fadeAnim }}>
   {/* Page title + subtitle */}
   <View style={styles.headerBlock}>
     <Text style={typography.largeTitleMedium} allowFontScaling={false}>
@@ -157,44 +158,43 @@ export default function ShareScreen({ navigation }) {
   </View>
 
   {/* Tabs + content */}
-  <Animated.View style={{ opacity: fadeAnim }}>
-    <View style={styles.tabsContainer}>
-      {['Users', 'Link', 'SMS'].map((tab) => (
-        <TouchableOpacity
-          key={tab}
-          style={activeTab === tab ? styles.tabActive : styles.tabInactive}
-          onPress={() => {
-            setActiveTab(tab);
-            setSearch('');
-            setSearchFocused(false);
-          }}
+  <View style={styles.tabsContainer}>
+    {['Users', 'Link', 'SMS'].map((tab) => (
+      <TouchableOpacity
+        key={tab}
+        style={activeTab === tab ? styles.tabActive : styles.tabInactive}
+        onPress={() => {
+          setActiveTab(tab);
+          setSearch('');
+          setSearchFocused(false);
+        }}
+      >
+        <Text
+          style={activeTab === tab ? styles.tabActiveText : styles.tabInactiveText}
+          maxFontSizeMultiplier={1.2}
         >
-          <Text
-            style={activeTab === tab ? styles.tabActiveText : styles.tabInactiveText}
-            maxFontSizeMultiplier={1.2}
-          >
-            {tab}
-          </Text>
-        </TouchableOpacity>
-      ))}
+          {tab}
+        </Text>
+      </TouchableOpacity>
+    ))}
+  </View>
+
+  {activeTab === 'Users' && (
+    <View style={styles.content}>
+      <SearchBar
+        value={search}
+        onChangeText={setSearch}
+        onCancel={() => {
+          setSearch('');
+          setSearchFocused(false);
+        }}
+        onFocus={() => setSearchFocused(true)}
+      />
     </View>
+  )}
 
-    {activeTab === 'Users' && (
-      <View style={styles.content}>
-        <SearchBar
-          value={search}
-          onChangeText={setSearch}
-          onCancel={() => {
-            setSearch('');
-            setSearchFocused(false);
-          }}
-          onFocus={() => setSearchFocused(true)}
-        />
-      </View>
-    )}
-
-    {renderTabContent()}
-  </Animated.View>
+  {renderTabContent()}
+</Animated.View>
 </ScrollView>
 
           {/* Search takeover */}

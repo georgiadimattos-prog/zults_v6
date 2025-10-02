@@ -1,18 +1,15 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import { View, StyleSheet, TouchableOpacity, Image, Text } from "react-native";
 import { colors, typography } from "../../theme";
 
 import addIcon from "../../assets/images/add.png";
 import deleteIcon from "../../assets/images/delete-icon.png";
-import walletIcon from "../../assets/images/wallet-icon.png"; // 👈 new
+import walletIcon from "../../assets/images/wallet-icon.png";
 
 export default function RezultsHeaderContainer({ onAdd, onDelete, onWallet }) {
   return (
     <View style={styles.container}>
-      {/* Left Title */}
-      <Text style={styles.title}>Your Rezults</Text>
-
-      {/* Right Actions */}
+      {/* Right Actions only */}
       <View style={styles.actions}>
         {/* Delete button */}
         <TouchableOpacity style={styles.iconButton} onPress={onDelete}>
@@ -49,14 +46,10 @@ export default function RezultsHeaderContainer({ onAdd, onDelete, onWallet }) {
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "flex-end", // ✅ no left title, push actions right
     alignItems: "center",
-  },
-  title: {
-    ...typography.bodyMedium,
-    fontSize: 18,
-    fontWeight: "500",
-    color: colors.foreground.default,
+    marginBottom: 0, // ✅ breathing space above RezultsCard
+
   },
   actions: {
     flexDirection: "row",
@@ -85,6 +78,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "400",
     color: "#141414",
+    maxFontSizeMultiplier: 1.2, // ✅ keep capped
   },
   iconSmall: {
     width: 20,

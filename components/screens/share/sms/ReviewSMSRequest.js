@@ -15,7 +15,7 @@ import { colors, typography } from '../../../../theme';
 import ZultsButton from '../../../ui/ZultsButton';
 import ScreenWrapper from '../../../ui/ScreenWrapper';
 import ScreenFooter from '../../../ui/ScreenFooter';
-import Navbar from '../../../ui/Navbar';   // ✅ standardized navbar
+import Navbar from '../../../ui/Navbar';
 
 export default function ReviewSMSRequest() {
   const route = useRoute();
@@ -30,71 +30,73 @@ export default function ReviewSMSRequest() {
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScreenWrapper topPadding={0}>
-  {/* ✅ Navbar pinned at the top, outside scroll */}
-  <Navbar />
+          {/* Navbar */}
+          <Navbar />
 
-  {/* Scrollable content */}
-  <ScrollView
-    contentContainerStyle={[styles.content, { flexGrow: 1, paddingBottom: 120 }]}
-    keyboardShouldPersistTaps="handled"
-  >
-    {/* Header */}
-    <View style={styles.headerBlock}>
-      <Text allowFontScaling={false} style={styles.pageTitle}>
-        Review SMS
-      </Text>
-      <Text allowFontScaling={false} style={styles.subtitle}>
-        Check the details before you send.
-      </Text>
-    </View>
+          {/* Scrollable content */}
+          <ScrollView
+            contentContainerStyle={[styles.content, { flexGrow: 1, paddingBottom: 120 }]}
+            keyboardShouldPersistTaps="handled"
+          >
+            {/* Header */}
+            <View style={styles.headerBlock}>
+              <Text style={typography.largeTitleMedium} allowFontScaling={false}>
+                Review SMS
+              </Text>
+              <Text style={typography.bodyRegular} maxFontSizeMultiplier={1.2}>
+                Check the details before you send.
+              </Text>
+            </View>
 
-    {/* Phone number */}
-    <View style={styles.inputGroup}>
-      <Text style={styles.label}>Phone number</Text>
-      <View style={styles.inputWrapper}>
-        <Text style={styles.inputText}>{String(phone)}</Text>
-      </View>
-    </View>
+            {/* Phone number */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Phone number</Text>
+              <View style={styles.inputWrapper}>
+                <Text style={styles.inputText} maxFontSizeMultiplier={1.2}>
+                  {String(phone)}
+                </Text>
+              </View>
+            </View>
 
-    {/* Message (static, not editable) */}
-    <View style={styles.inputGroup}>
-      <Text style={styles.label}>Message</Text>
-      <View style={styles.staticBox}>
-        <Text style={styles.staticText}>
-          A reminder to consider getting tested for STIs. This may be from a past or potential partner.
-        </Text>
-      </View>
-    </View>
+            {/* Message (static, not editable) */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Message</Text>
+              <View style={styles.staticBox}>
+                <Text style={styles.staticText} maxFontSizeMultiplier={1.2}>
+                  A reminder to consider getting tested for STIs. This may be from a past or potential partner.
+                </Text>
+              </View>
+            </View>
 
-    {/* Checkbox */}
-    <View style={styles.checkboxRow}>
-      <TouchableOpacity
-        onPress={() => setAgreed(!agreed)}
-        style={styles.checkboxContainer}
-        activeOpacity={0.7}
-      >
-        <View style={[styles.checkbox, agreed && styles.checkboxChecked]}>
-          {agreed && <Text style={styles.checkmark}>✓</Text>}
-        </View>
-        <Text style={styles.checkboxText}>
-          I confirm this request is for a legitimate purpose and I’ve considered its impact on the recipient.
-        </Text>
-      </TouchableOpacity>
-    </View>
-  </ScrollView>
+            {/* Checkbox */}
+            <View style={styles.checkboxRow}>
+              <TouchableOpacity
+                onPress={() => setAgreed(!agreed)}
+                style={styles.checkboxContainer}
+                activeOpacity={0.7}
+              >
+                <View style={[styles.checkbox, agreed && styles.checkboxChecked]}>
+                  {agreed && <Text style={styles.checkmark}>✓</Text>}
+                </View>
+                <Text style={styles.checkboxText} maxFontSizeMultiplier={1.2}>
+                  I confirm this request is for a legitimate purpose and I’ve considered its impact on the recipient.
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
 
-  {/* Footer stays pinned too */}
-  <ScreenFooter>
-    <ZultsButton
-      label="Send SMS"
-      type="primary"
-      size="large"
-      fullWidth
-      disabled={!agreed}
-      onPress={() => navigation.navigate('SMSRequestSent')}
-    />
-  </ScreenFooter>
-</ScreenWrapper>
+          {/* Footer */}
+          <ScreenFooter>
+            <ZultsButton
+              label="Send SMS"
+              type="primary"
+              size="large"
+              fullWidth
+              disabled={!agreed}
+              onPress={() => navigation.navigate('SMSRequestSent')}
+            />
+          </ScreenFooter>
+        </ScreenWrapper>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
@@ -108,26 +110,15 @@ const styles = StyleSheet.create({
     marginTop: 32,
     marginBottom: 24,
   },
-  pageTitle: {
-    ...typography.largeTitleMedium,
+  staticBox: {
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    padding: 16,
+  },
+  staticText: {
+    ...typography.inputText, // ✅ unified with inputs
     color: colors.foreground.default,
-    marginBottom: 6,
   },
-  subtitle: {
-    ...typography.bodyRegular,
-    color: colors.foreground.soft,
-    marginBottom: 24,
-  },
-  staticBox: {   // 👈 new style
-  borderRadius: 12,
-  backgroundColor: 'rgba(255,255,255,0.05)', // subtle frosted bg
-  padding: 16,
-},
-staticText: {
-  ...typography.bodyRegular,
-  color: colors.foreground.default,
-  lineHeight: 20,
-},
   inputGroup: {
     marginBottom: 24,
   },
@@ -137,16 +128,15 @@ staticText: {
     marginBottom: 6,
   },
   inputWrapper: {
-    borderWidth: 1.2,
-    borderColor: 'rgba(255,255,255,0.1)',
-    borderRadius: 16,
-    backgroundColor: 'rgba(20,20,20,0.5)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.05)',
     padding: 16,
   },
   inputText: {
-    ...typography.bodyRegular,
+    ...typography.inputText, // ✅ unified with inputs
     color: colors.foreground.default,
-    lineHeight: 20,
   },
   checkboxRow: {
     marginBottom: 32,

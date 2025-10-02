@@ -42,17 +42,19 @@ export default function DeleteModal({ visible, onClose }) {
           <TouchableWithoutFeedback>
             <View style={styles.container}>
               {/* Title */}
-              <Text style={styles.title}>Delete Rezults?</Text>
+              <Text style={styles.title} allowFontScaling={false}>
+                Delete Rezults?
+              </Text>
 
               {/* Description */}
-              <Text style={styles.description}>
+              <Text style={styles.description} maxFontSizeMultiplier={1.2}>
                 This will permanently remove your Rezults and disable sharing.
               </Text>
 
               {/* Actions */}
               <ZultsButton
                 label="Delete Rezults"
-                type="primary"   // ✅ strong action
+                type="primary"
                 size="large"
                 fullWidth
                 onPress={handleDelete}
@@ -62,7 +64,7 @@ export default function DeleteModal({ visible, onClose }) {
 
               <ZultsButton
                 label="Cancel"
-                type="ghost"     // ✅ low emphasis cancel
+                type="ghost"
                 size="large"
                 fullWidth
                 onPress={onClose}
@@ -89,12 +91,12 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   title: {
-    ...typography.title1Medium,
+    ...typography.largeTitleMedium,   // ✅ unified modal title
     color: colors.foreground.default,
     marginBottom: 16,
   },
   description: {
-    ...typography.bodyRegular,
+    ...typography.bodyRegular,        // ✅ unified modal subtitle
     color: colors.foreground.soft,
     marginBottom: 24,
   },

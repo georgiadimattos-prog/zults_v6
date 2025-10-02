@@ -11,7 +11,7 @@ export default function SMSRequestSent() {
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      navigation.navigate('MainScreen'); // ✅ go straight back to MainScreen
+      navigation.navigate('MainScreen');
     }, 9000);
     return () => clearTimeout(timeout);
   }, [navigation]);
@@ -34,8 +34,16 @@ export default function SMSRequestSent() {
             style={styles.image}
             resizeMode="contain"
           />
-          <Text style={styles.title}>Sent!</Text>
-          <Text style={styles.subtitle}>
+          <Text
+            style={styles.title}
+            allowFontScaling={false}   // 🚫 fixed size title
+          >
+            Sent!
+          </Text>
+          <Text
+            style={styles.subtitle}
+            maxFontSizeMultiplier={1.2}  // ✅ capped scaling
+          >
             You can send another SMS in one week.
           </Text>
         </View>

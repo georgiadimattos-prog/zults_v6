@@ -30,35 +30,39 @@ export default function ConfirmModal({
           <TouchableWithoutFeedback>
             <View style={styles.container}>
               {/* Title */}
-              <Text style={styles.title}>{title}</Text>
+              <Text style={styles.title} allowFontScaling={false}>
+                {title}
+              </Text>
 
               {/* Description */}
               {description ? (
-                <Text style={styles.description}>{description}</Text>
+                <Text style={styles.description} maxFontSizeMultiplier={1.2}>
+                  {description}
+                </Text>
               ) : null}
 
               {/* Confirm button */}
-<ZultsButton
-  label={confirmLabel}
-  type="primary"   // ✅ strong action
-  size="large"
-  fullWidth
-  onPress={() => {
-    onConfirm?.();
-    onClose();
-  }}
-/>
+              <ZultsButton
+                label={confirmLabel}
+                type="primary"
+                size="large"
+                fullWidth
+                onPress={() => {
+                  onConfirm?.();
+                  onClose();
+                }}
+              />
 
-<View style={{ height: 12 }} />
+              <View style={{ height: 12 }} />
 
-{/* Cancel button */}
-<ZultsButton
-  label="Cancel"
-  type="ghost"     // ✅ low emphasis cancel
-  size="large"
-  fullWidth
-  onPress={onClose}
-/>
+              {/* Cancel button */}
+              <ZultsButton
+                label="Cancel"
+                type="ghost"
+                size="large"
+                fullWidth
+                onPress={onClose}
+              />
             </View>
           </TouchableWithoutFeedback>
         </BlurView>
@@ -81,12 +85,12 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   title: {
-    ...typography.title1Medium,
+    ...typography.largeTitleMedium, // ✅ same as screen titles
     color: colors.foreground.default,
     marginBottom: 16,
   },
   description: {
-    ...typography.bodyRegular,
+    ...typography.bodyRegular, // ✅ matches subtitle baseline
     color: colors.foreground.soft,
     marginBottom: 24,
   },

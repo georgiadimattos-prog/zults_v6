@@ -29,10 +29,12 @@ export default function NoRezultsModal({ visible, onClose }) {
           <TouchableWithoutFeedback>
             <View style={styles.container}>
               {/* Title */}
-              <Text style={styles.title}>No Rezults Yet</Text>
+              <Text style={styles.title} allowFontScaling={false}>
+                No Rezults Yet
+              </Text>
 
               {/* Description */}
-              <Text style={styles.description}>
+              <Text style={styles.description} maxFontSizeMultiplier={1.2}>
                 You don’t have any Rezults yet. Please get tested and add Rezults
                 before sharing.
               </Text>
@@ -45,7 +47,7 @@ export default function NoRezultsModal({ visible, onClose }) {
                 fullWidth
                 onPress={() => {
                   onClose?.();
-                  navigation.navigate("GetRezultsSelectProvider"); // ✅ provider picker
+                  navigation.navigate("GetRezultsSelectProvider");
                 }}
               />
 
@@ -81,12 +83,12 @@ const styles = StyleSheet.create({
     paddingBottom: 32,
   },
   title: {
-    ...typography.title1Medium,
+    ...typography.largeTitleMedium, // ✅ unified modal title
     color: colors.foreground.default,
     marginBottom: 12,
   },
   description: {
-    ...typography.bodyRegular,
+    ...typography.bodyRegular, // ✅ unified modal subtitle
     color: colors.foreground.soft,
     marginBottom: 24,
   },
