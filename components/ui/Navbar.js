@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
     tintColor: colors.foreground.default,
   },
   rightText: {
-    ...typography.bodyMedium,
+    ...typography.subtitleMedium,
     color: colors.info.onContainer,
   },
   backButton: {
@@ -89,10 +89,23 @@ export function NavbarBackInvite({ onBackPress }) {
       </View>
 
       <View style={styles.right}>
-        <TouchableOpacity onPress={sendInvite} style={styles.backButton}>
-          <Ionicons name="person-add" size={24} color={colors.foreground.default} />
-        </TouchableOpacity>
-      </View>
+  <TouchableOpacity
+    onPress={sendInvite}
+    style={{ paddingHorizontal: 8, paddingVertical: 6 }}
+  >
+    <Text
+      style={{
+        ...typography.subtitleMedium,
+        color: colors.info.onContainer,
+      }}
+      numberOfLines={1}
+      ellipsizeMode="tail"
+      maxFontSizeMultiplier={1.2}
+    >
+      Invite
+    </Text>
+  </TouchableOpacity>
+</View>
     </View>
   );
 }
@@ -162,6 +175,7 @@ export function NavbarBackRightText({ onBackPress, rightText, onRightPress }) {
             style={styles.rightText}
             numberOfLines={1}     // ✅ stays on one line
             ellipsizeMode="tail"  // ✅ adds "…" if too long
+            maxFontSizeMultiplier={1.2}
           >
             {rightText != null ? String(rightText) : ''}
           </Text>

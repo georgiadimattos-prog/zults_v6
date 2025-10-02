@@ -244,7 +244,7 @@ export default function MainUnverifiedWithRezults({ onLinkPress, onSharePress })
         confirmLabel="Continue"
         onConfirm={() => {
           setShowAddModal(false);
-          navigation.navigate("GetRezultsProvider");
+          navigation.navigate("GetRezultsSelectProvider");
         }}
       />
 

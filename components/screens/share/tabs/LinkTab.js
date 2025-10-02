@@ -121,7 +121,7 @@ export default function LinkTab() {
 
         {!linkActive ? (
           <ZultsButton
-            label="Generate New Link"
+            label="Generate Link"
             type="primary"
             size="large"
             fullWidth
@@ -161,7 +161,7 @@ export default function LinkTab() {
         onClose={() => setShowModal(false)}
         onGetRezults={() => {
           setShowModal(false);
-          navigation.navigate("GetRezultsProvider");
+          navigation.navigate("GetRezultsSelectProvider");
         }}
       />
 
@@ -177,7 +177,7 @@ export default function LinkTab() {
 
 const styles = StyleSheet.create({
   content: {
-    paddingHorizontal: 16,
+   flex: 1,
   },
   card: {
     backgroundColor: colors.background.surface3,
@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   linkText: {
-    ...typography.bodySmall,
+    ...typography.inputText,
     color: colors.foreground.default,
   },
   toast: {

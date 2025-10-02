@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import { colors, typography } from '../../theme';
 import searchIcon from '../../assets/images/search-icon.png';
-import closeIcon from '../../assets/images/close-cross.png'; // reuse your existing cross
+import closeIcon from '../../assets/images/close-cross.png';
 
 export default function SearchBar({ value, onChangeText, onCancel, onFocus }) {
   return (
@@ -18,16 +18,18 @@ export default function SearchBar({ value, onChangeText, onCancel, onFocus }) {
 
       {/* Input */}
       <TextInput
-        style={styles.input}
+        style={[styles.input, typography.inputText]}   // ✅ same baseline as ZultsInput
         value={value}
         onChangeText={onChangeText}
         placeholder="Search by username"
-        placeholderTextColor={colors.neutralText.subtext}
+        placeholderTextColor={colors.foreground.muted} // ✅ muted grey, same as Paste Link
         onFocus={onFocus}
-        allowFontScaling // 👈 system handles Dynamic Type
+        maxFontSizeMultiplier={1.2}                    // ✅ capped scaling
+        autoCapitalize="none"
+        autoCorrect={false}
       />
 
-      {/* Clear button only when typing */}
+      {/* Clear button */}
       {value.length > 0 && (
         <TouchableOpacity onPress={() => onChangeText('')}>
           <Image source={closeIcon} style={styles.clearIcon} />
@@ -41,12 +43,12 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.background.surface2, // ✅ subtle pill bg
+    backgroundColor: colors.background.surface2,
     borderRadius: 12,
     paddingHorizontal: 10,
-    paddingVertical: 8,   // 👈 allows breathing room
+    paddingVertical: 8,
     marginBottom: 16,
-    minHeight: 40,        // 👈 grows with larger fonts
+    minHeight: 40,
   },
   icon: {
     width: 16,
@@ -56,12 +58,9 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    fontFamily: typography.bodyRegular.fontFamily,
-    fontSize: 16,               // 👈 base brand size
-    lineHeight: 20,
     color: colors.foreground.default,
-    paddingVertical: 0,         // centers text vertically
-    includeFontPadding: false,  // Android cleanup
+    paddingVertical: 0,
+    includeFontPadding: false,
     textAlignVertical: 'center',
   },
   clearIcon: {

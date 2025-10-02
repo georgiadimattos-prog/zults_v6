@@ -8,7 +8,7 @@ import ZultsButton from '../../../ui/ZultsButton';
 
 export default function LinkScreenShareSheet() {
   const route = useRoute();
-  const link = route.params?.link || 'https://myrezults.com/share/demo';
+  const link = route.params?.link || 'https://demorezultslink';
 
   const handleShare = async () => {
     try {
@@ -27,6 +27,12 @@ export default function LinkScreenShareSheet() {
       <Navbar />
 
       <View style={styles.content}>
+        <Text
+          style={styles.subtitle}
+          maxFontSizeMultiplier={1.2}
+        >
+          You can share your Rezults link directly from here.
+        </Text>
 
         <ZultsButton
           label="Share Link"

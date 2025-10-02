@@ -1,4 +1,5 @@
 import { fonts } from './fonts';
+import colors from './colors';
 
 // 📝 Zults Design System button rules
 // - Pill buttons → ONLY inside chat screen (e.g. "Share Rezults", "Request Rezults")
@@ -6,20 +7,25 @@ import { fonts } from './fonts';
 // - Use size="medium" inside cards (e.g. NotificationCard, Activities)
 // - Use size="large" for primary CTAs (e.g. Share, Get Rezults)
 
-
 export const typography = {
-  // Large Titles
+  // 🔹 Large Titles → Page headers
   largeTitleMedium: {
     fontFamily: fonts.medium,
     fontSize: 34,
     lineHeight: 41,
     letterSpacing: -0.5,
+    includeFontPadding: false,
+    allowFontScaling: false,           // 🚫 fixed size (no scaling)
+    color: colors.foreground.default,  // ✅ always white
   },
   largeTitleRegular: {
     fontFamily: fonts.regular,
     fontSize: 34,
     lineHeight: 41,
     letterSpacing: -0.5,
+    includeFontPadding: false,
+    allowFontScaling: false,
+    color: colors.foreground.default,
   },
 
   // Title 1
@@ -92,20 +98,26 @@ export const typography = {
     letterSpacing: -0.08,
   },
 
-  // Body
+  // 🔹 Body → Page subtitles
   bodyMedium: {
     fontFamily: fonts.medium,
     fontSize: 16,
     lineHeight: 20,
+    letterSpacing: -0.08,
     includeFontPadding: false,
     allowFontScaling: true,
+    maxFontSizeMultiplier: 1.2,        // ✅ capped scaling
+    color: colors.foreground.soft,     // ✅ softer grey
   },
   bodyRegular: {
     fontFamily: fonts.regular,
     fontSize: 16,
     lineHeight: 20,
+    letterSpacing: -0.08,
     includeFontPadding: false,
     allowFontScaling: true,
+    maxFontSizeMultiplier: 1.2,
+    color: colors.foreground.soft,
   },
 
   // Subheadline
@@ -177,18 +189,30 @@ export const typography = {
     includeFontPadding: false,
     allowFontScaling: true,
   },
-   buttonMediumMedium: {
+  buttonMediumMedium: {
     fontFamily: fonts.medium,
-    fontSize: 15,     // in-between 16 (large) and 14 (small)
+    fontSize: 15,
     lineHeight: 20,
     includeFontPadding: false,
     allowFontScaling: true,
   },
-  buttonMediumRegular: {
+   buttonMediumRegular: {
+    fontFamily: fonts.regular,
+    fontSize: 15,
+    lineHeight: 20,
+    includeFontPadding: false,
+    allowFontScaling: true,
+  },
+
+  // 🔹 Inputs
+  inputText: {
   fontFamily: fonts.regular,
-  fontSize: 15,
+  fontSize: 16,
   lineHeight: 20,
-  includeFontPadding: false,  // Android cleanup
-  allowFontScaling: true,     // 👈 opt-in scaling
-}
+  letterSpacing: -0.08,
+  includeFontPadding: false,
+  allowFontScaling: true,
+  maxFontSizeMultiplier: 1.2,
+  color: colors.foreground.default, // white text
+},
 };

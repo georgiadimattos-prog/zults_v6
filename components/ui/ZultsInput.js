@@ -11,6 +11,7 @@ export default function ZultsInput({
   icon,
   secureTextEntry = false,
   style,
+  ...props
 }) {
   return (
     <View style={style}>
@@ -18,15 +19,17 @@ export default function ZultsInput({
       <View style={styles.inputWrapper}>
         {icon && <Image source={icon} style={styles.icon} />}
         <TextInput
-          style={styles.input}
+          style={[styles.input, typography.inputText]}
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
-          placeholderTextColor={colors.foreground.muted} // 👈 softer placeholder
+          placeholderTextColor={colors.foreground.muted}
           keyboardType={keyboardType}
           secureTextEntry={secureTextEntry}
           autoCapitalize="none"
           autoCorrect={false}
+          maxFontSizeMultiplier={1.2}
+          {...props}
         />
       </View>
     </View>
@@ -35,7 +38,7 @@ export default function ZultsInput({
 
 const styles = StyleSheet.create({
   label: {
-    ...typography.subheadlineRegular,       // 👈 slightly larger, softer label
+    ...typography.subheadlineRegular,
     color: colors.foreground.soft,
     marginBottom: 6,
   },
@@ -43,19 +46,23 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     borderRadius: 12,
-    backgroundColor: colors.background.surface2, // 👈 subtle filled bg, no border
+    backgroundColor: 'rgba(255,255,255,0.05)',   // ✅ subtle filled bg
     paddingHorizontal: 14,
     paddingVertical: 12,
+    borderWidth: 1,                              // ✅ stroke line
+    borderColor: 'rgba(255,255,255,0.15)',       // ✅ subtle stroke
   },
   input: {
     flex: 1,
-    ...typography.bodyRegular,
     color: colors.foreground.default,
+    paddingVertical: 0,
+    includeFontPadding: false,
+    textAlignVertical: "center",
   },
   icon: {
     width: 18,
     height: 18,
-    tintColor: colors.foreground.muted, // 👈 lighter tint
+    tintColor: colors.foreground.muted,
     marginRight: 8,
   },
 });

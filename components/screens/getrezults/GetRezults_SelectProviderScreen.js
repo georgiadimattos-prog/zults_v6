@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { colors, typography } from "../../../theme";
+import { colors, typography } from "../../../theme"; 
 import ScreenWrapper from "../../ui/ScreenWrapper";
 import Navbar from "../../ui/Navbar";
 import InfoCard from "../../ui/InfoCard";
@@ -24,20 +24,20 @@ export default function GetRezults_SelectProviderScreen() {
       >
         {/* Page title + subtitle */}
         <View style={styles.headerBlock}>
-  <Text style={styles.pageTitle} allowFontScaling={false}>
-    Get Rezults
-  </Text>
-  <Text style={styles.subtitle}>
-    Choose an option below to get started.
-  </Text>
-</View>
+          <Text style={typography.largeTitleMedium} allowFontScaling={false}>
+            Get Rezults
+          </Text>
+          <Text style={typography.bodyRegular} maxFontSizeMultiplier={1.2}>
+            Choose an option below to get started.
+          </Text>
+        </View>
 
         {/* Info Cards */}
         <InfoCard
           title="Add Rezults"
           description="Link your test provider to turn your STI results into Rezults."
           icon={cardIcon}
-          onPress={() => navigation.navigate("GetRezultsPasteLink")} // ✅ wired to stack
+          onPress={() => navigation.navigate("GetRezultsPasteLink")}
         />
 
         <InfoCard
@@ -61,17 +61,7 @@ export default function GetRezults_SelectProviderScreen() {
 const styles = StyleSheet.create({
   headerBlock: {
     marginTop: 32,
-    marginBottom: 24,
-  },
-  pageTitle: {
-    ...typography.largeTitleMedium,
-    color: colors.foreground.default,
-    marginBottom: 6,
-  },
-  subtitle: {
-     ...typography.subheadlineRegular,
-    color: colors.foreground.soft,
-    marginBottom: 24,
+    marginBottom: 24,   // space below subtitle before content
   },
   content: {
     paddingHorizontal: 16, // ✅ consistent Apple gutter

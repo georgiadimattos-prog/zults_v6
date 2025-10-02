@@ -51,20 +51,23 @@ export default function GetRezults_HowToFindLinkScreen() {
       >
         {/* Page title + subtitle */}
         <View style={styles.headerBlock}>
-          <Text style={styles.pageTitle} allowFontScaling={false}>
+          <Text style={typography.largeTitleMedium} allowFontScaling={false}>
             How to find your link
           </Text>
-          <Text style={styles.subtitle}>
+          <Text style={typography.bodyRegular} maxFontSizeMultiplier={1.2}>
             Follow these steps in your {providerName} account to find and copy your results link.
           </Text>
         </View>
 
         {/* Steps */}
         {steps.map((s, i) => (
-          <Text key={i} style={styles.step}>
-            {i + 1}. {s}
-          </Text>
-        ))}
+  <View key={i} style={styles.stepRow}>
+    <Text style={styles.stepNumber}>{i + 1}.</Text>
+    <Text style={styles.stepText} maxFontSizeMultiplier={1.2}>
+      {s}
+    </Text>
+  </View>
+))}
 
         {/* Video tutorial section */}
         <View style={styles.videoContainer}>
@@ -82,23 +85,6 @@ const styles = StyleSheet.create({
   headerBlock: {
     marginTop: 32,
     marginBottom: 24,
-  },
-  pageTitle: {
-    ...typography.largeTitleMedium,
-    color: colors.foreground.default,
-    marginBottom: 6,
-  },
-  subtitle: {
-    ...typography.bodyRegular, // 👈 same as SelectProvider
-    color: colors.foreground.soft,
-    marginBottom: 24,
-    lineHeight: 22,
-  },
-  step: {
-    ...typography.bodyRegular, // 👈 match subtitle size/weight
-    color: colors.foreground.soft,
-    lineHeight: 22,
-    marginBottom: 12,
   },
   videoContainer: {
     marginTop: 32,
@@ -123,6 +109,22 @@ const styles = StyleSheet.create({
     color: colors.foreground.soft,
   },
   content: {
-    paddingHorizontal: 16, // ✅ consistent gutter
+    paddingHorizontal: 16,
   },
+  stepRow: {
+  flexDirection: 'row',
+  alignItems: 'flex-start',
+  marginBottom: 16,
+},
+stepNumber: {
+  ...typography.bodyMedium,
+  color: colors.foreground.default,
+  marginRight: 8,
+},
+stepText: {
+  flex: 1,
+  ...typography.bodyRegular,
+  color: colors.foreground.soft,
+  lineHeight: 22,
+},
 });

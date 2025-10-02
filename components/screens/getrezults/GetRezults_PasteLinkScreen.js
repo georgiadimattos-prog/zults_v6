@@ -2,7 +2,6 @@ import React, { useState, useMemo, useRef } from "react";
 import {
   View,
   Text,
-  TextInput,
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
@@ -11,9 +10,9 @@ import {
   TouchableOpacity,
   Image,
   Animated,
-  ScrollView as RNScrollView,   // 👈 rename the native one
+  ScrollView as RNScrollView,
 } from "react-native";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"; // 👈 add this
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { BlurView } from "expo-blur";
 import * as Haptics from "expo-haptics";
@@ -22,7 +21,7 @@ import ZultsButton from "../../ui/ZultsButton";
 import ScreenWrapper from "../../ui/ScreenWrapper";
 import ScreenFooter from "../../ui/ScreenFooter";
 import { NavbarBackRightText } from "../../ui/Navbar";
-import ZultsInput from "../../ui/ZultsInput";  // 👈 add this import
+import ZultsInput from "../../ui/ZultsInput";
 
 // Logos
 import shlLogo from "../../../assets/images/SHL.png";
@@ -42,7 +41,6 @@ export default function GetRezults_PasteLinkScreen() {
   const navigation = useNavigation();
   const route = useRoute();
 
-  // ✅ start with null (not "null" string)
   const [selectedProvider, setSelectedProvider] = useState(
     route.params?.providerId ?? null
   );
@@ -71,7 +69,6 @@ export default function GetRezults_PasteLinkScreen() {
     });
   };
 
-  // ✅ toggle press
   const handlePress = (providerId) => {
     Haptics.selectionAsync();
     if (selectedProvider === providerId) {
@@ -83,113 +80,102 @@ export default function GetRezults_PasteLinkScreen() {
 
   return (
     <KeyboardAvoidingView
-    style={{ flex: 1, backgroundColor: colors.background.surface1 }}
-    behavior={Platform.OS === "ios" ? "padding" : undefined}
-  >
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <ScreenWrapper topPadding={0}>
-        
-        {/* Navbar always visible */}
-        <NavbarBackRightText
-          rightText="How to find your link?"
-          onRightPress={() =>
-            navigation.navigate("GetRezultsHowToFindLink", {
-              providerId: selectedProvider,
-            })
-          }
-        />
+      style={{ flex: 1, backgroundColor: colors.background.surface1 }}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <ScreenWrapper topPadding={0}>
+          <NavbarBackRightText
+            rightText="How to find your link?"
+            onRightPress={() =>
+              navigation.navigate("GetRezultsHowToFindLink", {
+                providerId: selectedProvider,
+              })
+            }
+          />
 
-        {/* Scrollable content */}
-<KeyboardAwareScrollView
-  contentContainerStyle={[
-    styles.content,
-    { flexGrow: 1, paddingBottom: 90 },
-  ]}
-  keyboardShouldPersistTaps="handled"
-  enableOnAndroid={true}
-  extraScrollHeight={-170} // 👈 negative offset to keep input aligned above footer
-  showsVerticalScrollIndicator={false}
->
-  {/* Page title + subtitle */}
-  <View style={styles.headerBlock}>
-    <Text style={styles.pageTitle} allowFontScaling={false}>
-      Add Rezults
-    </Text>
-    <Text style={styles.subtitle}>{subtitle}</Text>
-  </View>
-
-  {/* Provider carousel */}
-  <RNScrollView
-    horizontal
-    showsHorizontalScrollIndicator={false}
-    contentContainerStyle={styles.carousel}
-  >
-    {providers.map((provider) => {
-      const isSelected = selectedProvider === provider.id;
-      const scaleAnim = useRef(new Animated.Value(1)).current;
-
-      return (
-        <TouchableOpacity
-          key={provider.id}
-          activeOpacity={0.9}
-          onPress={() => handlePress(provider.id)}
-        >
-          <Animated.View
-            style={[
-              styles.card,
-              { transform: [{ scale: scaleAnim }] },
-              isSelected && styles.cardSelected,
-            ]}
+          <KeyboardAwareScrollView
+            contentContainerStyle={[styles.content, { flexGrow: 1, paddingBottom: 90 }]}
+            keyboardShouldPersistTaps="handled"
+            enableOnAndroid={true}
+            extraScrollHeight={-170}
+            showsVerticalScrollIndicator={false}
           >
-            <BlurView
-              intensity={60}
-              tint="dark"
-              style={StyleSheet.absoluteFill}
-            />
-
-            {/* Radio indicator */}
-            <View style={styles.radioCircle}>
-              {isSelected && <View style={styles.radioDot} />}
+            {/* Page title + subtitle */}
+            <View style={styles.headerBlock}>
+              <Text style={typography.largeTitleMedium} allowFontScaling={false}>
+                Add Rezults
+              </Text>
+              <Text style={typography.bodyRegular} maxFontSizeMultiplier={1.2}>
+                {subtitle}
+              </Text>
             </View>
 
-            <Image
-              source={provider.logo}
-              style={styles.logo}
-              resizeMode="contain"
-            />
-          </Animated.View>
-        </TouchableOpacity>
-      );
-    })}
-  </RNScrollView>
+            {/* Provider carousel */}
+            <RNScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.carousel}
+            >
+              {providers.map((provider) => {
+                const isSelected = selectedProvider === provider.id;
+                const scaleAnim = useRef(new Animated.Value(1)).current;
 
-  {/* Input only if provider selected */}
-  {selectedProvider && (
-    <ZultsInput
-      label="Paste your link"
-      value={link}
-      onChangeText={setLink}
-      placeholder="https://..."
-      keyboardType="url"
-      style={{ marginBottom: 24 }}
-    />
-  )}
-</KeyboardAwareScrollView>
+                return (
+                  <TouchableOpacity
+                    key={provider.id}
+                    activeOpacity={0.9}
+                    onPress={() => handlePress(provider.id)}
+                  >
+                    <Animated.View
+                      style={[
+                        styles.card,
+                        { transform: [{ scale: scaleAnim }] },
+                        isSelected && styles.cardSelected,
+                      ]}
+                    >
+                      <BlurView intensity={60} tint="dark" style={StyleSheet.absoluteFill} />
+                      <View style={styles.radioCircle}>
+                        {isSelected && <View style={styles.radioDot} />}
+                      </View>
+                      <Image
+                        source={provider.logo}
+                        style={styles.logo}
+                        resizeMode="contain"
+                      />
+                    </Animated.View>
+                  </TouchableOpacity>
+                );
+              })}
+            </RNScrollView>
 
-{/* Footer with Continue button */}
-<ScreenFooter>
-  <ZultsButton
-    label="Add Rezults"
-    type="primary"
-    size="large"
-    fullWidth
-    onPress={handleContinue}
-    disabled={!selectedProvider || link.trim().length < 5}
+            {/* Input only if provider selected */}
+{selectedProvider && (
+  <ZultsInput
+    value={link}
+    onChangeText={setLink}
+    placeholder="Paste link here..."
+    keyboardType="url"
+    style={{ marginBottom: 24 }}
+    placeholderTextColor={colors.foreground.muted}
+    maxFontSizeMultiplier={1.2}
   />
-</ScreenFooter>
-      </ScreenWrapper>
-    </TouchableWithoutFeedback>
-  </KeyboardAvoidingView>
+)}
+          </KeyboardAwareScrollView>
+
+          <ScreenFooter>
+            <ZultsButton
+              label="Add Rezults"
+              type="primary"
+              size="large"
+              fullWidth
+              onPress={handleContinue}
+              disabled={!selectedProvider || link.trim().length < 5}
+            />
+          </ScreenFooter>
+        </ScreenWrapper>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -199,16 +185,6 @@ const CARD_HEIGHT = 120;
 const styles = StyleSheet.create({
   headerBlock: {
     marginTop: 32,
-    marginBottom: 24,
-  },
-  pageTitle: {
-    ...typography.largeTitleMedium,
-    color: colors.foreground.default,
-    marginBottom: 6,
-  },
-  subtitle: {
-    ...typography.bodyRegular,
-    color: colors.foreground.soft,
     marginBottom: 24,
   },
   carousel: {
@@ -255,21 +231,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: colors.neutral[0],
   },
-  input: {
-  ...typography.bodyRegular,
-  borderWidth: 0,
-  borderRadius: 20,
-  paddingHorizontal: 16,
-  paddingVertical: 14,
-  color: colors.foreground.default,
-  backgroundColor: "rgba(255,255,255,0.08)",
-  marginBottom: 24,
-  shadowColor: "#000",
-  shadowOpacity: 0.1,
-  shadowRadius: 6,
-  shadowOffset: { width: 0, height: 3 },
-},
   content: {
-    paddingHorizontal: 16, // ✅ consistent Apple gutter
+    paddingHorizontal: 16,
   },
 });

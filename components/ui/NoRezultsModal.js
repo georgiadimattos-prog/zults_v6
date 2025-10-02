@@ -45,7 +45,7 @@ export default function NoRezultsModal({ visible, onClose }) {
                 fullWidth
                 onPress={() => {
                   onClose?.();
-                  navigation.navigate("GetRezultsProvider"); // ✅ provider picker
+                  navigation.navigate("GetRezultsSelectProvider"); // ✅ provider picker
                 }}
               />
 

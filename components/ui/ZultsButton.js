@@ -1,4 +1,3 @@
-// components/ui/ZultsButton.js
 import React from "react";
 import { TouchableOpacity, Text, StyleSheet, View, Image } from "react-native";
 import { colors, typography } from "../../theme";
@@ -6,15 +5,15 @@ import * as Haptics from "expo-haptics";
 
 export default function ZultsButton({
   label,
-  type = "primary",   // "primary" | "secondary" | "ghost" | "brand"
-  size = "large",      // "large" | "medium" | "small"
+  type = "primary",
+  size = "large",
   fullWidth = true,
   disabled = false,
-  pill = false,        // 👈 NEW: force pill style
+  pill = false,
   onPress,
   style,
-  icon,                // 👈 NEW: optional icon source (require(...))
-  iconPosition = "left", // 👈 "left" | "right"
+  icon,
+  iconPosition = "left",
 }) {
   const containerStyles = [
     styles.base,
@@ -39,33 +38,36 @@ export default function ZultsButton({
   };
 
   return (
-  <TouchableOpacity
-    style={containerStyles}
-    onPress={handlePress}
-    disabled={disabled}
-    activeOpacity={0.75}
-  >
-    <View style={styles.content}>
-      {icon && iconPosition === "left" && (
-        <Image
-          source={icon}
-          style={[styles.icon, { tintColor: textStyles?.color || "#C2C2C2" }]}
-          resizeMode="contain"
-        />
-      )}
-      <Text style={textStyles} allowFontScaling>
-        {label}
-      </Text>
-      {icon && iconPosition === "right" && (
-        <Image
-          source={icon}
-          style={[styles.icon, { tintColor: textStyles?.color || "#C2C2C2" }]}
-          resizeMode="contain"
-        />
-      )}
-    </View>
-  </TouchableOpacity>
-);
+    <TouchableOpacity
+      style={containerStyles}
+      onPress={handlePress}
+      disabled={disabled}
+      activeOpacity={0.75}
+    >
+      <View style={styles.content}>
+        {icon && iconPosition === "left" && (
+          <Image
+            source={icon}
+            style={[styles.icon, { tintColor: textStyles?.color || "#C2C2C2" }]}
+            resizeMode="contain"
+          />
+        )}
+        <Text
+          style={textStyles}
+          maxFontSizeMultiplier={1.2}   // ✅ cap scaling
+        >
+          {label}
+        </Text>
+        {icon && iconPosition === "right" && (
+          <Image
+            source={icon}
+            style={[styles.icon, { tintColor: textStyles?.color || "#C2C2C2" }]}
+            resizeMode="contain"
+          />
+        )}
+      </View>
+    </TouchableOpacity>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -136,13 +138,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   text_large: {
-    ...typography.buttonLargeRegular,
+    ...typography.buttonLargeMedium,   // ✅ now medium weight
   },
   text_medium: {
-    ...typography.buttonMediumRegular,
+    ...typography.buttonMediumMedium, // ✅ now medium weight
   },
   text_small: {
-    ...typography.buttonSmallRegular,
+    ...typography.buttonSmallMedium,  // ✅ now medium weight
   },
 
   // Text colors per variant

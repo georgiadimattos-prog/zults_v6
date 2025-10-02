@@ -17,7 +17,6 @@ export default function AddRezultsCardScreen() {
   const { providerId, resultsLink } = route.params || {};
 
   const handleAddRezults = () => {
-    // ✅ Save into cache
     rezultsCache.hasRezults = true;
     rezultsCache.card = {
       userName: "John Doe",
@@ -25,7 +24,6 @@ export default function AddRezultsCardScreen() {
       testDate: "12 Dec 2025",
     };
 
-    // ✅ Reset stack back to MainScreen
     navigation.reset({
       index: 0,
       routes: [{ name: "MainScreen" }],
@@ -33,11 +31,9 @@ export default function AddRezultsCardScreen() {
   };
 
   const handleCancel = () => {
-    // ✅ Reset cache
     rezultsCache.hasRezults = false;
     rezultsCache.card = null;
 
-    // ✅ Reset stack back to MainScreen
     navigation.reset({
       index: 0,
       routes: [{ name: "MainScreen" }],
@@ -46,18 +42,17 @@ export default function AddRezultsCardScreen() {
 
   return (
     <ScreenWrapper topPadding={0}>
-      {/* Navbar with back arrow (just pops stack) */}
       <Navbar
-  onBackPress={() =>
-    navigation.reset({
-      index: 1,
-      routes: [
-        { name: "MainScreen" },
-        { name: "GetRezultsSelectProvider" },
-      ],
-    })
-  }
-/>
+        onBackPress={() =>
+          navigation.reset({
+            index: 1,
+            routes: [
+              { name: "MainScreen" },
+              { name: "GetRezultsSelectProvider" },
+            ],
+          })
+        }
+      />
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
@@ -65,10 +60,13 @@ export default function AddRezultsCardScreen() {
       >
         {/* Page title + subtitle */}
         <View style={styles.headerBlock}>
-          <Text style={styles.pageTitle} allowFontScaling={false}>
-  Your Rezults
-</Text>
-          <Text style={styles.subtitle}>
+          <Text style={typography.largeTitleMedium} allowFontScaling={false}>
+            Your Rezults
+          </Text>
+          <Text
+            style={typography.bodyRegular}
+            maxFontSizeMultiplier={1.2}
+          >
             By clicking Add Rezults, you confirm this information is your own and accurate.{" "}
             <Text
               style={styles.link}
@@ -79,14 +77,15 @@ export default function AddRezultsCardScreen() {
           </Text>
         </View>
 
-        <RezultsCard
-          userName="John Doe"
-          providerName="Sexual Health London"
-          testDate="12 Dec 2025"
-        />
+        <View style={{ width: "100%", alignItems: "center", marginTop: 24 }}>
+  <RezultsCard
+    userName="John Doe"
+    providerName="Sexual Health London"
+    testDate="12 Dec 2025"
+  />
+</View>
       </ScrollView>
 
-      {/* Footer actions */}
       <ScreenFooter>
         <ZultsButton
           label="Add Rezults"
@@ -115,16 +114,6 @@ const styles = StyleSheet.create({
   },
   headerBlock: {
     marginTop: 32,
-    marginBottom: 24,
-  },
-  pageTitle: {
-    ...typography.largeTitleMedium,
-    color: colors.foreground.default,
-    marginBottom: 6,
-  },
-  subtitle: {
-    ...typography.bodyRegular,
-    color: colors.foreground.soft,
     marginBottom: 24,
   },
   link: {

@@ -25,12 +25,12 @@ const CARD_WIDTH = screenWidth - 32;
 const CARD_HEIGHT = CARD_WIDTH / 1.586;
 
 export default function RezultsCard({
-  realName = null, // 👈 only passed for Melany
+  realName = null,
   providerName = "Sexual Health London (SHL)",
   testDate = "25 Sep 2025",
   videoSource = require("../../assets/videos/Card_All_GlowingBorder_25sec.mp4"),
-  showExpand = false, // ✅ controls expand button
-  onExpand, // ✅ parent callback (from RezultsScreen)
+  showExpand = false,
+  onExpand,
 }) {
   const [showBack, setShowBack] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -56,13 +56,10 @@ export default function RezultsCard({
     iconRotate.value = withTiming(next ? 180 : 0, { duration: 300 });
   };
 
-  // 👇 Auto-flip once on mount
   useEffect(() => {
     const timer = setTimeout(() => {
-      // Flip forward
       rotate.value = withTiming(180, { duration: 600 });
       setTimeout(() => {
-        // Flip back
         rotate.value = withTiming(0, { duration: 600 });
       }, 1200);
     }, 800);
@@ -103,19 +100,28 @@ export default function RezultsCard({
           <View style={styles.overlay}>
             <View>
               {realName === "Melany J Rabideau" ? (
-                <Text style={styles.name}>{realName}</Text>
+                <Text style={styles.name} maxFontSizeMultiplier={1.2}>
+                  {realName}
+                </Text>
               ) : null}
-              <Text style={styles.provider}>{providerName}</Text>
+              <Text style={styles.provider} maxFontSizeMultiplier={1.2}>
+                {providerName}
+              </Text>
             </View>
-            <Text style={styles.link}>Show Rezults</Text>
+            <Text style={styles.link} maxFontSizeMultiplier={1.2}>
+              Show Rezults
+            </Text>
           </View>
         </Animated.View>
 
         {/* Back */}
         <Animated.View style={[styles.cardBack, backAnimatedStyle]}>
           <View style={styles.backHeader}>
-            <Text style={styles.testedOn}>
-              Tested on <Text style={styles.testedDate}>{testDate}</Text>
+            <Text style={styles.testedOn} maxFontSizeMultiplier={1.2}>
+              Tested on{" "}
+              <Text style={styles.testedDate} maxFontSizeMultiplier={1.2}>
+                {testDate}
+              </Text>
             </Text>
 
             {showExpand && (
@@ -146,7 +152,13 @@ export default function RezultsCard({
               "Mycoplasma",
             ].map((label, idx) => (
               <View key={idx} style={styles.pill}>
-                <Text style={styles.pillText}>{label}</Text>
+                <Text
+  style={styles.pillText}
+  maxFontSizeMultiplier={1.1}   // ✅ allow scaling up
+  numberOfLines={2}             // ✅ wrap if needed
+>
+  {label}
+</Text>
               </View>
             ))}
           </View>
@@ -242,17 +254,21 @@ const styles = StyleSheet.create({
   pillsBottom: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 6,
+    gap: 3,
   },
   pill: {
-    backgroundColor: "#5D5D5D",
-    borderRadius: 36,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-  },
-  pillText: {
-    ...typography.captionSmallRegular,
-    color: colors.foreground.default,
-    fontSize: 12,
-  },
+  backgroundColor: "#5D5D5D",
+  borderRadius: 20,
+  paddingHorizontal: 8,   // ✅ tighter padding
+  paddingVertical: 2,     // ✅ very small vertical padding
+  justifyContent: "center",
+  alignItems: "center",
+},
+pillText: {
+  ...typography.captionSmallRegular,
+  color: colors.foreground.default,
+  fontSize: 14,
+  lineHeight: 16,          // ✅ keeps text compact
+  textAlign: "center",
+},
 });

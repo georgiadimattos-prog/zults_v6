@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,17 +8,16 @@ import {
   ScrollView,
   Animated,
   Easing,
-} from 'react-native';
-import { colors, typography } from '../../../../theme';
-import infoIcon from '../../../../assets/images/info-icon.png';
-import ScreenFooter from '../../../ui/ScreenFooter';
-import ZultsButton from '../../../ui/ZultsButton';
+} from "react-native";
+import { colors, typography } from "../../../../theme";
+import infoIcon from "../../../../assets/images/info-icon.png";
+import ZultsButton from "../../../ui/ZultsButton";
 
 export default function SMSTab({ navigation }) {
-  const [phone, setPhone] = useState('');
+  const [phone, setPhone] = useState("");
   const isValid = phone.trim().length >= 8;
 
-  // ✅ Pulse animation for the green quota number
+  // ✅ Pulse animation for quota number
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
@@ -41,104 +40,98 @@ export default function SMSTab({ navigation }) {
   }, [pulseAnim]);
 
   return (
-    <>
-      {/* Scrollable main content */}
-      <ScrollView
-        contentContainerStyle={{
-          flexGrow: 1,
-          paddingHorizontal: 16,
-          paddingBottom: 120,
-        }}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Phone input */}
-<View style={styles.inputGroup}>
-  <View style={styles.inputWrapper}>
-    <TextInput
-      style={styles.input}
-      value={phone}
-      onChangeText={setPhone}
-      placeholder="Add phone number"   // ✅ back to clean Apple style
-      placeholderTextColor={colors.neutralText.subtext}
-      keyboardType="phone-pad"
-      onFocus={() => {
-        if (!phone) {
-          setPhone("+447123456789"); // 👈 demo number prefilled
-        }
+    <ScrollView
+      contentContainerStyle={{
+        flexGrow: 1,
+        paddingBottom: 120,
       }}
-    />
-  </View>
-</View>
+      keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
+    >
+      {/* Card container */}
+      <View style={styles.card}>
+        {/* Phone input */}
+        <View style={styles.inputWrapper}>
+          <TextInput
+            style={[styles.input, typography.inputText]}
+            value={phone}
+            onChangeText={setPhone}
+            placeholder="Add phone number"
+            placeholderTextColor={colors.foreground.muted}
+            keyboardType="phone-pad"
+            maxFontSizeMultiplier={1.2}
+            onFocus={() => {
+              if (!phone) {
+                setPhone("+447123456789"); // 👈 demo number prefilled
+              }
+            }}
+          />
+        </View>
 
-        {/* Info banner */}
-        <View style={styles.infoBox}>
+        {/* Info row */}
+        <View style={styles.infoRow}>
           <Image source={infoIcon} style={styles.infoIcon} />
           <Text style={styles.infoText}>
-            You have{' '}
-            <Animated.Text
-              style={[
-                styles.infoHighlight,
-                { transform: [{ scale: pulseAnim }] },
-              ]}
-            >
-              1 of 1
-            </Animated.Text>{' '}
-            SMS available this week
-          </Text>
+  <Animated.Text
+    style={[styles.infoHighlight, { transform: [{ scale: pulseAnim }] }]}
+    maxFontSizeMultiplier={1.2}
+  >
+    1 of 1
+  </Animated.Text>{" "}
+  SMS available this week
+</Text>
         </View>
-      </ScrollView>
 
-      {/* Footer pinned at bottom */}
-      <ScreenFooter>
+        {/* Continue button */}
         <ZultsButton
           label="Continue"
           type="primary"
           size="large"
           fullWidth
           disabled={!isValid}
-          onPress={() => navigation.navigate('ReviewSMSRequest', { phone })}
+          onPress={() => navigation.navigate("ReviewSMSRequest", { phone })}
+          style={{ marginTop: 16 }}
         />
-      </ScreenFooter>
-    </>
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  inputGroup: {
-    marginBottom: 16,   // ⬅️ reduce gap under phone input
-  },
-  label: {
-    ...typography.captionSmallRegular,
-    color: colors.neutralText.label,
-    marginBottom: 8,
+  card: {
+    backgroundColor: colors.background.surface3,
+    borderRadius: 20,
+    padding: 16,
+    marginTop: 16,
   },
   inputWrapper: {
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.15)',
+    borderColor: "rgba(255,255,255,0.15)",
     borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
+    backgroundColor: "rgba(255,255,255,0.05)",
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    marginBottom: 16,
   },
   input: {
-    ...typography.bodyRegular,
+    flex: 1,
     color: colors.foreground.default,
+    paddingVertical: 0,
+    includeFontPadding: false,
+    textAlignVertical: "center",
   },
-  infoBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#0D3E2D',
-    padding: 12,
+  infoRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#0D3E2D",
     borderRadius: 12,
-    marginTop: 0,      // ⬅️ new, brings it closer to input
-    marginBottom: 40,  // ⬅️ reduced from 32, keeps consistent breathing room
+    padding: 12,
   },
   infoIcon: {
     width: 16,
     height: 16,
     marginRight: 8,
-    tintColor: '#1DCA7A',
+    tintColor: "#1DCA7A",
   },
   infoText: {
     flexShrink: 1,
@@ -146,7 +139,7 @@ const styles = StyleSheet.create({
     color: colors.neutral[0],
   },
   infoHighlight: {
-    color: '#1DCA7A',
-    fontWeight: '600',
+    color: "#1DCA7A",
+    fontWeight: "600",
   },
 });
