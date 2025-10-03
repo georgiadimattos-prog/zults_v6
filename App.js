@@ -1,3 +1,4 @@
+// App.js
 import React from "react";
 import "react-native-gesture-handler";
 import { NavigationContainer } from "@react-navigation/native";
@@ -6,15 +7,13 @@ import { useFonts } from "expo-font";
 import { Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
-// Main Screens
+// Screens
 import MainScreen from "./components/screens/mainscreen/MainScreen";
 import SettingsScreen from "./components/screens/settings/SettingsScreen";
 import AddToWalletScreen from "./components/screens/wallet/AddToWalletScreen";
-
-// Activities
 import ActivitiesScreen from "./components/screens/activities/ActivitiesScreen";
 
-// Get Rezults Screens
+// Get Rezults flow
 import GetRezults_SelectProviderScreen from "./components/screens/getrezults/GetRezults_SelectProviderScreen";
 import GetRezults_PasteLinkScreen from "./components/screens/getrezults/GetRezults_PasteLinkScreen";
 import GetRezults_LoadingScreen from "./components/screens/getrezults/GetRezults_LoadingScreen";
@@ -22,7 +21,7 @@ import GetRezults_HowToFindLinkScreen from "./components/screens/getrezults/GetR
 import AddRezultsCardScreen from "./components/screens/getrezults/AddRezultsCardScreen";
 import PolicyScreen from "./components/screens/getrezults/PolicyScreen";
 
-// Share Screens
+// Share flow
 import ShareScreen from "./components/screens/share/ShareScreen";
 import ReviewSMSRequest from "./components/screens/share/sms/ReviewSMSRequest";
 import SMSRequestSent from "./components/screens/share/sms/SMSRequestSent";
@@ -32,8 +31,9 @@ import LinkScreenSuccess from "./components/screens/share/link/LinkScreen_Succes
 // Chat + Rezults
 import UserChatScreen from "./components/screens/usersearch/UserChatScreen";
 import RezultsScreen from "./components/screens/RezultsScreen";
+import RezultsTooltipDemo from "./components/screens/rezults/RezultsTooltipDemo"; // ✅ Demo tutorial
 
-// Intro Video
+// Intro
 import IntroVideoScreen from "./components/screens/intro/IntroVideoScreen";
 
 const Stack = createNativeStackNavigator();
@@ -88,43 +88,40 @@ export default function App() {
           />
           <Stack.Screen name="Settings" component={SettingsScreen} />
           <Stack.Screen
-  name="AddToWallet"
-  component={AddToWalletScreen}
-  options={{
-    presentation: "transparentModal",
-    animation: "fade",
-    headerShown: false,
-  }}
-/>
+            name="AddToWallet"
+            component={AddToWalletScreen}
+            options={{
+              presentation: "transparentModal",
+              animation: "fade",
+              headerShown: false,
+            }}
+          />
 
           {/* Activities */}
           <Stack.Screen name="Activities" component={ActivitiesScreen} />
 
           {/* Get Rezults Flow */}
-<Stack.Screen
-  name="GetRezultsSelectProvider"   // 👈 entry point with 3 InfoCards
-  component={GetRezults_SelectProviderScreen}
-/>
-<Stack.Screen
-  name="GetRezultsPasteLink"        // 👈 merged carousel + paste link page
-  component={GetRezults_PasteLinkScreen}
-/>
-<Stack.Screen
-  name="GetRezultsLoading"
-  component={GetRezults_LoadingScreen}
-/>
-<Stack.Screen
-  name="GetRezultsHowToFindLink"
-  component={GetRezults_HowToFindLinkScreen}
-/>
-<Stack.Screen
-  name="AddRezultsCard"
-  component={AddRezultsCardScreen}
-/>
-<Stack.Screen
-  name="PolicyScreen"
-  component={PolicyScreen}
-/>
+          <Stack.Screen
+            name="GetRezultsSelectProvider"
+            component={GetRezults_SelectProviderScreen}
+          />
+          <Stack.Screen
+            name="GetRezultsPasteLink"
+            component={GetRezults_PasteLinkScreen}
+          />
+          <Stack.Screen
+            name="GetRezultsLoading"
+            component={GetRezults_LoadingScreen}
+          />
+          <Stack.Screen
+            name="GetRezultsHowToFindLink"
+            component={GetRezults_HowToFindLinkScreen}
+          />
+          <Stack.Screen
+            name="AddRezultsCard"
+            component={AddRezultsCardScreen}
+          />
+          <Stack.Screen name="PolicyScreen" component={PolicyScreen} />
 
           {/* Share */}
           <Stack.Screen name="Share" component={ShareScreen} />
@@ -136,6 +133,15 @@ export default function App() {
           {/* Chat + Rezults */}
           <Stack.Screen name="UserChat" component={UserChatScreen} />
           <Stack.Screen name="Rezults" component={RezultsScreen} />
+
+          {/* Demo tutorial for Rezy */}
+          <Stack.Screen
+            name="RezultsTooltipDemo"
+            component={RezultsTooltipDemo}
+            options={{
+              headerShown: false, // set true if you want default back nav
+            }}
+          />
         </Stack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>

@@ -26,6 +26,8 @@ const CARD_HEIGHT = CARD_WIDTH / 1.586;
 
 export default function RezultsCard({
   realName = null,
+  isVerified = false,      // ✅ new prop
+  showRealName = false,    // ✅ new prop
   providerName = "Sexual Health London (SHL)",
   testDate = "25 Sep 2025",
   videoSource = require("../../assets/videos/Card_All_GlowingBorder_25sec.mp4"),
@@ -99,11 +101,12 @@ export default function RezultsCard({
 
           <View style={styles.overlay}>
             <View>
-              {realName === "Melany J Rabideau" ? (
-                <Text style={styles.name} maxFontSizeMultiplier={1.2}>
-                  {realName}
-                </Text>
-              ) : null}
+              {/* ✅ Only verified users may show their real name */}
+              {isVerified && showRealName && realName && (
+  <Text style={styles.name} maxFontSizeMultiplier={1.2}>
+    {realName}
+  </Text>
+)}
               <Text style={styles.provider} maxFontSizeMultiplier={1.2}>
                 {providerName}
               </Text>
@@ -153,12 +156,12 @@ export default function RezultsCard({
             ].map((label, idx) => (
               <View key={idx} style={styles.pill}>
                 <Text
-  style={styles.pillText}
-  maxFontSizeMultiplier={1.1}   // ✅ allow scaling up
-  numberOfLines={2}             // ✅ wrap if needed
->
-  {label}
-</Text>
+                  style={styles.pillText}
+                  maxFontSizeMultiplier={1.1}
+                  numberOfLines={2}
+                >
+                  {label}
+                </Text>
               </View>
             ))}
           </View>
@@ -202,11 +205,12 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "flex-end",
   },
-  name: {
+   name: {
     ...typography.bodyMedium,
     fontSize: 18,
     fontWeight: "500",
     color: colors.neutral[0],
+    marginRight: 6,
   },
   provider: {
     ...typography.bodyRegular,
@@ -257,18 +261,18 @@ const styles = StyleSheet.create({
     gap: 3,
   },
   pill: {
-  backgroundColor: "#5D5D5D",
-  borderRadius: 20,
-  paddingHorizontal: 8,   // ✅ tighter padding
-  paddingVertical: 2,     // ✅ very small vertical padding
-  justifyContent: "center",
-  alignItems: "center",
-},
-pillText: {
-  ...typography.captionSmallRegular,
-  color: colors.foreground.default,
-  fontSize: 14,
-  lineHeight: 16,          // ✅ keeps text compact
-  textAlign: "center",
-},
+    backgroundColor: "#5D5D5D",
+    borderRadius: 20,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  pillText: {
+    ...typography.captionSmallRegular,
+    color: colors.foreground.default,
+    fontSize: 14,
+    lineHeight: 16,
+    textAlign: "center",
+  },
 });

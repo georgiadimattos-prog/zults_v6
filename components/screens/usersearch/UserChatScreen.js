@@ -29,6 +29,9 @@ import { useDemoChat } from "../../ui/useDemoChat";
 import ZultsButton from "../../ui/ZultsButton";
 import RezultsActionButton from "../../ui/RezultsActionButton";
 import { DeviceEventEmitter } from "react-native";
+import ChatTopActions from "../../ui/ChatTopActions";
+import RezultsCardTooltip from "../../ui/RezultsCardTooltip";
+import { useFocusEffect } from "@react-navigation/native";
 
 const TomasAvatar = require("../../../assets/images/tomas.png");
 
@@ -124,111 +127,170 @@ export default function UserChatScreen() {
   const [isBlocked, setIsBlocked] = useState(false);
   const [isAtBottom, setIsAtBottom] = useState(true);
 
-  const flatListRef = useRef(null);
-  const typingIdRef = useRef(null);
-  const requestTimers = useRef([]);
-  const shareTimers = useRef([]);
+  const [highlightTopCTA, setHighlightTopCTA] = useState(false);
 
-  const chatStateRef = useRef(chatState);
-  const otherUserStateRef = useRef(otherUserState);
-  useEffect(() => { chatStateRef.current = chatState; }, [chatState]);
-  useEffect(() => { otherUserStateRef.current = otherUserState; }, [otherUserState]);
+  // 👇 pulse animation for the demo "View Rezults" button
+const pulseAnim = useRef(new Animated.Value(1)).current;
+useEffect(() => {
+  if (highlightTopCTA) {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, {
+          toValue: 1.08,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulseAnim, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+      ])
+    );
+    loop.start();
+    return () => loop.stop(); // cleanup
+  } else {
+    pulseAnim.stopAnimation();
+    pulseAnim.setValue(1);
+  }
+}, [highlightTopCTA]);
 
-  const handleScroll = (e) => {
-    const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
-    const distanceFromBottom = contentSize.height - (contentOffset.y + layoutMeasurement.height);
-    setIsAtBottom(distanceFromBottom < 50);
-  };
+const flatListRef = useRef(null);
+const typingIdRef = useRef(null);
+const requestTimers = useRef([]);
+const shareTimers = useRef([]);
 
-  const hasSeededRef = useRef(false);
+// keep refs in sync with latest state
+const chatStateRef = useRef(chatState);
+const otherUserStateRef = useRef(otherUserState);
+useEffect(() => { chatStateRef.current = chatState; }, [chatState]);
+useEffect(() => { otherUserStateRef.current = otherUserState; }, [otherUserState]);
 
-  // Mark active chat (non-enumerable so it won't appear in loops)
-  useEffect(() => {
-    const key = user.id || `user-${user.name}`;
+const handleScroll = (e) => {
+  const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
+  const distanceFromBottom = contentSize.height - (contentOffset.y + layoutMeasurement.height);
+  setIsAtBottom(distanceFromBottom < 50);
+};
+
+const hasSeededRef = useRef(false);
+
+// Mark active chat (non-enumerable so it won't appear in loops)
+useEffect(() => {
+  const key = user.id || `user-${user.name}`;
+  try {
+    if (Object.prototype.propertyIsEnumerable.call(chatCache, "__activeKey")) {
+      delete chatCache.__activeKey;
+    }
+    Object.defineProperty(chatCache, "__activeKey", {
+      value: key,
+      configurable: true,
+      enumerable: false,
+      writable: true,
+    });
+  } catch {
+    chatCache.__activeKey = key;
+  }
+
+  // cleanup on unmount → reset so View Rezults doesn’t persist
+  return () => {
     try {
-      if (Object.prototype.propertyIsEnumerable.call(chatCache, "__activeKey")) {
-        delete chatCache.__activeKey;
-      }
       Object.defineProperty(chatCache, "__activeKey", {
-        value: key,
+        value: null,
         configurable: true,
         enumerable: false,
         writable: true,
       });
     } catch {
-      // fallback
-      chatCache.__activeKey = key;
+      chatCache.__activeKey = null;
     }
-    return () => {
-      try {
-        Object.defineProperty(chatCache, "__activeKey", {
-          value: null,
-          configurable: true,
-          enumerable: false,
-          writable: true,
-        });
-      } catch {
-        chatCache.__activeKey = null;
-      }
-    };
-  }, [user]); // this was previously enumerable, which caused the “__activeKey chat” to appear:contentReference[oaicite:0]{index=0}
+
+    // ✅ reset other user state so button won’t linger
+    setOtherUserState({ hasShared: false, hasRequested: false });
+    setChatState({ hasShared: false, hasRequested: false });
+    if (chatCache[key]) {
+      chatCache[key].otherUserState = { hasShared: false, hasRequested: false };
+      chatCache[key].chatState = { hasShared: false, hasRequested: false };
+    }
+  };
+}, [user]);
 
   // restore / seed flow + clear unread only when opening chat
-  useEffect(() => {
-    const key = user.id || `user-${user.name}`;
+useEffect(() => {
+  const key = user.id || `user-${user.name}`;
 
-    if (chatCache[key] && Array.isArray(chatCache[key].chatData) && chatCache[key].chatData.length > 0) {
-      const saved = chatCache[key];
-      setChatData(saved.chatData || []);
-      setChatState(saved.chatState || { hasShared: false, hasRequested: false });
-      setOtherUserState(saved.otherUserState || { hasShared: false, hasRequested: false });
-      if (saved.blocked) setIsBlocked(true);
+  if (
+    chatCache[key] &&
+    Array.isArray(chatCache[key].chatData) &&
+    chatCache[key].chatData.length > 0
+  ) {
+    const saved = chatCache[key];
+    setChatData(saved.chatData || []);
+    setChatState(saved.chatState || { hasShared: false, hasRequested: false });
+    setOtherUserState(saved.otherUserState || { hasShared: false, hasRequested: false });
+    if (saved.blocked) setIsBlocked(true);
 
-      chatCache[key].hasUnread = false; // unread cleared on entering the chat (correct place):contentReference[oaicite:1]{index=1}
+    chatCache[key].hasUnread = false;
+    DeviceEventEmitter.emit("chat-updated");
+
+    setTimeout(() => flatListRef.current?.scrollToEnd({ animated: false }), 0);
+    return;
+  }
+
+  if (user.isBot && !hasSeededRef.current) {
+    hasSeededRef.current = true;
+    setChatData([]);
+    seedDemoChat(user, setChatData, flatListRef, setHighlightTopCTA);
+
+    if (chatCache[key]) {
+      chatCache[key].hasUnread = false;
       DeviceEventEmitter.emit("chat-updated");
-
-      setTimeout(() => flatListRef.current?.scrollToEnd({ animated: false }), 0);
-      return;
     }
-
-    if (user.isBot && !hasSeededRef.current) {
-      hasSeededRef.current = true;
-      setChatData([]);
-      seedDemoChat(user, setChatData, flatListRef);
-
-      if (chatCache[key]) {
-        chatCache[key].hasUnread = false; // also clear unread on first open of Rezy chat:contentReference[oaicite:2]{index=2}
-        DeviceEventEmitter.emit("chat-updated");
-      }
-    }
-  }, [user]);
+  }
+}, [user]);
 
   // persist (skip chatData for Rezy so Activities tagline stays static)
-  useEffect(() => {
-    const key = user.id || `user-${user.name}`;
-    const hasAction = chatData.length > 0;
-    if (!hasAction && !isBlocked) return;
+useEffect(() => {
+  const key = user.id || `user-${user.name}`;
+  const hasAction = chatData.length > 0;
+  if (!hasAction && !isBlocked) return;
 
+  if (user.isBot && user.id === "zults-demo") {
+  chatCache[key] = {
+    ...(chatCache[key] || {}),
+    user: { id: user.id, name: user.name, image: user.image, isBot: true },
+    chatState,
+    otherUserState,
+    blocked: isBlocked,
+    hasViewedDemoRezults: chatCache[key]?.hasViewedDemoRezults || false, // ✅ persist flag
+  };
+  return;
+}
+
+  chatCache[key] = {
+    ...(chatCache[key] || {}),
+    user: { id: user.id, name: user.name, image: user.image },
+    chatData,
+    chatState,
+    otherUserState,
+    blocked: isBlocked,
+  };
+}, [chatData, chatState, otherUserState, user, isBlocked]);
+
+// 👇 put this AFTER the above useEffect, not inside it
+useFocusEffect(
+  React.useCallback(() => {
     if (user.isBot && user.id === "zults-demo") {
-      chatCache[key] = {
-        ...(chatCache[key] || {}),
-        user: { id: user.id, name: user.name, image: user.image, isBot: true },
-        chatState,
-        otherUserState,
-        blocked: isBlocked,
-      };
-      return;
-    }
+      setOtherUserState({ hasShared: false, hasRequested: false });
+      setChatState({ hasShared: false, hasRequested: false });
 
-    chatCache[key] = {
-      ...(chatCache[key] || {}),
-      user: { id: user.id, name: user.name, image: user.image },
-      chatData,
-      chatState,
-      otherUserState,
-      blocked: isBlocked,
-    };
-  }, [chatData, chatState, otherUserState, user, isBlocked]);
+      const key = user.id || `user-${user.name}`;
+      if (chatCache[key]) {
+        chatCache[key].otherUserState = { hasShared: false, hasRequested: false };
+        chatCache[key].chatState = { hasShared: false, hasRequested: false };
+      }
+    }
+  }, [user])
+);
 
   const addTyping = () => {
     if (typingIdRef.current) return;
@@ -252,119 +314,129 @@ export default function UserChatScreen() {
     }
   };
 
-  // ----- request/share demo flows (unchanged) -----
-  const startRequestFlow = () => {
-    requestTimers.current.forEach((t) => clearTimeout(t));
-    requestTimers.current = [];
+// ----- request/share demo flows -----
+const startRequestFlow = () => {
+  console.log("🚀 startRequestFlow entered for", user.id);
 
-    requestTimers.current.push(setTimeout(() => addTyping(), 3000));
-    requestTimers.current.push(
-      setTimeout(() => {
-        if (chatStateRef.current.hasShared) {
-          removeTyping();
-          return;
-        }
-        removeTyping();
-        setOtherUserState({ hasRequested: true, hasShared: false });
+  if (user.id === "zults-demo") {
+    console.log("⏭️ Skipping flow for Rezy");
+    return;
+  }
 
-        setChatData((prev) => {
-          const updated = [
-            ...prev,
-            {
-              id: Date.now().toString(),
-              type: "request",
-              direction: "from-other",
-              username: user.name,
-              avatar: user.image || fallbackAvatar,
-              timestamp: "10:07AM",
-            },
-          ];
-          chatCache[user.id] = {
-            ...(chatCache[user.id] || {}),
-            user,
-            chatData: updated,
-            hasUnread: true,
-          };
-          setTimeout(() => DeviceEventEmitter.emit("chat-updated"), 0);
-          return updated;
-        });
-      }, 5000)
-    );
+  console.log("▶️ Starting request flow for", user.id);
 
-    requestTimers.current.push(
-      setTimeout(() => {
-        if (chatStateRef.current.hasShared) {
-          removeTyping();
-          return;
-        }
-        addTyping();
-        requestTimers.current.push(
-          setTimeout(() => {
-            if (chatStateRef.current.hasShared) {
-              removeTyping();
-              return;
-            }
-            removeTyping();
-            setOtherUserState({ hasRequested: false, hasShared: true });
+  // Clear existing timers
+  requestTimers.current.forEach((t) => clearTimeout(t));
+  requestTimers.current = [];
 
-            setChatData((prev) => {
-              const updated = [
-                ...prev,
-                {
-                  id: Date.now().toString(),
-                  type: "share",
-                  direction: "from-other",
-                  username: user.name,
-                  avatar: user.image || fallbackAvatar,
-                  timestamp: "10:12AM",
-                },
-              ];
-              chatCache[user.id] = {
-                ...(chatCache[user.id] || {}),
-                user,
-                chatData: updated,
-                hasUnread: true,
-              };
-              setTimeout(() => DeviceEventEmitter.emit("chat-updated"), 0);
-              return updated;
-            });
+  // After 3s -> typing indicator
+  requestTimers.current.push(
+    setTimeout(() => {
+      console.log("💬 Bot typing started:", user.name);
+      addTyping();
+    }, 3000)
+  );
 
-            requestTimers.current.push(
-              setTimeout(() => {
-                setOtherUserState({ hasShared: false, hasRequested: false });
-                setChatState({
-                  hasShared: chatStateRef.current.hasShared,
-                  hasRequested: false,
-                });
+  // After 5s -> Demo bot sends a REQUEST bubble
+  requestTimers.current.push(
+    setTimeout(() => {
+      removeTyping();
 
-                setChatData((prev) => {
-                  const updated = [
-                    ...prev,
-                    {
-                      id: Date.now().toString(),
-                      type: "stop-share",
-                      direction: "from-other",
-                      username: user.name,
-                      avatar: user.image || fallbackAvatar,
-                      timestamp: "10:27AM",
-                    },
-                  ];
-                  chatCache[user.id] = {
-                    ...(chatCache[user.id] || {}),
-                    user,
-                    chatData: updated,
-                    hasUnread: true,
-                  };
-                  setTimeout(() => DeviceEventEmitter.emit("chat-updated"), 0);
-                  return updated;
-                });
-              }, 15000)
-            );
-          }, 2000)
-        );
-      }, 10000)
-    );
-  };
+      console.log("🟢 Bot request bubble sent by", user.name);
+
+      setOtherUserState({ hasRequested: true, hasShared: false });
+
+      setChatData((prev) => {
+        const updated = [
+          ...prev,
+          {
+            id: Date.now().toString(),
+            type: "request",
+            direction: "from-other", // 👈 incoming from the bot
+            username: user.name || "Demo User",
+            avatar: user.image || fallbackAvatar,
+            timestamp: "10:07AM",
+          },
+        ];
+        chatCache[user.id] = {
+          ...(chatCache[user.id] || {}),
+          user,
+          chatData: updated,
+          hasUnread: true,
+        };
+        setTimeout(() => DeviceEventEmitter.emit("chat-updated"), 0);
+        return updated;
+      });
+    }, 5000)
+  );
+
+  // After 10s -> Demo bot shares Rezults
+  requestTimers.current.push(
+    setTimeout(() => {
+      removeTyping();
+
+      console.log("📤 Bot share bubble sent by", user.name);
+
+      setOtherUserState({ hasRequested: false, hasShared: true });
+
+      setChatData((prev) => {
+        const updated = [
+          ...prev,
+          {
+            id: Date.now().toString(),
+            type: "share",
+            direction: "from-other", // 👈 incoming from the bot
+            username: user.name || "Demo User",
+            avatar: user.image || fallbackAvatar,
+            timestamp: "10:12AM",
+          },
+        ];
+        chatCache[user.id] = {
+          ...(chatCache[user.id] || {}),
+          user,
+          chatData: updated,
+          hasUnread: true,
+        };
+        setTimeout(() => DeviceEventEmitter.emit("chat-updated"), 0);
+        return updated;
+      });
+
+      // After 15s -> Demo bot stops sharing
+      requestTimers.current.push(
+        setTimeout(() => {
+          console.log("⛔ Bot stop-share bubble sent by", user.name);
+
+          setOtherUserState({ hasShared: false, hasRequested: false });
+          setChatState({ hasShared: false, hasRequested: false });
+
+          setChatData((prev) => {
+            const updated = [
+              ...prev,
+              {
+                id: Date.now().toString(),
+                type: "stop-share",
+                direction: "from-other", // 👈 incoming from the bot
+                username: user.name || "Demo User",
+                avatar: user.image || fallbackAvatar,
+                timestamp: "10:27AM",
+              },
+            ];
+            chatCache[user.id] = {
+              ...(chatCache[user.id] || {}),
+              user,
+              chatData: updated,
+              hasUnread: true,
+            };
+            setTimeout(() => DeviceEventEmitter.emit("chat-updated"), 0);
+            return updated;
+          });
+        }, 15000)
+      );
+    }, 10000)
+  );
+};
+
+
 
   const startShareFlow = () => {
     shareTimers.current.forEach((t) => clearTimeout(t));
@@ -440,299 +512,341 @@ export default function UserChatScreen() {
     return true;
   };
 
-  return (
-    <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: colors.background.surface1 }}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-      keyboardVerticalOffset={0}
-    >
-      <View style={styles.root}>
-        {/* Header */}
-        <BlurView intensity={40} tint="dark" style={styles.topBlur}>
-          <View style={styles.topRow}>
-            <View style={{ flex: 1 }} />
-            {!isDemoChat && (
-              <TouchableOpacity onPress={() => setShowActionsModal(true)}>
-                <Image source={moreIcon} style={styles.moreIcon} />
-              </TouchableOpacity>
-            )}
-          </View>
-
-          <View style={styles.userRow}>
-            <TouchableOpacity
-              onPress={() => {
-                if (route.params?.from === "Activities") {
-                  navigation.goBack();
-                } else {
-                  const hasAction = chatData.some(
-                    (msg) => msg.type === "request" || msg.type === "share" || msg.type === "stop-share"
-                  );
-                  if (hasAction) {
-                    navigation.navigate("MainScreen");
-                  } else {
-                    navigation.goBack();
-                  }
-                }
-              }}
-            >
-              <Image source={arrowLeft} style={styles.backIcon} />
+return (
+  <KeyboardAvoidingView
+    style={{ flex: 1, backgroundColor: colors.background.surface1 }}
+    behavior={Platform.OS === "ios" ? "padding" : undefined}
+    keyboardVerticalOffset={0}
+  >
+    <View style={styles.root}>
+      {/* Header */}
+      <BlurView intensity={40} tint="dark" style={styles.topBlur}>
+        <View style={styles.topRow}>
+          <View style={{ flex: 1 }} />
+          {!isDemoChat && (
+            <TouchableOpacity onPress={() => setShowActionsModal(true)}>
+              <Image source={moreIcon} style={styles.moreIcon} />
             </TouchableOpacity>
+          )}
+        </View>
 
-            <Image source={user.image || fallbackAvatar} style={styles.avatar} />
-            <Text style={styles.username} numberOfLines={1} ellipsizeMode="tail">
-              {user.name}
-            </Text>
-
-            {!isBlocked &&
-              (isDemoChat ? (
-                <ZultsButton
-                  label="View Rezults"
-                  type="brand"
-                  size="medium"
-                  pill
-                  fullWidth={false}
-                  onPress={() => {
-                    navigation.navigate("Rezults", {
-                      username: user.name,
-                      avatar: user.image || fallbackAvatar,
-                      realName: user.realName || user.name,
-                      providerName: "Sexual Health London",
-                      testDate: "25 Sep 2025",
-                      showExpand: true,
-                    });
-                  }}
-                />
-              ) : (
-                <RezultsActionButton
-                  status={otherUserState.hasShared ? "view" : chatState.hasRequested ? "requested" : "request"}
-                  onPress={() => {
-                    if (otherUserState.hasShared) {
-                      navigation.navigate("Rezults", {
-                        username: user.name,
-                        avatar: user.image || fallbackAvatar,
-                        realName: user.realName || user.name,
-                        providerName: user.name === "Binkey" ? "Planned Parenthood" : "Sexual Health London",
-                        testDate: "25 Sep 2025",
-                        showExpand: true,
-                      });
-                    } else if (!chatState.hasRequested) {
-                      setChatState({ ...chatState, hasRequested: true });
-                      setChatData((prev) => [
-                        ...prev,
-                        {
-                          id: Date.now().toString(),
-                          type: "request",
-                          direction: "from-user",
-                          username: currentUser.name,
-                          avatar: currentUser.avatar,
-                          timestamp: "10:02AM",
-                        },
-                      ]);
-                      startRequestFlow();
-                    }
-                  }}
-                />
-              ))}
-          </View>
-        </BlurView>
-
-        {/* Messages */}
-        {isBlocked ? (
-          <View style={styles.blockOverlay}>
-            <Text style={styles.blockedText}>This user is blocked</Text>
-          </View>
-        ) : (
-          <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-            <FlatList
-              ref={flatListRef}
-              data={chatData}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) =>
-                item.type === "typing" ? (
-                  <View style={styles.typingBubble}>
-                    <TypingDots />
-                  </View>
-                ) : (
-                  <MessageRow item={item} onDoubleLike={handleDoubleLike} />
-                )
-              }
-              keyboardShouldPersistTaps="handled"
-              showsVerticalScrollIndicator={false}
-              contentInsetAdjustmentBehavior="automatic"
-              contentContainerStyle={{ paddingHorizontal: 8, paddingTop: 180 }}
-              ListFooterComponent={isDemoChat ? <View style={{ height: footerHeight + 50 }} /> : <View style={{ height: 140 }} />}
-              ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
-              onScroll={handleScroll}
-              scrollEventThrottle={16}
-              onContentSizeChange={() => {
-                if (isAtBottom) {
-                  requestAnimationFrame(() => {
-                    flatListRef.current?.scrollToEnd({ animated: true });
-                  });
+        <View style={styles.userRow}>
+          <TouchableOpacity
+            onPress={() => {
+              if (route.params?.from === "Activities") {
+                navigation.goBack();
+              } else {
+                const hasAction = chatData.some(
+                  (msg) =>
+                    msg.type === "request" ||
+                    msg.type === "share" ||
+                    msg.type === "stop-share"
+                );
+                if (hasAction) {
+                  navigation.navigate("MainScreen");
+                } else {
+                  navigation.goBack();
                 }
+              }
+            }}
+          >
+            <Image source={arrowLeft} style={styles.backIcon} />
+          </TouchableOpacity>
+
+          <Image source={user.image || fallbackAvatar} style={styles.avatar} />
+          <Text style={styles.username} numberOfLines={1} ellipsizeMode="tail">
+            {user.name}
+          </Text>
+
+          {!isBlocked && (
+  (isDemoChat && user.id === "zults-demo") ? (
+    !chatCache[user.id]?.hasViewedDemoRezults ? (
+      <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
+        <RezultsActionButton
+          status="view"
+          onPress={() => {
+            setHighlightTopCTA(false);
+            setOtherUserState({ hasShared: false, hasRequested: false });
+            const key = user.id || `user-${user.name}`;
+            if (chatCache[key]) {
+              chatCache[key].hasViewedDemoRezults = true;
+            }
+            navigation.navigate("RezultsTooltipDemo");
+          }}
+        />
+      </Animated.View>
+    ) : null
+  ) : otherUserState.hasShared ? (
+    <RezultsActionButton
+      status="view"
+      onPress={() => {
+        navigation.navigate("Rezults", {
+          username: user.name,
+          avatar: user.image || fallbackAvatar,
+          realName: user.realName || user.name,
+          providerName:
+            user.name === "Binkey"
+              ? "Planned Parenthood"
+              : "Sexual Health London",
+          testDate: "25 Sep 2025",
+          showExpand: true,
+        });
+      }}
+    />
+  ) : chatState.hasRequested ? (
+    <RezultsActionButton status="requested" />
+  ) : (
+    <RezultsActionButton
+  status="request"
+  onPress={() => {
+    console.log("🟣 Request pressed for", user.id);
+
+    setChatState({ ...chatState, hasRequested: true });
+    setChatData((prev) => [
+      ...prev,
+      {
+        id: Date.now().toString(),
+        type: "request",
+        direction: "from-user",
+        username: currentUser.name,   // Jonster
+        avatar: currentUser.avatar,
+        timestamp: "Now",
+      },
+    ]);
+
+    // ✅ Quick patch: trigger scripted flow for anyone that's not Rezy
+    if (user.id !== "zults-demo") {
+      console.log("▶️ Triggering startRequestFlow for", user.id);
+      startRequestFlow();
+    }
+  }}
+/>
+  )
+)}
+</View>
+</BlurView>
+
+      {/* Messages */}
+      {isBlocked ? (
+        <View style={styles.blockOverlay}>
+          <Text style={styles.blockedText}>This user is blocked</Text>
+        </View>
+      ) : (
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+          <FlatList
+            ref={flatListRef}
+            data={chatData}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) =>
+              item.type === "typing" ? (
+                <View style={styles.typingBubble}>
+                  <TypingDots />
+                </View>
+              ) : (
+                <MessageRow item={item} onDoubleLike={handleDoubleLike} />
+              )
+            }
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+            contentInsetAdjustmentBehavior="automatic"
+            contentContainerStyle={{
+              paddingHorizontal: 8,
+              paddingTop: 180,
+            }}
+            ListFooterComponent={
+              isDemoChat ? (
+                <View style={{ height: footerHeight + 50 }} />
+              ) : (
+                <View style={{ height: 140 }} />
+              )
+            }
+            ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
+            onScroll={handleScroll}
+            scrollEventThrottle={16}
+            onContentSizeChange={() => {
+              if (isAtBottom) {
+                requestAnimationFrame(() => {
+                  flatListRef.current?.scrollToEnd({ animated: true });
+                });
+              }
+            }}
+          />
+        </TouchableWithoutFeedback>
+      )}
+
+
+      {/* Footer */}
+      {!isBlocked && (
+        <BlurView
+          intensity={40}
+          tint="dark"
+          style={styles.footerBlur}
+          onLayout={(e) => setFooterHeight(e.nativeEvent.layout.height)}
+        >
+          {isDemoChat ? (
+            <View style={styles.footer}>
+              <TextInput
+                placeholder="Ask me..."
+                placeholderTextColor={colors.foreground.muted}
+                value={message}
+                onChangeText={setMessage}
+                style={styles.input}
+              />
+              <TouchableOpacity
+                style={styles.sendButton}
+                onPress={() => {
+                  if (!message.trim()) return;
+                  const userMsg = {
+                    id: Date.now().toString(),
+                    type: "text",
+                    direction: "from-user",
+                    username: currentUser.name,
+                    avatar: currentUser.avatar,
+                    text: message,
+                    timestamp: "Now",
+                  };
+                  setChatData((prev) => [...prev, userMsg]);
+                  setMessage("");
+                  if (isDemoChat) {
+                    handleUserMessage(
+                      user,
+                      setChatData,
+                      flatListRef,
+                      message
+                    );
+                  }
+                }}
+              >
+                <Image
+                  source={require("../../../assets/images/send-arrow.png")}
+                  style={styles.sendIcon}
+                />
+              </TouchableOpacity>
+            </View>
+          ) : chatState.hasShared ? (
+            <RezultsActionButton
+              status="stop"
+              onPress={() => {
+                setChatState((prev) => ({ ...prev, hasShared: false }));
+                setChatData((prev) => [
+                  ...prev,
+                  {
+                    id: Date.now().toString(),
+                    type: "stop-share",
+                    direction: "from-user",
+                    username: currentUser.name,
+                    avatar: currentUser.avatar,
+                    timestamp: "Now",
+                  },
+                ]);
+                shareTimers.current.forEach((t) => clearTimeout(t));
+                requestTimers.current.forEach((t) => clearTimeout(t));
+                shareTimers.current = [];
+                requestTimers.current = [];
+                removeTyping();
               }}
             />
-          </TouchableWithoutFeedback>
-        )}
-
-        {/* Footer */}
-        {!isBlocked && (
-          <BlurView
-            intensity={40}
-            tint="dark"
-            style={styles.footerBlur}
-            onLayout={(e) => setFooterHeight(e.nativeEvent.layout.height)}
-          >
-            {isDemoChat ? (
-              <View style={styles.footer}>
-                <TextInput
-                  placeholder="Ask me..."
-                  placeholderTextColor={colors.foreground.muted}
-                  value={message}
-                  onChangeText={setMessage}
-                  style={styles.input}
-                />
-                <TouchableOpacity
-                  style={styles.sendButton}
-                  onPress={() => {
-                    if (!message.trim()) return;
-                    const userMsg = {
-                      id: Date.now().toString(),
-                      type: "text",
-                      direction: "from-user",
-                      username: currentUser.name,
-                      avatar: currentUser.avatar,
-                      text: message,
-                      timestamp: "Now",
-                    };
-                    setChatData((prev) => [...prev, userMsg]);
-                    setMessage("");
-                    if (isDemoChat) {
-                      handleUserMessage(user, setChatData, flatListRef, message);
-                    }
-                  }}
-                >
-                  <Image source={require("../../../assets/images/send-arrow.png")} style={styles.sendIcon} />
-                </TouchableOpacity>
-              </View>
-            ) : chatState.hasShared ? (
-              <RezultsActionButton
-                status="stop"
-                onPress={() => {
-                  setChatState((prev) => ({ ...prev, hasShared: false }));
-                  setChatData((prev) => [
-                    ...prev,
-                    {
-                      id: Date.now().toString(),
-                      type: "stop-share",
-                      direction: "from-user",
-                      username: currentUser.name,
-                      avatar: currentUser.avatar,
-                      timestamp: "Now",
-                    },
-                  ]);
-                  shareTimers.current.forEach((t) => clearTimeout(t));
-                  requestTimers.current.forEach((t) => clearTimeout(t));
-                  shareTimers.current = [];
-                  requestTimers.current = [];
-                  removeTyping();
+          ) : (
+            <View style={styles.footer}>
+              <TextInput
+                ref={inputRef}
+                placeholder="Add note..."
+                placeholderTextColor={colors.foreground.muted}
+                value={message}
+                onChangeText={setMessage}
+                style={styles.input}
+                onFocus={() => {
+                  if (!rezultsCache.hasRezults) {
+                    inputRef.current?.blur();
+                    setShowNoRezultsModal(true);
+                  }
                 }}
               />
-            ) : (
-              <View style={styles.footer}>
-                <TextInput
-                  ref={inputRef}
-                  placeholder="Add note..."
-                  placeholderTextColor={colors.foreground.muted}
-                  value={message}
-                  onChangeText={setMessage}
-                  style={styles.input}
-                  onFocus={() => {
-                    if (!rezultsCache.hasRezults) {
-                      inputRef.current?.blur();
-                      setShowNoRezultsModal(true);
-                    }
-                  }}
-                />
-                <ZultsButton
-                  label="Share Rezults"
-                  type={rezultsCache.hasRezults ? "brand" : "secondary"}
-                  size="medium"
-                  pill
-                  fullWidth={false}
-                  onPress={() => {
-                    if (rezultsCache.hasRezults) {
-                      setChatState({ ...chatState, hasShared: true });
-                      const shareMsg = {
-                        id: Date.now().toString(),
-                        type: "share",
-                        direction: "from-user",
-                        username: currentUser.name,
-                        avatar: currentUser.avatar,
-                        timestamp: "Now",
-                      };
-                      const noteMsg =
-                        message.trim().length > 0
-                          ? {
-                              id: (Date.now() + 1).toString(),
-                              type: "text",
-                              direction: "from-user",
-                              username: currentUser.name,
-                              avatar: currentUser.avatar,
-                              text: message,
-                              timestamp: "Now",
-                            }
-                          : null;
-                      setChatData((prev) => [...prev, shareMsg, ...(noteMsg ? [noteMsg] : [])]);
-                      setMessage("");
-                      startShareFlow();
-                    } else {
-                      setShowNoRezultsModal(true);
-                    }
-                  }}
-                />
-              </View>
-            )}
-          </BlurView>
-        )}
+              <ZultsButton
+                label="Share Rezults"
+                type={rezultsCache.hasRezults ? "brand" : "secondary"}
+                size="medium"
+                pill
+                fullWidth={false}
+                onPress={() => {
+                  if (rezultsCache.hasRezults) {
+                    setChatState({ ...chatState, hasShared: true });
+                    const shareMsg = {
+                      id: Date.now().toString(),
+                      type: "share",
+                      direction: "from-user",
+                      username: currentUser.name,
+                      avatar: currentUser.avatar,
+                      timestamp: "Now",
+                    };
+                    const noteMsg =
+                      message.trim().length > 0
+                        ? {
+                            id: (Date.now() + 1).toString(),
+                            type: "text",
+                            direction: "from-user",
+                            username: currentUser.name,
+                            avatar: currentUser.avatar,
+                            text: message,
+                            timestamp: "Now",
+                          }
+                        : null;
+                    setChatData((prev) => [
+                      ...prev,
+                      shareMsg,
+                      ...(noteMsg ? [noteMsg] : []),
+                    ]);
+                    setMessage("");
+                    startShareFlow();
+                  } else {
+                    setShowNoRezultsModal(true);
+                  }
+                }}
+              />
+            </View>
+          )}
+        </BlurView>
+      )}
 
-        {/* Block / Unblock Modal */}
-        <ActionModal
-          visible={showActionsModal}
-          onClose={() => setShowActionsModal(false)}
-          title={isBlocked ? "Unblock user?" : "Block user?"
-          }
-          description={
-            isBlocked
-              ? "Unblock this user to continue chatting and sharing Rezults."
-              : "This user won’t be able to send their Rezults or request to see yours. They won’t be notified if you block them."
-          }
-          actions={[
-            {
-              label: isBlocked ? "Unblock" : "Block",
-              onPress: () => {
-                const key = user.id || `user-${user.name}`;
-                if (isBlocked) {
-                  setIsBlocked(false);
-                  setChatData([]);
-                  setChatState({ hasShared: false, hasRequested: false });
-                  setOtherUserState({ hasShared: false, hasRequested: false });
-                  if (chatCache[key]) chatCache[key].blocked = false;
-                } else {
-                  setIsBlocked(true);
-                  setChatData([]);
-                  if (chatCache[key]) chatCache[key].blocked = true;
-                }
-              },
+      {/* Block / Unblock Modal */}
+      <ActionModal
+        visible={showActionsModal}
+        onClose={() => setShowActionsModal(false)}
+        title={isBlocked ? "Unblock user?" : "Block user?"}
+        description={
+          isBlocked
+            ? "Unblock this user to continue chatting and sharing Rezults."
+            : "This user won’t be able to send their Rezults or request to see yours. They won’t be notified if you block them."
+        }
+        actions={[
+          {
+            label: isBlocked ? "Unblock" : "Block",
+            onPress: () => {
+              const key = user.id || `user-${user.name}`;
+              if (isBlocked) {
+                setIsBlocked(false);
+                setChatData([]);
+                setChatState({ hasShared: false, hasRequested: false });
+                setOtherUserState({ hasShared: false, hasRequested: false });
+                if (chatCache[key]) chatCache[key].blocked = false;
+              } else {
+                setIsBlocked(true);
+                setChatData([]);
+                if (chatCache[key]) chatCache[key].blocked = true;
+              }
             },
-          ]}
-        />
+          },
+        ]}
+      />
 
-        {/* No Rezults Modal */}
-        <NoRezultsModal visible={showNoRezultsModal} onClose={() => setShowNoRezultsModal(false)} />
-      </View>
-    </KeyboardAvoidingView>
-  );
+      {/* No Rezults Modal */}
+      <NoRezultsModal
+        visible={showNoRezultsModal}
+        onClose={() => setShowNoRezultsModal(false)}
+      />
+    </View>
+  </KeyboardAvoidingView>
+);
 }
 
 const styles = StyleSheet.create({

@@ -81,16 +81,31 @@ export default function RezultActionBubble(props) {
   // --- Action bubbles (request/share/stop) ---
   let label = '';
   let subtext = '';
+
   if (type === 'cancel-request') {
     label = 'Request Cancelled';
   } else if (type === 'request') {
-    label = 'Requested Rezults';
-    subtext = 'Requested access to view your Rezults';
+    if (isFromOther) {
+      label = `Request from ${username || 'User'}`;
+      subtext = `${username || 'They'} want to see your Rezults`;
+    } else {
+      label = 'Requested Rezults';
+      subtext = 'You asked to view their Rezults';
+    }
   } else if (type === 'share') {
-    label = 'Sharing Rezults';
-    subtext = 'Rezults available to view';
+    if (isFromOther) {
+      label = `${username || 'User'} is sharing Rezults`;
+      subtext = 'Rezults available to view';
+    } else {
+      label = 'Sharing Rezults';
+      subtext = 'Your Rezults are now available to view';
+    }
   } else if (type === 'stop-share') {
-    label = 'Sharing Ended';
+    if (isFromOther) {
+      label = `${username || 'User'} stopped sharing`;
+    } else {
+      label = 'You stopped sharing';
+    }
   }
 
   return (
@@ -163,7 +178,7 @@ export default function RezultActionBubble(props) {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    marginBottom: 6,       // reduced because timestamp now has its own margin
+    marginBottom: 6,
     paddingHorizontal: 8,
     alignItems: 'flex-start',
   },
@@ -198,17 +213,13 @@ const styles = StyleSheet.create({
   // System / status bubbles
   systemBubble: {
     alignSelf: 'center',
-    backgroundColor: '#3A3A3C', // neutral grey pill
+    backgroundColor: '#3A3A3C',
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 14,
     minHeight: 32,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    shadowOffset: { width: 0, height: 1 },
   },
   systemText: {
     ...typography.chatMeta,
@@ -218,7 +229,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
-  // Other person’s message bubble
+  // Bubble styles
   bubbleLeft: {
     backgroundColor: colors.background.surface2,
     alignSelf: 'flex-start',
@@ -227,23 +238,15 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 16,
     borderBottomLeftRadius: 16,
   },
-
-  // User’s message bubble
   bubbleRight: {
-    backgroundColor: '#E9E3F6', // soft lavender brand tint
+    backgroundColor: '#E9E3F6',
     alignSelf: 'flex-end',
     borderTopRightRadius: 0,
     borderTopLeftRadius: 16,
     borderBottomLeftRadius: 16,
     borderBottomRightRadius: 16,
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 3,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 2, // Android
   },
 
-  // Default text inside bubbles
   messageTextUser: {
     ...typography.chatMessage,
     color: '#2C2C2C',
@@ -253,7 +256,6 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
 
-  // Labels
   label: {
     ...typography.chatMessageBold,
     marginBottom: 2,
@@ -265,7 +267,6 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
 
-  // Subtext
   subtext: {
     ...typography.chatMessage,
     fontSize: 14,
@@ -277,33 +278,15 @@ const styles = StyleSheet.create({
     color: '#A1A1A1',
   },
 
-  // Timestamps
-  timestampLeft: {
-    ...typography.chatMeta,
-    marginTop: 6,
-    marginBottom: 6,        // ✅ spacing after timestamp
-    fontSize: 11,
-    color: colors.foreground.muted,
-    alignSelf: 'flex-start',
-  },
-  timestampRight: {
-    ...typography.chatMeta,
-    marginTop: 6,
-    marginBottom: 6,        // ✅ spacing after timestamp
-    fontSize: 11,
-    color: colors.foreground.muted,
-    alignSelf: 'flex-end',
-  },
   timestamp: {
     ...typography.chatMeta,
     marginTop: 6,
-    marginBottom: 6,        // ✅ spacing after timestamp
+    marginBottom: 6,
     fontSize: 11,
     color: colors.foreground.muted,
-    textAlign: 'right',     // for action bubbles
+    textAlign: 'right',
   },
 
-  // Typing bubble
   typingBubble: {
     backgroundColor: '#F1F1F1',
     borderRadius: 18,
@@ -312,11 +295,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    shadowColor: '#000',
-    shadowOpacity: 0.06,
-    shadowRadius: 2,
-    shadowOffset: { width: 0, height: 1 },
-    elevation: 1,
   },
   dot: {
     fontSize: 8,

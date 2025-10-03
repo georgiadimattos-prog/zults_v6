@@ -5,28 +5,21 @@ import faq from "../../assets/data/faq.json";
 import synonyms from "../../assets/data/synonyms.json";
 import { DeviceEventEmitter } from "react-native";
 
-// ⏱ helper for scheduling
+// helper for scheduling
 const scheduleMessage = (delay, fn) => setTimeout(fn, delay);
-
-// 🔧 unique id helper
 const createId = (prefix = "demo") =>
   `${prefix}-${Date.now()}-${Math.floor(Math.random() * 100000)}`;
 
-// 🔍 FAQ answer finder
 function normalizeQuestion(question) {
   const lowerQ = question.toLowerCase().trim();
-  if (synonyms[lowerQ]) {
-    return synonyms[lowerQ];
-  }
+  if (synonyms[lowerQ]) return synonyms[lowerQ];
   return lowerQ;
 }
 
 function findAnswer(question) {
   const normalized = normalizeQuestion(question);
   for (const key in faq) {
-    if (normalized.includes(key)) {
-      return faq[key];
-    }
+    if (normalized.includes(key)) return faq[key];
   }
   return "I’m not sure about that 🤔 but I can share trusted info about Rezults and sexual health!";
 }
@@ -56,10 +49,9 @@ export function useDemoChat() {
     }
   };
 
-  const seedDemoChat = (user, setChatData, flatListRef) => {
+  const seedDemoChat = (user, setChatData, flatListRef, setHighlightTopCTA) => {
     const key = user.id || user.name || "default";
 
-    // persist empty bot user in cache
     chatCache[key] = {
       user: { id: user.id, name: "Rezy", image: user.image, isBot: true },
       chatData: [],
@@ -70,27 +62,23 @@ export function useDemoChat() {
     };
 
     const pushMessage = (msg) => {
-  setChatData((prev) => [...prev, msg]);
-  chatCache[key].chatData.push(msg);
+      setChatData((prev) => [...prev, msg]);
+      chatCache[key].chatData.push(msg);
+      chatCache[key].hasUnread = true;
+      setTimeout(() => {
+        DeviceEventEmitter.emit("chat-updated");
+        flatListRef?.current?.scrollToEnd({ animated: true });
+      }, 300);
+    };
 
-  // ✅ Always mark unread if new message comes from Rezy
-  chatCache[key].hasUnread = true;
-
-  // ✅ Let Activities refresh
-  setTimeout(() => {
-    DeviceEventEmitter.emit("chat-updated");
-    flatListRef?.current?.scrollToEnd({ animated: true });
-  }, 300);
-};
-
-    // 🟣 Intro messages (first 2 instantly)
+    // ---- Messages in flat order ----
     pushMessage({
       id: createId(),
       type: "text",
       direction: "from-other",
       username: "Rezy",
       avatar: user.image,
-      text: "Hi there 👋 Welcome to Zults! This is a demo Rezults so you can see how sharing works. Tap 'View Rezults' to see mine.",
+      text: "Hey 👋 I’m Rezy.",
       timestamp: "Now",
     });
 
@@ -100,12 +88,12 @@ export function useDemoChat() {
       direction: "from-other",
       username: "Rezy",
       avatar: user.image,
-      text: "You’ll also see me at the top of your Activities screen 💜 I’ll be your sexual health companion, ask me anything, even the things you might not ask your friends.",
+      text: "Think of me as your sexual health friend 💜.",
       timestamp: "Now",
     });
 
-    // ⏱ Typing → next 2 lines
-    scheduleMessage(4000, () => {
+    // Companion role
+    scheduleMessage(3500, () => {
       addTyping(setChatData, user);
       scheduleMessage(2000, () => {
         removeTyping(setChatData);
@@ -115,52 +103,87 @@ export function useDemoChat() {
           direction: "from-other",
           username: "Rezy",
           avatar: user.image,
-          text: "Hi, I’m Rezy 🤖 here to help with anything sexual health and Rezults.",
+          text: "Someone you can chat about sexual health without shame or awkwardness.",
           timestamp: "Now",
-        });
-
-        // another typing for the tips line
-        scheduleMessage(3000, () => {
-          addTyping(setChatData, user);
-          scheduleMessage(2000, () => {
-            removeTyping(setChatData);
-            pushMessage({
-              id: createId(),
-              type: "text",
-              direction: "from-other",
-              username: "Rezy",
-              avatar: user.image,
-              text: "Oh, and sometimes I’ll nudge you about testing or drop little STI facts 🌱 — just to keep your Rezults (and your knowledge) fresh.",
-              timestamp: "Now",
-            });
-          });
         });
       });
     });
 
-    // ⏱ Later: typing → Rezults share demo
+    // Nudges
+    scheduleMessage(8000, () => {
+      addTyping(setChatData, user);
+      scheduleMessage(2000, () => {
+        removeTyping(setChatData);
+        pushMessage({
+          id: createId(),
+          type: "text",
+          direction: "from-other",
+          username: "Rezy",
+          avatar: user.image,
+          text: "And sometimes, I’ll nudge you… little reminders to re-test or bite-sized STI facts 🌱.",
+          timestamp: "Now",
+        });
+      });
+    });
+
+    // Reassurance
     scheduleMessage(12000, () => {
       addTyping(setChatData, user);
       scheduleMessage(2000, () => {
         removeTyping(setChatData);
         pushMessage({
           id: createId(),
-          type: "share",
+          type: "text",
           direction: "from-other",
           username: "Rezy",
           avatar: user.image,
+          text: "Nothing heavy... just enough to keep you fresh.",
+          timestamp: "Now",
+        });
+      });
+    });
+
+    // CTA intro
+    scheduleMessage(16000, () => {
+      addTyping(setChatData, user);
+      scheduleMessage(2000, () => {
+        removeTyping(setChatData);
+        pushMessage({
+          id: createId(),
+          type: "text",
+          direction: "from-other",
+          username: "Rezy",
+          avatar: user.image,
+          text: "Alright, enough talking. See the View Rezults button up top?",
+          timestamp: "Now",
+        });
+
+        setHighlightTopCTA?.(true);
+      });
+    });
+
+    // Final tap instruction
+    scheduleMessage(20000, () => {
+      addTyping(setChatData, user);
+      scheduleMessage(2000, () => {
+        removeTyping(setChatData);
+        pushMessage({
+          id: createId(),
+          type: "text",
+          direction: "from-other",
+          username: "Rezy",
+          avatar: user.image,
+          text: "Tap it and I’ll show you a demo Rezults card 💳.",
           timestamp: "Now",
         });
       });
     });
   };
 
-  // ✅ Handle user messages with FAQ replies
   const handleUserMessage = (user, setChatData, flatListRef, message) => {
     const key = user.id || user.name || "default";
     const answer = findAnswer(message);
 
-    // simulate typing + delayed reply
     addTyping(setChatData, user);
     setTimeout(() => {
       removeTyping(setChatData);
@@ -175,7 +198,7 @@ export function useDemoChat() {
       };
       setChatData((prev) => [...prev, botReply]);
       chatCache[key].chatData.push(botReply);
-      chatCache[key].hasUnread = true; // ✅ mark unread
+      chatCache[key].hasUnread = true;
       flatListRef?.current?.scrollToEnd({ animated: true });
     }, 1500);
   };
