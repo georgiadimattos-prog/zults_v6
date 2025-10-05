@@ -43,6 +43,7 @@ export default function RezultActionBubble(props) {
     avatar,
     timestamp = '10:02AM',
     text,
+    chatUserId, // ✅ from UserChatScreen
   } = props;
 
   const isFromUser = direction === 'from-user';
@@ -58,9 +59,18 @@ export default function RezultActionBubble(props) {
       <View style={[styles.container, isFromUser && styles.rightAlign, isFromOther && styles.leftAlign]}>
         {isFromOther && <Image source={avatar || fallbackAvatar} style={styles.avatar} />}
         <View style={styles.contentBlock}>
-          <View style={[styles.bubble, isFromUser ? styles.bubbleRight : styles.bubbleLeft]}>
+          <View
+            style={[
+              styles.bubble,
+              isFromUser ? styles.bubbleRight : styles.bubbleLeft,
+              chatUserId === 'zults-demo' && { alignItems: 'center', alignSelf: 'flex-start' }, // ✅ Rezy fix
+            ]}
+          >
             <Text
-              style={isFromUser ? styles.messageTextUser : styles.messageTextOther}
+              style={[
+                isFromUser ? styles.messageTextUser : styles.messageTextOther,
+                chatUserId === 'zults-demo' && { textAlign: 'left' }, // ✅ keep text flow natural
+              ]}
               allowFontScaling
             >
               {text}
@@ -135,17 +145,23 @@ export default function RezultActionBubble(props) {
           style={[
             styles.bubble,
             isFromUser ? styles.bubbleRight : styles.bubbleLeft,
-            isSystemMessage && styles.systemBubble,
+            isSystemMessage &&
+              chatUserId !== 'zults-demo' && [ // ✅ skip Rezy chatroom entirely
+                styles.systemBubble,
+                { flexWrap: 'wrap', alignItems: 'flex-start' },
+              ],
           ]}
         >
           <Text
-            style={
+            style={[
               isSystemMessage
                 ? styles.systemText
                 : isFromOther
                 ? styles.labelOther
-                : styles.label
-            }
+                : styles.label,
+              { flexShrink: 1, flexWrap: 'wrap' },
+            ]}
+            numberOfLines={undefined}
             allowFontScaling
           >
             {label}
@@ -200,17 +216,29 @@ const styles = StyleSheet.create({
     ...typography.chatMeta,
     fontWeight: '500',
     marginBottom: 4,
+    color: colors.foreground.default,
   },
-  usernameLeft: { textAlign: 'left', alignSelf: 'flex-start' },
-  usernameRight: { textAlign: 'right', alignSelf: 'flex-end' },
+  usernameLeft: {
+    textAlign: 'left',
+    alignSelf: 'flex-start',
+    color: colors.foreground.soft,
+  },
+  usernameRight: {
+    textAlign: 'right',
+    alignSelf: 'flex-end',
+    color: colors.foreground.default,
+  },
 
   bubble: {
     paddingHorizontal: 14,
-    paddingVertical: 8,
+    paddingVertical: 7,
     borderRadius: 18,
+    flexShrink: 1,
+    flexWrap: 'wrap',
+    alignItems: 'stretch',
+    alignSelf: 'flex-start',
   },
 
-  // System / status bubbles
   systemBubble: {
     alignSelf: 'center',
     backgroundColor: '#3A3A3C',
@@ -229,7 +257,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
-  // Bubble styles
   bubbleLeft: {
     backgroundColor: colors.background.surface2,
     alignSelf: 'flex-start',
@@ -260,22 +287,41 @@ const styles = StyleSheet.create({
     ...typography.chatMessageBold,
     marginBottom: 2,
     color: '#2C2C2C',
+    flexShrink: 1,
+    flexWrap: 'wrap',
+    includeFontPadding: true,
+    allowFontScaling: true,
+    maxFontSizeMultiplier: 1.2,
   },
   labelOther: {
     ...typography.chatMessageBold,
     marginBottom: 2,
     color: '#FFFFFF',
+    flexShrink: 1,
+    flexWrap: 'wrap',
+    includeFontPadding: true,
+    allowFontScaling: true,
+    maxFontSizeMultiplier: 1.2,
   },
-
   subtext: {
     ...typography.chatMessage,
     fontSize: 14,
     color: '#6E6E6E',
+    flexShrink: 1,
+    flexWrap: 'wrap',
+    includeFontPadding: true,
+    allowFontScaling: true,
+    maxFontSizeMultiplier: 1.2,
   },
   subtextOther: {
     ...typography.chatMessage,
     fontSize: 14,
     color: '#A1A1A1',
+    flexShrink: 1,
+    flexWrap: 'wrap',
+    includeFontPadding: true,
+    allowFontScaling: true,
+    maxFontSizeMultiplier: 1.2,
   },
 
   timestamp: {

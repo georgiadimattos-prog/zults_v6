@@ -64,7 +64,7 @@ function TypingDots() {
   );
 }
 
-const MessageRow = memo(function MessageRow({ item, onDoubleLike }) {
+const MessageRow = memo(function MessageRow({ item, user, onDoubleLike }) {
   const scale = useRef(new Animated.Value(1)).current;
 
   const handleDouble = () => {
@@ -76,17 +76,28 @@ const MessageRow = memo(function MessageRow({ item, onDoubleLike }) {
   };
 
   return (
-    <TapGestureHandler numberOfTaps={2} onActivated={handleDouble}>
-      <View style={{ alignSelf: item.direction === "from-user" ? "flex-end" : "flex-start" }}>
-        <View style={{ position: "relative" }}>
-          <RezultActionBubble
-            type={item.type}
-            direction={item.direction}
-            username={item.username}
-            avatar={item.avatar}
-            timestamp={item.timestamp}
-            text={item.text || ""}
-          />
+  <TapGestureHandler numberOfTaps={2} onActivated={handleDouble}>
+    <View
+  style={{
+    alignSelf: item.direction === "from-user" ? "flex-end" : "flex-start",
+    maxWidth: "85%",
+    flexShrink: 1,
+    flexDirection: "row",   // ✅ allows wrapping
+    flexWrap: "wrap",
+    justifyContent: "flex-start", // ✅ keep text left-aligned
+    alignItems: "flex-start",     // ✅ bubble grows downward, not centered
+  }}
+>
+      <View style={{ position: "relative" }}>
+        <RezultActionBubble
+  type={item.type}
+  direction={item.direction}
+  username={item.username}
+  avatar={item.avatar}
+  timestamp={item.timestamp}
+  text={item.text || ""}
+  chatUserId={user.id}   // ✅ tell each bubble whose chatroom it belongs to
+/>
           {item.liked && (
             <Animated.View
               style={{
@@ -638,14 +649,14 @@ return (
             data={chatData}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) =>
-              item.type === "typing" ? (
-                <View style={styles.typingBubble}>
-                  <TypingDots />
-                </View>
-              ) : (
-                <MessageRow item={item} onDoubleLike={handleDoubleLike} />
-              )
-            }
+  item.type === "typing" ? (
+    <View style={styles.typingBubble}>
+      <TypingDots />
+    </View>
+  ) : (
+    <MessageRow item={item} user={user} onDoubleLike={handleDoubleLike} /> // ✅ pass user down
+  )
+}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
             contentInsetAdjustmentBehavior="automatic"

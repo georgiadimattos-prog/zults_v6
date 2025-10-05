@@ -11,6 +11,7 @@ import {
   Image,
   Animated,
   ScrollView as RNScrollView,
+  Linking, // 👈 Correct way
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -27,10 +28,12 @@ import ZultsInput from "../../ui/ZultsInput";
 import shlLogo from "../../../assets/images/SHL.png";
 import randoxLogo from "../../../assets/images/Randox.png";
 import nhsLogo from "../../../assets/images/NHS.png";
+import ppLogo from "../../../assets/images/pp-logo.png";
 
 const PROVIDER_NAMES = {
   shl: "Sexual Health London",
   randox: "Randox Health",
+  nhs: "NHS",
   pp: "Planned Parenthood",
 };
 
@@ -44,13 +47,14 @@ export default function GetRezults_PasteLinkScreen() {
   const [selectedProvider, setSelectedProvider] = useState(
     route.params?.providerId ?? null
   );
-  const [link, setLink] = useState("https://demolink");
+  const [link, setLink] = useState("");
 
   const providers = [
-    { id: "shl", name: "Sexual Health London", logo: shlLogo },
-    { id: "randox", name: "Randox Health", logo: randoxLogo },
-    { id: "pp", name: "Planned Parenthood", logo: nhsLogo },
-  ];
+  { id: "pp", name: "Planned Parenthood", logo: ppLogo }, // 👈 first
+  { id: "shl", name: "Sexual Health London", logo: shlLogo },
+  { id: "nhs", name: "NHS", logo: nhsLogo },
+  { id: "randox", name: "Randox Health", logo: randoxLogo },
+];
 
   const providerName = useMemo(
     () => (selectedProvider ? PROVIDER_NAMES[selectedProvider] : "Your Provider"),
@@ -150,29 +154,47 @@ export default function GetRezults_PasteLinkScreen() {
             </RNScrollView>
 
             {/* Input only if provider selected */}
-{selectedProvider && (
-  <ZultsInput
+            {selectedProvider && (
+              <ZultsInput
     value={link}
     onChangeText={setLink}
     placeholder="Paste link here..."
     keyboardType="url"
-    style={{ marginBottom: 24 }}
+    style={{ marginBottom: 70 }} // 👈 added space so it stays above footer
     placeholderTextColor={colors.foreground.muted}
     maxFontSizeMultiplier={1.2}
   />
-)}
+            )}
           </KeyboardAwareScrollView>
 
           <ScreenFooter>
-            <ZultsButton
-              label="Add Rezults"
-              type="primary"
-              size="large"
-              fullWidth
-              onPress={handleContinue}
-              disabled={!selectedProvider || link.trim().length < 5}
-            />
-          </ScreenFooter>
+  <ZultsButton
+    label="Add Rezults"
+    type="primary"
+    size="large"
+    fullWidth
+    onPress={handleContinue}
+    disabled={!selectedProvider || link.trim().length < 5}
+  />
+
+  {/* Subtle footer link */}
+  <TouchableOpacity
+    style={{ marginTop: 12 }}
+    onPress={() =>
+      Linking.openURL(
+        "mailto:support@myrezults.com?subject=Request a new provider&body=Hi Zults team, I can’t find my provider in the list. Please add... Thank you.")
+    }
+  >
+    <Text
+      style={[
+        typography.subheadlineRegular,
+        { color: colors.foreground.muted, textAlign: "center" },
+      ]}
+    >
+      Don’t see your provider? Let us know.
+    </Text>
+  </TouchableOpacity>
+</ScreenFooter>
         </ScreenWrapper>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>

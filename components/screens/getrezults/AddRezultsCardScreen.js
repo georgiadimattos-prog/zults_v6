@@ -11,18 +11,30 @@ import ScreenFooter from "../../ui/ScreenFooter";
 // ✅ import the cache
 import { rezultsCache } from "../../../cache/rezultsCache";
 
+// Provider map (so we can display correct name)
+const PROVIDER_NAMES = {
+  pp: "Planned Parenthood",
+  shl: "Sexual Health London",
+  nhs: "NHS",
+  randox: "Randox Health",
+};
+
 export default function AddRezultsCardScreen() {
   const navigation = useNavigation();
   const route = useRoute();
   const { providerId, resultsLink } = route.params || {};
 
+  const providerName = PROVIDER_NAMES[providerId] || "Your Provider";
+
   const handleAddRezults = () => {
     rezultsCache.hasRezults = true;
     rezultsCache.card = {
-      userName: "John Doe",
-      providerName: "Sexual Health London",
-      testDate: "12 Dec 2025",
-    };
+  realName: "John Doe",
+  isVerified: true,
+  showRealName: true,
+  providerName,
+  testDate: "12 Dec 2025",
+};
 
     navigation.reset({
       index: 0,
@@ -63,10 +75,7 @@ export default function AddRezultsCardScreen() {
           <Text style={typography.largeTitleMedium} allowFontScaling={false}>
             Your Rezults
           </Text>
-          <Text
-            style={typography.bodyRegular}
-            maxFontSizeMultiplier={1.2}
-          >
+          <Text style={typography.bodyRegular} maxFontSizeMultiplier={1.2}>
             By clicking Add Rezults, you confirm this information is your own and accurate.{" "}
             <Text
               style={styles.link}
@@ -77,13 +86,16 @@ export default function AddRezultsCardScreen() {
           </Text>
         </View>
 
+        {/* Rezults Card Preview */}
         <View style={{ width: "100%", alignItems: "center", marginTop: 24 }}>
-  <RezultsCard
-    userName="John Doe"
-    providerName="Sexual Health London"
-    testDate="12 Dec 2025"
-  />
-</View>
+          <RezultsCard
+  realName="John Doe"
+  isVerified={true}
+  showRealName={true}
+  providerName={providerName}
+  testDate="12 Dec 2025"
+/>
+        </View>
       </ScrollView>
 
       <ScreenFooter>

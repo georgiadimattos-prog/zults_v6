@@ -9,7 +9,6 @@ import InfoCard from "../../ui/InfoCard";
 // Icons
 import cardIcon from "../../../assets/images/card-icon.png";
 import labIcon from "../../../assets/images/lab-icon.png";
-import messageIcon from "../../../assets/images/message-new.png";
 
 export default function GetRezults_SelectProviderScreen() {
   const navigation = useNavigation();
@@ -45,13 +44,6 @@ export default function GetRezults_SelectProviderScreen() {
           description="See providers you can test with and connect your Rezults."
           icon={labIcon}
           onPress={() => navigation.navigate("ProvidersList")}
-        />
-
-        <InfoCard
-          title="Using a different provider?"
-          description="Send us an email telling us who, and we'll work on adding them."
-          icon={messageIcon}
-          onPress={() => navigation.navigate("RequestProvider")}
         />
       </ScrollView>
     </ScreenWrapper>

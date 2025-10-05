@@ -165,10 +165,12 @@ export default function MainUnverifiedWithRezults({ onLinkPress, onSharePress })
   }}
 >
   <RezultsCard
-    userName={rezultsCache.card?.userName || "Unknown User"}
-    providerName={rezultsCache.card?.providerName || "Unknown Provider"}
-    testDate={rezultsCache.card?.testDate || "Unknown Date"}
-  />
+  realName={rezultsCache.card?.realName || null}     // ✅ pull real name from cache
+  isVerified={rezultsCache.card?.isVerified || false} 
+  showRealName={rezultsCache.card?.showRealName || false}
+  providerName={rezultsCache.card?.providerName || "Unknown Provider"}
+  testDate={rezultsCache.card?.testDate || "Unknown Date"}
+/>
   <View style={{ marginTop: 12 }}>
     <ExpireContainer expiryDate="29 Sep 2025" daysLeft={43} />
   </View>
