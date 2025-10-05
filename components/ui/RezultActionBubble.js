@@ -105,16 +105,16 @@ export default function RezultActionBubble(props) {
   } else if (type === 'share') {
     if (isFromOther) {
       label = `${username || 'User'} is sharing Rezults`;
-      subtext = 'Rezults available to view';
+      subtext = 'Rezults are now available to view';
     } else {
       label = 'Sharing Rezults';
-      subtext = 'Your Rezults are now available to view';
+      subtext = 'Rezults are now available to view';
     }
   } else if (type === 'stop-share') {
     if (isFromOther) {
-      label = `${username || 'User'} stopped sharing`;
+      label = `${username || 'User'} stopped sharing Rezults`;
     } else {
-      label = 'You stopped sharing';
+      label = 'You stopped sharing Rezults';
     }
   }
 
@@ -162,14 +162,16 @@ export default function RezultActionBubble(props) {
   ]}
 >
           <Text
-            style={[
-              isSystemMessage
-                ? styles.systemText
-                : isFromOther
-                ? styles.labelOther
-                : styles.label,
-              { flexShrink: 1, flexWrap: 'wrap' },
-            ]}
+  style={[
+    type === 'stop-share' && isFromUser      // ✅ new condition
+      ? styles.labelOther                    // use white text for "You stopped sharing"
+      : isSystemMessage
+      ? styles.systemText
+      : isFromOther
+      ? styles.labelOther
+      : styles.label,
+    { flexShrink: 1, flexWrap: 'wrap' },
+  ]}
             numberOfLines={undefined}
             allowFontScaling
           >
@@ -187,10 +189,16 @@ export default function RezultActionBubble(props) {
         </View>
 
         {!isSystemMessage && (
-          <Text style={styles.timestamp} allowFontScaling>
-            {timestamp}
-          </Text>
-        )}
+  <Text
+    style={[
+      styles.timestamp,
+      type === 'stop-share' && isFromUser && { color: '#A8A8A8' }, // ✅ soft grey timestamp for dark bubble
+    ]}
+    allowFontScaling
+  >
+    {timestamp}
+  </Text>
+)}
       </View>
 
       {isFromUser && !isSystemMessage && (

@@ -35,6 +35,10 @@ import { useFocusEffect } from "@react-navigation/native";
 
 const TomasAvatar = require("../../../assets/images/tomas.png");
 
+// Simple local time formatter
+const getLocalTime = () =>
+  new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
 function TypingDots() {
   const dot1 = useRef(new Animated.Value(0.3)).current;
   const dot2 = useRef(new Animated.Value(0.3)).current;
@@ -366,7 +370,7 @@ const startRequestFlow = () => {
             direction: "from-other", // 👈 incoming from the bot
             username: user.name || "Demo User",
             avatar: user.image || fallbackAvatar,
-            timestamp: "10:07AM",
+            timestamp: getLocalTime(),
           },
         ];
         chatCache[user.id] = {
@@ -399,7 +403,7 @@ const startRequestFlow = () => {
             direction: "from-other", // 👈 incoming from the bot
             username: user.name || "Demo User",
             avatar: user.image || fallbackAvatar,
-            timestamp: "10:12AM",
+            timestamp: getLocalTime(),
           },
         ];
         chatCache[user.id] = {
@@ -429,7 +433,7 @@ const startRequestFlow = () => {
                 direction: "from-other", // 👈 incoming from the bot
                 username: user.name || "Demo User",
                 avatar: user.image || fallbackAvatar,
-                timestamp: "10:27AM",
+                timestamp: getLocalTime(),
               },
             ];
             chatCache[user.id] = {
@@ -468,7 +472,7 @@ const startRequestFlow = () => {
               direction: "from-other",
               username: user.name,
               avatar: user.image || fallbackAvatar,
-              timestamp: "10:12AM",
+              timestamp: getLocalTime(),
             },
           ];
           chatCache[user.id] = {
@@ -498,7 +502,7 @@ const startRequestFlow = () => {
                   direction: "from-other",
                   username: user.name,
                   avatar: user.image || fallbackAvatar,
-                  timestamp: "10:27AM",
+                  timestamp: getLocalTime(),
                 },
               ];
               chatCache[user.id] = {
@@ -621,7 +625,7 @@ return (
         direction: "from-user",
         username: currentUser.name,   // Jonster
         avatar: currentUser.avatar,
-        timestamp: "Now",
+        timestamp: getLocalTime(),
       },
     ]);
 
@@ -714,7 +718,7 @@ return (
                     username: currentUser.name,
                     avatar: currentUser.avatar,
                     text: message,
-                    timestamp: "Now",
+                    timestamp: getLocalTime(),
                   };
                   setChatData((prev) => [...prev, userMsg]);
                   setMessage("");
@@ -747,7 +751,7 @@ return (
                     direction: "from-user",
                     username: currentUser.name,
                     avatar: currentUser.avatar,
-                    timestamp: "Now",
+                    timestamp: getLocalTime(),
                   },
                 ]);
                 shareTimers.current.forEach((t) => clearTimeout(t));
@@ -788,7 +792,7 @@ return (
                       direction: "from-user",
                       username: currentUser.name,
                       avatar: currentUser.avatar,
-                      timestamp: "Now",
+                      timestamp: getLocalTime(),
                     };
                     const noteMsg =
                       message.trim().length > 0
@@ -799,7 +803,7 @@ return (
                             username: currentUser.name,
                             avatar: currentUser.avatar,
                             text: message,
-                            timestamp: "Now",
+                            timestamp: getLocalTime(),
                           }
                         : null;
                     setChatData((prev) => [
