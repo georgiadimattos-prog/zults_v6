@@ -48,7 +48,7 @@ export default function RezultActionBubble(props) {
 
   const isFromUser = direction === 'from-user';
   const isFromOther = direction === 'from-other';
-  const isSystemMessage = type === 'cancel-request' || type === 'stop-share';
+  const isSystemMessage = type === 'cancel-request';
 
   // --- Typing bubble ---
   if (type === 'typing') return <TypingIndicator avatar={avatar} />;
@@ -142,16 +142,25 @@ export default function RezultActionBubble(props) {
         )}
 
         <View
-          style={[
-            styles.bubble,
-            isFromUser ? styles.bubbleRight : styles.bubbleLeft,
-            isSystemMessage &&
-              chatUserId !== 'zults-demo' && [ // ✅ skip Rezy chatroom entirely
-                styles.systemBubble,
-                { flexWrap: 'wrap', alignItems: 'flex-start' },
-              ],
-          ]}
-        >
+  style={[
+    styles.bubble,
+    isFromUser ? styles.bubbleRight : styles.bubbleLeft,
+
+    // ✅ make stop-share behave like a normal bubble, not centered
+    type === 'stop-share' && {
+      backgroundColor: '#3A3A3C',
+      alignItems: 'flex-start',
+      justifyContent: 'flex-start',
+    },
+
+    // ✅ keep cancel-request using systemBubble styling
+    type === 'cancel-request' &&
+      chatUserId !== 'zults-demo' && [
+        styles.systemBubble,
+        { flexWrap: 'wrap', alignItems: 'flex-start' },
+      ],
+  ]}
+>
           <Text
             style={[
               isSystemMessage
@@ -230,25 +239,24 @@ const styles = StyleSheet.create({
   },
 
   bubble: {
-    paddingHorizontal: 14,
-    paddingVertical: 7,
-    borderRadius: 18,
-    flexShrink: 1,
-    flexWrap: 'wrap',
-    alignItems: 'stretch',
-    alignSelf: 'flex-start',
-  },
+  paddingHorizontal: 14,
+  paddingVertical: 8,
+  borderRadius: 18,
+  flexShrink: 1,
+  flexWrap: 'wrap',
+  alignItems: 'flex-start',
+  alignSelf: 'flex-start',
+},
 
   systemBubble: {
-    alignSelf: 'center',
-    backgroundColor: '#3A3A3C',
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 14,
-    minHeight: 32,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  alignSelf: 'flex-start',     // ✅ align left like normal bubbles
+  backgroundColor: '#3A3A3C',
+  paddingVertical: 8,          // ✅ more balanced height
+  paddingHorizontal: 14,
+  borderRadius: 18,
+  justifyContent: 'flex-start', // ✅ top-left text alignment
+  alignItems: 'flex-start',
+},
   systemText: {
     ...typography.chatMeta,
     fontSize: 13,
@@ -314,24 +322,21 @@ const styles = StyleSheet.create({
     maxFontSizeMultiplier: 1.2,
   },
   subtextOther: {
-    ...typography.chatMessage,
-    fontSize: 14,
-    color: '#A1A1A1',
-    flexShrink: 1,
-    flexWrap: 'wrap',
-    includeFontPadding: true,
-    allowFontScaling: true,
-    maxFontSizeMultiplier: 1.2,
-  },
+  ...typography.chatMessage,
+  fontSize: 14,
+  color: '#B1B1B1', // softer contrast
+  flexShrink: 1,
+  flexWrap: 'wrap',
+},
 
   timestamp: {
-    ...typography.chatMeta,
-    marginTop: 6,
-    marginBottom: 6,
-    fontSize: 11,
-    color: colors.foreground.muted,
-    textAlign: 'right',
-  },
+  ...typography.chatMeta,
+  marginTop: 4,       // tighter top
+  marginBottom: 8,    // uniform bottom gap
+  fontSize: 11,
+  color: colors.foreground.muted,
+  textAlign: 'right',
+},
 
   typingBubble: {
     backgroundColor: '#F1F1F1',
