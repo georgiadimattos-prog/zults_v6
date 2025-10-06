@@ -199,30 +199,36 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "flex-end",
   },
+
+  // 💜 Unified typography system
   name: {
     ...typography.bodyMedium,
-    fontSize: 18,
-    fontWeight: "500",
-    color: colors.neutral[0],
+    fontSize: 16,
+    lineHeight: 20,
+    fontWeight: "600",
+    color: colors.foreground.default, // bright white
   },
   provider: {
     ...typography.bodyRegular,
-    fontSize: 14,
-    color: colors.foreground.soft,
+    fontSize: 15,
+    lineHeight: 20,
+    color: colors.foreground.soft, // off-white
   },
   link: {
     ...typography.bodyMedium,
-    fontSize: 14,
-    color: "rgba(255,255,255,0.6)",
+    fontSize: 15,
+    lineHeight: 20,
+    color: colors.foreground.soft, // off-white for subtle call to action
     fontWeight: "500",
   },
+
   cardBack: {
     position: "absolute",
     width: CARD_WIDTH,
     height: CARD_HEIGHT,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.25)", // slightly brighter for visibility
+    borderColor: "rgba(255,255,255,0.25)",
     backgroundColor: colors.background.surface1,
     padding: 16,
     justifyContent: "space-between",
@@ -240,22 +246,38 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  testedOn: { ...typography.captionSmallRegular, color: colors.foreground.soft },
-  testedDate: { color: colors.foreground.default, fontWeight: "500" },
-  pillsBottom: { flexDirection: "row", flexWrap: "wrap", gap: 3 },
+
+  // 💬 Text inside back side
+  testedOn: {
+    ...typography.bodyRegular,
+    fontSize: 15,
+    lineHeight: 20,
+    color: colors.foreground.soft, // off-white
+  },
+  testedDate: {
+    color: colors.foreground.default, // bright white for emphasis
+    fontWeight: "600",
+  },
+
+  // 🟣 Pills area
+  pillsBottom: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 4,
+  },
   pill: {
-    backgroundColor: "#5D5D5D",
+    backgroundColor: "rgba(255,255,255,0.08)", // subtle soft gray
     borderRadius: 20,
     paddingHorizontal: 8,
-    paddingVertical: 2,
+    paddingVertical: 3,
     justifyContent: "center",
     alignItems: "center",
   },
   pillText: {
-    ...typography.captionSmallRegular,
-    color: colors.foreground.default,
+    ...typography.bodyRegular,
     fontSize: 14,
-    lineHeight: 16,
+    lineHeight: 18,
+    color: colors.foreground.default, // white text for clarity
     textAlign: "center",
   },
 });

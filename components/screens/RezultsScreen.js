@@ -8,6 +8,7 @@ import {
   Text,
   ScrollView,
   Dimensions,
+  Linking,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { BlurView } from "expo-blur";
@@ -84,39 +85,47 @@ function RezultsScreen() {
               {testDate},{" "}
               using{" "}
               <Text
-  style={{
-    color: colors.neutral[0],
-    textDecorationLine: "underline",
-  }}
->
-  Planned Parenthood
-</Text>
+                style={{
+                  color: colors.info.onContainer,
+                  textDecorationLine: "underline",
+                }}
+                onPress={() => {
+                  const url =
+                    providerName?.toLowerCase().includes("planned")
+                      ? "https://www.plannedparenthood.org"
+                      : providerName?.toLowerCase().includes("sexual health london")
+                      ? "https://www.shl.uk"
+                      : "https://www.zults.com";
+                  Linking.openURL(url);
+                }}
+              >
+                {providerName || "your provider"}
+              </Text>
               .
             </Text>
 
             <Text style={styles.expandedTitle}>Infection Window Periods</Text>
             <Text style={styles.expandedText}>
-              Some STIs take time to show up in results, meaning a recent
-              infection might not be detected right away.
+              Some STIs take time to show up in results, meaning a recent infection
+              might not be detected right away.
             </Text>
             <Text style={styles.expandedText}>
-              • Chlamydia & Gonorrhoea: ~2 weeks{"\n"}
-              • Syphilis, Hep B & C: 6–12 weeks{"\n"}
-              • HIV: ~6 weeks
+              • Chlamydia & Gonorrhoea – ~2 weeks{"\n"}
+              • Syphilis, Hep B & C – 6–12 weeks{"\n"}
+              • HIV – ~6 weeks
             </Text>
 
             <Text style={styles.expandedTitle}>ID Verification</Text>
             <Text style={styles.expandedText}>
-              These are at-home tests, we can't fully guarantee who took the
-              test. If you see a blue tick next to someone’s profile, it means:{"\n"}
+              These are at-home tests, so we can’t fully guarantee who took the test.{"\n"}
+              If you see a blue tick next to someone’s profile, it means:{"\n"}
               • We verified their name matches their test provider’s results{"\n"}
               • Their photo matches their official ID
             </Text>
 
             <Text style={styles.expandedText}>
-              Rezults are a tool for safer dating but they don’t replace other
-              protections. Using condoms is still the most reliable way to protect
-              against STIs.
+              Rezults are a tool for safer dating, but they don’t replace other protections.{"\n"}
+              Using condoms is still the most reliable way to protect against STIs.
             </Text>
           </ScrollView>
         </View>
@@ -174,36 +183,38 @@ const styles = StyleSheet.create({
     height: 18,
     marginLeft: 6,
   },
+
+  // 💜 Unified typography (same as tooltip)
   expandedBox: {
-  borderRadius: 20,
-  marginHorizontal: 16,
-  marginTop: 16,
-  marginBottom: 32,
-  padding: 16,
-  minHeight: 200,
-  maxHeight: SCREEN_HEIGHT * 0.95,
-  backgroundColor: colors.background.surface1,
-  borderWidth: 1,
-  borderColor: "rgba(255,255,255,0.15)", // 👈 subtle soft border, like Rezy
-  shadowColor: "#000",
-  shadowOpacity: 0.2,
-  shadowRadius: 8,
-  shadowOffset: { width: 0, height: 2 },
-  elevation: 3,
-},
+    borderRadius: 20,
+    marginHorizontal: 16,
+    marginTop: 16,
+    marginBottom: 32,
+    padding: 16,
+    minHeight: 200,
+    maxHeight: SCREEN_HEIGHT * 0.95,
+    backgroundColor: colors.background.surface1,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.15)",
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
+  },
   expandedTitle: {
     ...typography.bodyMedium,
-    fontSize: 14,
-    fontWeight: "500",
-    color: colors.foreground.default,
+    fontSize: 16,
+    fontWeight: "600",
+    color: colors.foreground.default, // bright white
     marginTop: 12,
     marginBottom: 6,
   },
   expandedText: {
     ...typography.bodyRegular,
-    fontSize: 14,
-    color: colors.foreground.soft,
+    fontSize: 15,
+    lineHeight: 20,
+    color: colors.foreground.soft, // off-white
     marginBottom: 8,
-    lineHeight: 18,
   },
 });

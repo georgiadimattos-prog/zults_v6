@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, StyleSheet, Dimensions, ScrollView } from "react-native";
+import { View, Text, Image, StyleSheet, Dimensions, ScrollView, Linking } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { colors, typography } from "../../../theme";
 import RezultsCard from "../../ui/RezultsCard";
@@ -15,20 +15,24 @@ const CARD_HEIGHT = CARD_WIDTH / 1.586;
 
 export default function RezultsTooltipDemo() {
   const navigation = useNavigation();
-  const [step, setStep] = useState(0);
   const [expanded, setExpanded] = useState(false);
+const [visibleCaptions, setVisibleCaptions] = useState([]);
 
-  const captions = [
-    "This is how a Rezults card looks like.",
-    "On the front you will see Name & Provider. On the back, you’ll see your test date and infections tested.",
-    "You can expand for more details here.",
-  ];
+const captions = [
+  "Hi 👋 This is how a Rezults card looks like.",
+  "On the front, you’ll see a profile photo, username, real name, and the provider’s name.",
+  "If you notice a blue verification tick next to a username, it means they’ve been ID-verified — so they don’t need to show their real name on their Rezults.",
+  "On the back, you’ll find their test date and which infections were tested for.",
+  "You can expand the card to see more details, including important info like testing window periods.",
+];
 
-  useEffect(() => {
-    setTimeout(() => setStep(0), 500);
-    setTimeout(() => setStep(1), 2500);
-    setTimeout(() => setStep(2), 5000);
-  }, []);
+useEffect(() => {
+  captions.forEach((caption, index) => {
+    setTimeout(() => {
+      setVisibleCaptions((prev) => [...prev, caption]);
+    }, 2500 * index); // 👈 each caption appears 2.5s apart
+  });
+}, []);
 
   return (
     <ScreenWrapper>
@@ -67,7 +71,17 @@ export default function RezultsTooltipDemo() {
               contentContainerStyle={{ paddingBottom: 12 }}
             >
               <Text style={styles.expandedText}>
-                These Rezults were created from Planned Parenthood tests on 25 Sep 2025.
+                These Rezults were created from{" "}
+                <Text
+                  style={{
+                    color: colors.info.onContainer, // 💙 same blue as Invite
+                    textDecorationLine: "underline",
+                  }}
+                  onPress={() => Linking.openURL("https://www.plannedparenthood.org")}
+                >
+                  Planned Parenthood
+                </Text>{" "}
+                tests on 25 Sep 2025.
               </Text>
 
               <Text style={styles.expandedTitle}>Infection Window Periods</Text>
@@ -98,7 +112,14 @@ export default function RezultsTooltipDemo() {
         )}
 
         {/* Caption */}
-        <Text style={styles.caption}>{captions[step]}</Text>
+        {/* Captions (progressive reveal) */}
+<View style={{ marginTop: 24, alignItems: "center", paddingHorizontal: 16 }}>
+  {visibleCaptions.map((caption, index) => (
+    <Text key={index} style={styles.caption}>
+      {caption}
+    </Text>
+  ))}
+</View>
       </ScrollView>
     </ScreenWrapper>
   );
@@ -106,14 +127,14 @@ export default function RezultsTooltipDemo() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 16,   // ✅ match blueprint gutter
-    paddingTop: 32,          // space below Navbar
+    paddingHorizontal: 16,
+    paddingTop: 32,
     paddingBottom: 40,
     alignItems: "center",
   },
   profileRow: {
     alignItems: "center",
-    marginTop: 32,           // ✅ like headerBlock spacing
+    marginTop: 32,
     marginBottom: 24,
   },
   avatar: {
@@ -138,34 +159,39 @@ const styles = StyleSheet.create({
     height: 18,
   },
   caption: {
-    marginTop: 24,           // ✅ match subtitle spacing
-    ...typography.bodyRegular,
-    color: "#fff",
-    textAlign: "center",
-  },
-  expandedBox: {
-    marginTop: 20,
-    width: CARD_WIDTH,
-    height: CARD_HEIGHT,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.2)",
-    backgroundColor: colors.background.surface1,
-    padding: 16,
-  },
-  expandedTitle: {
-    ...typography.bodyMedium,
-    fontSize: 14,
-    fontWeight: "500",
-    color: colors.foreground.default,
-    marginTop: 12,
-    marginBottom: 6,
-  },
-  expandedText: {
-    ...typography.bodyRegular,
-    fontSize: 14,
-    color: "#fff",
-    marginBottom: 8,
-    lineHeight: 18,
-  },
+  marginTop: 16,
+  ...typography.bodyRegular,
+  fontSize: 15,
+  lineHeight: 20,
+  color: colors.foreground.soft, // 👈 off-white for calm tone
+  textAlign: "center",
+},
+
+expandedBox: {
+  marginTop: 20,
+  width: CARD_WIDTH,
+  height: CARD_HEIGHT,
+  borderRadius: 20,
+  borderWidth: 1,
+  borderColor: "rgba(255,255,255,0.2)",
+  backgroundColor: colors.background.surface1,
+  padding: 16,
+},
+
+expandedTitle: {
+  ...typography.bodyMedium,
+  fontSize: 16,
+  fontWeight: "600",
+  color: colors.foreground.default, // 👈 bright white for titles
+  marginTop: 12,
+  marginBottom: 6,
+},
+
+expandedText: {
+  ...typography.bodyRegular,
+  fontSize: 15,
+  lineHeight: 20,
+  color: colors.foreground.soft, // 👈 off-white body copy
+  marginBottom: 8,
+},
 });
