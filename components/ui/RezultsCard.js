@@ -1,3 +1,4 @@
+// ✅ RezultsCard.js (clean baseline)
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -29,7 +30,7 @@ export default function RezultsCard({
   realName = null,
   isVerified = false,
   showRealName = false,
-  providerName = "Sexual Health London (SHL)",
+  providerName = "Planned Parenthood",
   testDate = "25 Sep 2025",
   videoSource = require("../../assets/videos/Card_All_GlowingBorder_25sec.mp4"),
   showExpand = false,
@@ -44,31 +45,24 @@ export default function RezultsCard({
   const slideUp = useSharedValue(20);
 
   useEffect(() => {
-    // fade + slide on mount
-    fadeIn.value = withTiming(1, {
-      duration: 600,
-      easing: Easing.out(Easing.quad),
-    });
-    slideUp.value = withTiming(0, {
-      duration: 600,
-      easing: Easing.out(Easing.quad),
-    });
+    fadeIn.value = withTiming(1, { duration: 600, easing: Easing.out(Easing.quad) });
+    slideUp.value = withTiming(0, { duration: 600, easing: Easing.out(Easing.quad) });
   }, []);
 
   const flipCard = () => {
     rotate.value = withTiming(showBack ? 0 : 180, { duration: 400 });
     setShowBack(!showBack);
-    if (onExpand) onExpand(false);
+    onExpand?.(false);
   };
 
   const toggleExpand = () => {
     const next = !expanded;
     setExpanded(next);
-    if (onExpand) onExpand(next);
+    onExpand?.(next);
     iconRotate.value = withTiming(next ? 180 : 0, { duration: 300 });
   };
 
-  // card flip auto-demo
+  // 🔁 quick flip teaser
   useEffect(() => {
     const timer = setTimeout(() => {
       rotate.value = withTiming(180, { duration: 600 });
@@ -79,7 +73,6 @@ export default function RezultsCard({
     return () => clearTimeout(timer);
   }, []);
 
-  // reanimated styles
   const entryAnimStyle = useAnimatedStyle(() => ({
     opacity: fadeIn.value,
     transform: [{ translateY: slideUp.value }],
@@ -101,7 +94,7 @@ export default function RezultsCard({
 
   return (
     <TouchableWithoutFeedback onPress={flipCard}>
-      <Animated.View style={[styles.container, entryAnimStyle]}>
+      <Animated.View style={[styles.container, entryAnimStyle, styles.tooltipBorder]}>
         {/* Front */}
         <Animated.View style={[styles.cardFront, frontAnimatedStyle]}>
           <Video
@@ -112,9 +105,7 @@ export default function RezultsCard({
             isMuted
             resizeMode="cover"
           />
-
           <Image source={logoIcon} style={styles.logo} resizeMode="contain" />
-
           <View style={styles.overlay}>
             <View>
               {isVerified && showRealName && realName && (
@@ -179,6 +170,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  tooltipBorder: {
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.15)",
+    borderRadius: 24,
+    padding: 6,
+  },
   cardFront: {
     position: "absolute",
     width: CARD_WIDTH,
@@ -186,10 +183,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: "hidden",
   },
-  videoCard: {
-    width: "100%",
-    height: "100%",
-  },
+  videoCard: { width: "100%", height: "100%" },
   logo: {
     position: "absolute",
     top: CARD_HEIGHT * 0.06,
@@ -228,7 +222,7 @@ const styles = StyleSheet.create({
     height: CARD_HEIGHT,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.2)",
+    borderColor: "rgba(255,255,255,0.25)", // slightly brighter for visibility
     backgroundColor: colors.background.surface1,
     padding: 16,
     justifyContent: "space-between",
@@ -246,19 +240,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  testedOn: {
-    ...typography.captionSmallRegular,
-    color: colors.foreground.soft,
-  },
-  testedDate: {
-    color: colors.foreground.default,
-    fontWeight: "500",
-  },
-  pillsBottom: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 3,
-  },
+  testedOn: { ...typography.captionSmallRegular, color: colors.foreground.soft },
+  testedDate: { color: colors.foreground.default, fontWeight: "500" },
+  pillsBottom: { flexDirection: "row", flexWrap: "wrap", gap: 3 },
   pill: {
     backgroundColor: "#5D5D5D",
     borderRadius: 20,

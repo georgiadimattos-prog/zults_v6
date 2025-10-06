@@ -84,15 +84,13 @@ function RezultsScreen() {
               {testDate},{" "}
               using{" "}
               <Text
-                style={{
-                  color: colors.neutral[0],
-                  textDecorationLine: "underline",
-                }}
-              >
-                {providerName === "Planned Parenthood"
-                  ? "Planned Parenthood"
-                  : "Sexual Health London (SHL)"}
-              </Text>
+  style={{
+    color: colors.neutral[0],
+    textDecorationLine: "underline",
+  }}
+>
+  Planned Parenthood
+</Text>
               .
             </Text>
 
@@ -177,14 +175,22 @@ const styles = StyleSheet.create({
     marginLeft: 6,
   },
   expandedBox: {
-    borderRadius: 16,
-    marginHorizontal: 16,
-    marginTop: 16,
-    marginBottom: 32,
-    padding: 16,
-    minHeight: 200,
-    maxHeight: SCREEN_HEIGHT * 0.95,
-  },
+  borderRadius: 20,
+  marginHorizontal: 16,
+  marginTop: 16,
+  marginBottom: 32,
+  padding: 16,
+  minHeight: 200,
+  maxHeight: SCREEN_HEIGHT * 0.95,
+  backgroundColor: colors.background.surface1,
+  borderWidth: 1,
+  borderColor: "rgba(255,255,255,0.15)", // 👈 subtle soft border, like Rezy
+  shadowColor: "#000",
+  shadowOpacity: 0.2,
+  shadowRadius: 8,
+  shadowOffset: { width: 0, height: 2 },
+  elevation: 3,
+},
   expandedTitle: {
     ...typography.bodyMedium,
     fontSize: 14,

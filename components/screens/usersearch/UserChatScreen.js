@@ -30,7 +30,6 @@ import ZultsButton from "../../ui/ZultsButton";
 import RezultsActionButton from "../../ui/RezultsActionButton";
 import { DeviceEventEmitter } from "react-native";
 import ChatTopActions from "../../ui/ChatTopActions";
-import RezultsCardTooltip from "../../ui/RezultsCardTooltip";
 import { useFocusEffect } from "@react-navigation/native";
 
 const TomasAvatar = require("../../../assets/images/tomas.png");
@@ -43,20 +42,41 @@ function TypingDots() {
   const dot1 = useRef(new Animated.Value(0.3)).current;
   const dot2 = useRef(new Animated.Value(0.3)).current;
   const dot3 = useRef(new Animated.Value(0.3)).current;
-
-  const animate = (dot, delay) => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(dot, { toValue: 1, duration: 300, delay, useNativeDriver: true }),
-        Animated.timing(dot, { toValue: 0.3, duration: 300, useNativeDriver: true }),
-      ])
-    ).start();
-  };
+  const loopRef = useRef(null);
 
   useEffect(() => {
-    animate(dot1, 0);
-    animate(dot2, 150);
-    animate(dot3, 300);
+    const animate = (dot, delay) =>
+      Animated.sequence([
+        Animated.timing(dot, {
+          toValue: 1,
+          duration: 300,
+          delay,
+          useNativeDriver: true,
+        }),
+        Animated.timing(dot, {
+          toValue: 0.3,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]);
+
+    loopRef.current = Animated.loop(
+      Animated.parallel([
+        animate(dot1, 0),
+        animate(dot2, 150),
+        animate(dot3, 300),
+      ])
+    );
+
+    loopRef.current.start();
+
+    return () => {
+      try {
+        loopRef.current?.stop();
+      } catch {
+        // ignore
+      }
+    };
   }, []);
 
   return (
@@ -600,7 +620,7 @@ return (
           avatar: user.image || fallbackAvatar,
           realName: user.realName || user.name,
           providerName:
-            user.name === "Binkey"
+            user.name === "Demo1"
               ? "Planned Parenthood"
               : "Sexual Health London",
           testDate: "25 Sep 2025",
