@@ -55,12 +55,12 @@ export default function ShareScreen({ navigation }) {
   }, [searchFocused, activeTab]);
 
   const users = [
-    { id: 'zults-demo', name: 'Rezy', image: zultsImage, isBot: true },
-    { id: 'demo1', name: 'Demo1', image: melany, isVerified: true },
-    { id: 'demo2', name: 'Demo2', image: tomas, isVerified: false },
-    { id: 'demo3', name: 'Demo3', image: madman, isVerified: false },
-    { id: 'demo4', name: 'Demo4', image: goodguy, isVerified: false },
-  ];
+  { id: 'zults-demo', name: 'Rezy', image: zultsImage, isBot: true },
+  { id: 'demo1', name: 'Demo1', image: melany, isVerified: true, providerName: 'Planned Parenthood' },
+  { id: 'demo2', name: 'Demo2', image: tomas, isVerified: false, providerName: 'Planned Parenthood' },
+  { id: 'demo3', name: 'Demo3', image: madman, isVerified: false, providerName: 'Planned Parenthood' },
+  { id: 'demo4', name: 'Demo4', image: goodguy, isVerified: false, providerName: 'Planned Parenthood' },
+];
 
   const filteredUsers = users.filter((u) =>
     u.name.toLowerCase().includes(search.toLowerCase())
@@ -69,8 +69,8 @@ export default function ShareScreen({ navigation }) {
   const NAVBAR_HEIGHT = 30;
 
   const handleUserPress = (user) => {
-    navigation.navigate('UserChat', { user });
-  };
+  navigation.navigate('UserChat', { user });
+};
 
   const renderTabContent = () => {
     if (activeTab === 'Users') {

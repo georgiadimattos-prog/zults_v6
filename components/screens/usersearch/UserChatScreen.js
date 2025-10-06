@@ -30,7 +30,6 @@ import ZultsButton from "../../ui/ZultsButton";
 import RezultsActionButton from "../../ui/RezultsActionButton";
 import { DeviceEventEmitter } from "react-native";
 import ChatTopActions from "../../ui/ChatTopActions";
-import RezultsCardTooltip from "../../ui/RezultsCardTooltip";
 import { useFocusEffect } from "@react-navigation/native";
 
 const TomasAvatar = require("../../../assets/images/tomas.png");
@@ -608,16 +607,17 @@ return (
       status="view"
       onPress={() => {
         navigation.navigate("Rezults", {
-          username: user.name,
-          avatar: user.image || fallbackAvatar,
-          realName: user.realName || user.name,
-          providerName:
-            user.name === "Binkey"
-              ? "Planned Parenthood"
-              : "Sexual Health London",
-          testDate: "25 Sep 2025",
-          showExpand: true,
-        });
+  username: user.name,
+  avatar: user.image || fallbackAvatar,
+  realName: user.realName || user.name,
+  providerName:
+  ["Demo1", "Demo2", "Demo3", "Demo4"].includes(user.name)
+    ? "Planned Parenthood"
+    : "Sexual Health London",
+  testDate: "25 Sep 2025",
+  showExpand: true,
+  withTooltipStyle: true, // ✅ normal flat RezultsCard for Demo1–4
+});
       }}
     />
   ) : chatState.hasRequested ? (

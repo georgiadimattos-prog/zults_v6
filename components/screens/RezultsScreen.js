@@ -177,14 +177,25 @@ const styles = StyleSheet.create({
     marginLeft: 6,
   },
   expandedBox: {
-    borderRadius: 16,
-    marginHorizontal: 16,
-    marginTop: 16,
-    marginBottom: 32,
-    padding: 16,
-    minHeight: 200,
-    maxHeight: SCREEN_HEIGHT * 0.95,
-  },
+  borderRadius: 16,
+  marginHorizontal: 16,
+  marginTop: 16,
+  marginBottom: 32,
+  padding: 16,
+  minHeight: 200,
+  maxHeight: SCREEN_HEIGHT * 0.95,
+
+  // ✨ Add this for subtle card look
+  backgroundColor: "rgba(255,255,255,0.02)", // faint inner fill
+  borderWidth: 1,
+  borderColor: "rgba(255,255,255,0.08)",     // soft stroke visible on dark
+  overflow: "hidden",
+  shadowColor: "#000",
+  shadowOpacity: 0.15,
+  shadowRadius: 8,
+  shadowOffset: { width: 0, height: 2 },
+  elevation: 2, // for Android
+},
   expandedTitle: {
     ...typography.bodyMedium,
     fontSize: 14,

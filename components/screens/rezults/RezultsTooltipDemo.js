@@ -48,15 +48,15 @@ export default function RezultsTooltipDemo() {
 
         {/* Rezults card */}
         <RezultsCard
-          realName="Demo"
-          isVerified={true}
-          showRealName={true}
-          providerName="Planned Parenthood"
-          testDate="25 Sep 2025"
-          showExpand={true}
-          onExpand={setExpanded}
-          demoMode={true}
-        />
+  realName="Demo"
+  isVerified
+  showRealName
+  providerName="Planned Parenthood"
+  testDate="25 Sep 2025"
+  showExpand
+  onExpand={setExpanded}
+  withTooltipStyle={true} // ✅ bordered Apple-style version for Rezy
+/>
 
         {/* Expanded box */}
         {expanded && (

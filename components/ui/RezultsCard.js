@@ -6,6 +6,7 @@ import {
   TouchableWithoutFeedback,
   Dimensions,
   Image,
+  Linking,
 } from "react-native";
 import { Video } from "expo-av";
 import Animated, {
@@ -29,46 +30,49 @@ export default function RezultsCard({
   realName = null,
   isVerified = false,
   showRealName = false,
-  providerName = "Sexual Health London (SHL)",
+  providerName = "Planned Parenthood",
   testDate = "25 Sep 2025",
   videoSource = require("../../assets/videos/Card_All_GlowingBorder_25sec.mp4"),
   showExpand = false,
   onExpand,
+  withTooltipStyle = false, // 👈 new prop for bordered Apple-style layout
 }) {
   const [showBack, setShowBack] = useState(false);
   const [expanded, setExpanded] = useState(false);
 
-  const rotate = useSharedValue(0);
-  const iconRotate = useSharedValue(0);
+  // 🪄 entry animation
   const fadeIn = useSharedValue(0);
   const slideUp = useSharedValue(20);
-
   useEffect(() => {
-    // fade + slide on mount
-    fadeIn.value = withTiming(1, {
-      duration: 600,
-      easing: Easing.out(Easing.quad),
-    });
-    slideUp.value = withTiming(0, {
-      duration: 600,
-      easing: Easing.out(Easing.quad),
-    });
+    fadeIn.value = withTiming(1, { duration: 700, easing: Easing.out(Easing.quad) });
+    slideUp.value = withTiming(0, { duration: 700, easing: Easing.out(Easing.quad) });
   }, []);
+
+  const rotate = useSharedValue(0);
+  const iconRotate = useSharedValue(0);
 
   const flipCard = () => {
     rotate.value = withTiming(showBack ? 0 : 180, { duration: 400 });
     setShowBack(!showBack);
-    if (onExpand) onExpand(false);
+    onExpand?.(false);
   };
 
   const toggleExpand = () => {
     const next = !expanded;
     setExpanded(next);
-    if (onExpand) onExpand(next);
+    onExpand?.(next);
     iconRotate.value = withTiming(next ? 180 : 0, { duration: 300 });
   };
 
-  // card flip auto-demo
+  const handleProviderPress = () => {
+    if (providerName.includes("Planned Parenthood")) {
+      Linking.openURL("https://www.plannedparenthood.org/");
+    } else if (providerName.includes("Sexual Health London")) {
+      Linking.openURL("https://www.shl.uk/");
+    }
+  };
+
+  // 💫 subtle flip tease animation on mount
   useEffect(() => {
     const timer = setTimeout(() => {
       rotate.value = withTiming(180, { duration: 600 });
@@ -79,7 +83,7 @@ export default function RezultsCard({
     return () => clearTimeout(timer);
   }, []);
 
-  // reanimated styles
+  // === Animations ===
   const entryAnimStyle = useAnimatedStyle(() => ({
     opacity: fadeIn.value,
     transform: [{ translateY: slideUp.value }],
@@ -99,9 +103,16 @@ export default function RezultsCard({
     transform: [{ rotate: `${iconRotate.value}deg` }],
   }));
 
+  // === UI ===
   return (
     <TouchableWithoutFeedback onPress={flipCard}>
-      <Animated.View style={[styles.container, entryAnimStyle]}>
+      <Animated.View
+        style={[
+          styles.container,
+          entryAnimStyle,
+          withTooltipStyle && styles.tooltipContainer, // ✅ Rezy-only border
+        ]}
+      >
         {/* Front */}
         <Animated.View style={[styles.cardFront, frontAnimatedStyle]}>
           <Video
@@ -112,25 +123,38 @@ export default function RezultsCard({
             isMuted
             resizeMode="cover"
           />
-
           <Image source={logoIcon} style={styles.logo} resizeMode="contain" />
-
           <View style={styles.overlay}>
             <View>
               {isVerified && showRealName && realName && (
-                <Text style={styles.name}>{realName}</Text>
+                <Text style={styles.name} maxFontSizeMultiplier={1.2}>
+                  {realName}
+                </Text>
               )}
-              <Text style={styles.provider}>{providerName}</Text>
+              <Text style={styles.provider} maxFontSizeMultiplier={1.2}>
+                {providerName}
+              </Text>
             </View>
-            <Text style={styles.link}>Show Rezults</Text>
+            <Text style={styles.link} maxFontSizeMultiplier={1.2}>
+              Show Rezults
+            </Text>
           </View>
         </Animated.View>
 
         {/* Back */}
-        <Animated.View style={[styles.cardBack, backAnimatedStyle]}>
+        <Animated.View
+          style={[
+            styles.cardBack,
+            backAnimatedStyle,
+            expanded && styles.expandedBox,
+          ]}
+        >
           <View style={styles.backHeader}>
-            <Text style={styles.testedOn}>
-              Tested on <Text style={styles.testedDate}>{testDate}</Text>
+            <Text style={styles.testedOn} maxFontSizeMultiplier={1.2}>
+              Tested on{" "}
+              <Text style={styles.testedDate} maxFontSizeMultiplier={1.2}>
+                {testDate}
+              </Text>
             </Text>
 
             {showExpand && (
@@ -138,7 +162,10 @@ export default function RezultsCard({
                 <View style={styles.expandButton}>
                   <Animated.Image
                     source={expanded ? collapseIcon : expandIcon}
-                    style={[{ width: 20, height: 20, tintColor: "#FFF" }, iconAnimatedStyle]}
+                    style={[
+                      { width: 20, height: 20, tintColor: "#FFF" },
+                      iconAnimatedStyle,
+                    ]}
                     resizeMode="contain"
                   />
                 </View>
@@ -161,7 +188,9 @@ export default function RezultsCard({
               "Mycoplasma",
             ].map((label, idx) => (
               <View key={idx} style={styles.pill}>
-                <Text style={styles.pillText}>{label}</Text>
+                <Text style={styles.pillText} numberOfLines={2}>
+                  {label}
+                </Text>
               </View>
             ))}
           </View>
@@ -171,6 +200,7 @@ export default function RezultsCard({
   );
 }
 
+// === Styles ===
 const styles = StyleSheet.create({
   container: {
     width: CARD_WIDTH,
@@ -179,6 +209,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  tooltipContainer: {
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.15)",
+    borderRadius: 24,
+    padding: 6,
+    backgroundColor: "transparent",
+  },
   cardFront: {
     position: "absolute",
     width: CARD_WIDTH,
@@ -186,10 +223,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: "hidden",
   },
-  videoCard: {
-    width: "100%",
-    height: "100%",
-  },
+  videoCard: { width: "100%", height: "100%" },
   logo: {
     position: "absolute",
     top: CARD_HEIGHT * 0.06,
@@ -210,6 +244,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "500",
     color: colors.neutral[0],
+    marginRight: 6,
   },
   provider: {
     ...typography.bodyRegular,
@@ -233,6 +268,15 @@ const styles = StyleSheet.create({
     padding: 16,
     justifyContent: "space-between",
   },
+  expandedBox: {
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.15)",
+    backgroundColor: colors.background.surface1,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 5,
+  },
   backHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -246,19 +290,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  testedOn: {
-    ...typography.captionSmallRegular,
-    color: colors.foreground.soft,
-  },
-  testedDate: {
-    color: colors.foreground.default,
-    fontWeight: "500",
-  },
-  pillsBottom: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 3,
-  },
+  testedOn: { ...typography.captionSmallRegular, color: colors.foreground.soft },
+  testedDate: { color: colors.foreground.default, fontWeight: "500" },
+  pillsBottom: { flexDirection: "row", flexWrap: "wrap", gap: 3 },
   pill: {
     backgroundColor: "#5D5D5D",
     borderRadius: 20,
