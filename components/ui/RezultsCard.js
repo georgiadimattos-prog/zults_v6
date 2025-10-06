@@ -13,6 +13,7 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
   interpolate,
+  Easing,
 } from "react-native-reanimated";
 import { colors, typography } from "../../theme";
 
@@ -26,8 +27,8 @@ const CARD_HEIGHT = CARD_WIDTH / 1.586;
 
 export default function RezultsCard({
   realName = null,
-  isVerified = false,      // ✅ new prop
-  showRealName = false,    // ✅ new prop
+  isVerified = false,
+  showRealName = false,
   providerName = "Sexual Health London (SHL)",
   testDate = "25 Sep 2025",
   videoSource = require("../../assets/videos/Card_All_GlowingBorder_25sec.mp4"),
@@ -39,25 +40,35 @@ export default function RezultsCard({
 
   const rotate = useSharedValue(0);
   const iconRotate = useSharedValue(0);
+  const fadeIn = useSharedValue(0);
+  const slideUp = useSharedValue(20);
+
+  useEffect(() => {
+    // fade + slide on mount
+    fadeIn.value = withTiming(1, {
+      duration: 600,
+      easing: Easing.out(Easing.quad),
+    });
+    slideUp.value = withTiming(0, {
+      duration: 600,
+      easing: Easing.out(Easing.quad),
+    });
+  }, []);
 
   const flipCard = () => {
     rotate.value = withTiming(showBack ? 0 : 180, { duration: 400 });
     setShowBack(!showBack);
-
-    if (onExpand) {
-      onExpand(false);
-    }
+    if (onExpand) onExpand(false);
   };
 
   const toggleExpand = () => {
     const next = !expanded;
     setExpanded(next);
-    if (onExpand) {
-      onExpand(next);
-    }
+    if (onExpand) onExpand(next);
     iconRotate.value = withTiming(next ? 180 : 0, { duration: 300 });
   };
 
+  // card flip auto-demo
   useEffect(() => {
     const timer = setTimeout(() => {
       rotate.value = withTiming(180, { duration: 600 });
@@ -65,9 +76,14 @@ export default function RezultsCard({
         rotate.value = withTiming(0, { duration: 600 });
       }, 1200);
     }, 800);
-
     return () => clearTimeout(timer);
   }, []);
+
+  // reanimated styles
+  const entryAnimStyle = useAnimatedStyle(() => ({
+    opacity: fadeIn.value,
+    transform: [{ translateY: slideUp.value }],
+  }));
 
   const frontAnimatedStyle = useAnimatedStyle(() => ({
     transform: [{ rotateY: `${interpolate(rotate.value, [0, 180], [0, 180])}deg` }],
@@ -85,7 +101,7 @@ export default function RezultsCard({
 
   return (
     <TouchableWithoutFeedback onPress={flipCard}>
-      <View style={styles.container}>
+      <Animated.View style={[styles.container, entryAnimStyle]}>
         {/* Front */}
         <Animated.View style={[styles.cardFront, frontAnimatedStyle]}>
           <Video
@@ -101,30 +117,20 @@ export default function RezultsCard({
 
           <View style={styles.overlay}>
             <View>
-              {/* ✅ Only verified users may show their real name */}
               {isVerified && showRealName && realName && (
-  <Text style={styles.name} maxFontSizeMultiplier={1.2}>
-    {realName}
-  </Text>
-)}
-              <Text style={styles.provider} maxFontSizeMultiplier={1.2}>
-                {providerName}
-              </Text>
+                <Text style={styles.name}>{realName}</Text>
+              )}
+              <Text style={styles.provider}>{providerName}</Text>
             </View>
-            <Text style={styles.link} maxFontSizeMultiplier={1.2}>
-              Show Rezults
-            </Text>
+            <Text style={styles.link}>Show Rezults</Text>
           </View>
         </Animated.View>
 
         {/* Back */}
         <Animated.View style={[styles.cardBack, backAnimatedStyle]}>
           <View style={styles.backHeader}>
-            <Text style={styles.testedOn} maxFontSizeMultiplier={1.2}>
-              Tested on{" "}
-              <Text style={styles.testedDate} maxFontSizeMultiplier={1.2}>
-                {testDate}
-              </Text>
+            <Text style={styles.testedOn}>
+              Tested on <Text style={styles.testedDate}>{testDate}</Text>
             </Text>
 
             {showExpand && (
@@ -155,18 +161,12 @@ export default function RezultsCard({
               "Mycoplasma",
             ].map((label, idx) => (
               <View key={idx} style={styles.pill}>
-                <Text
-                  style={styles.pillText}
-                  maxFontSizeMultiplier={1.1}
-                  numberOfLines={2}
-                >
-                  {label}
-                </Text>
+                <Text style={styles.pillText}>{label}</Text>
               </View>
             ))}
           </View>
         </Animated.View>
-      </View>
+      </Animated.View>
     </TouchableWithoutFeedback>
   );
 }
@@ -205,12 +205,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "flex-end",
   },
-   name: {
+  name: {
     ...typography.bodyMedium,
     fontSize: 18,
     fontWeight: "500",
     color: colors.neutral[0],
-    marginRight: 6,
   },
   provider: {
     ...typography.bodyRegular,
