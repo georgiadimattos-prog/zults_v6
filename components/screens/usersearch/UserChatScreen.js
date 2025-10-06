@@ -43,20 +43,32 @@ function TypingDots() {
   const dot1 = useRef(new Animated.Value(0.3)).current;
   const dot2 = useRef(new Animated.Value(0.3)).current;
   const dot3 = useRef(new Animated.Value(0.3)).current;
+  const loopRef = useRef(null);
 
-  const animate = (dot, delay) => {
-    Animated.loop(
+  useEffect(() => {
+    const animate = (dot, delay) =>
       Animated.sequence([
         Animated.timing(dot, { toValue: 1, duration: 300, delay, useNativeDriver: true }),
         Animated.timing(dot, { toValue: 0.3, duration: 300, useNativeDriver: true }),
-      ])
-    ).start();
-  };
+      ]);
 
-  useEffect(() => {
-    animate(dot1, 0);
-    animate(dot2, 150);
-    animate(dot3, 300);
+    // ✅ store the loop so we can stop it on unmount
+    loopRef.current = Animated.loop(
+      Animated.parallel([
+        animate(dot1, 0),
+        animate(dot2, 150),
+        animate(dot3, 300),
+      ])
+    );
+    loopRef.current.start();
+
+    return () => {
+      try {
+        loopRef.current?.stop(); // ✅ stops safely
+      } catch {
+        // ignore if already unmounted
+      }
+    };
   }, []);
 
   return (
