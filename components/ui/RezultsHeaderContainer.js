@@ -1,0 +1,87 @@
+import React from "react";
+import { View, StyleSheet, TouchableOpacity, Image, Text } from "react-native";
+import { colors, typography } from "../../theme";
+
+import addIcon from "../../assets/images/add.png";
+import deleteIcon from "../../assets/images/delete-icon.png";
+import walletIcon from "../../assets/images/wallet-icon.png";
+
+export default function RezultsHeaderContainer({ onAdd, onDelete, onWallet }) {
+  return (
+    <View style={styles.container}>
+      {/* Right Actions only */}
+      <View style={styles.actions}>
+        {/* Delete button */}
+        <TouchableOpacity style={styles.iconButton} onPress={onDelete}>
+          <Image
+            source={deleteIcon}
+            style={[styles.iconSmall, { tintColor: colors.neutral[0] }]}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
+
+        {/* Wallet button */}
+        <TouchableOpacity style={styles.iconButton} onPress={onWallet}>
+          <Image
+            source={walletIcon}
+            style={[styles.iconSmall, { tintColor: colors.neutral[0] }]}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
+
+        {/* Add button */}
+        <TouchableOpacity style={styles.addButton} onPress={onAdd}>
+          <Image
+            source={addIcon}
+            style={styles.iconSmall}
+            resizeMode="contain"
+          />
+          <Text style={styles.addText}>New</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: "row",
+    justifyContent: "flex-end", // ✅ no left title, push actions right
+    alignItems: "center",
+    marginBottom: 0, // ✅ breathing space above RezultsCard
+
+  },
+  actions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  iconButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: "rgba(255,255,255,0.05)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  addButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: 20,
+    paddingVertical: 11,
+    borderRadius: 8,
+    backgroundColor: "#FFF",
+  },
+  addText: {
+    ...typography.bodyRegular,
+    fontSize: 14,
+    fontWeight: "400",
+    color: "#141414",
+    maxFontSizeMultiplier: 1.2, // ✅ keep capped
+  },
+  iconSmall: {
+    width: 20,
+    height: 20,
+  },
+});
