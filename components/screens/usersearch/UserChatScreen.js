@@ -566,37 +566,34 @@ return (
         </View>
 
         <View style={styles.userRow}>
-          <TouchableOpacity
-            onPress={() => {
-              if (route.params?.from === "Activities") {
-                navigation.goBack();
-              } else {
-                const hasAction = chatData.some(
-                  (msg) =>
-                    msg.type === "request" ||
-                    msg.type === "share" ||
-                    msg.type === "stop-share"
-                );
-                if (hasAction) {
-                  navigation.navigate("MainScreen");
-                } else {
-                  navigation.goBack();
-                }
-              }
-            }}
-          >
-            <Image source={arrowLeft} style={styles.backIcon} />
-          </TouchableOpacity>
+  <TouchableOpacity
+    style={styles.backArea}
+    onPress={() => {
+      if (route.params?.from === "Activities") {
+        navigation.goBack();
+      } else {
+        const hasAction = chatData.some(
+          (msg) =>
+            msg.type === "request" ||
+            msg.type === "share" ||
+            msg.type === "stop-share"
+        );
+        if (hasAction) {
+          navigation.navigate("MainScreen");
+        } else {
+          navigation.goBack();
+        }
+      }
+    }}
+    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} // ✅ comfortable tap zone
+  >
+    <Image source={arrowLeft} style={styles.backIcon} />
+    <Image source={user.image || fallbackAvatar} style={styles.avatar} />
+  </TouchableOpacity>
 
-          <Image source={user.image || fallbackAvatar} style={styles.avatar} />
-          <Text
-  style={styles.username}
-  numberOfLines={1}
-  ellipsizeMode="tail"
-  allowFontScaling={false} // ✅ locked for Apple baseline
->
-  {user.name}
-</Text>
+  <Text style={styles.username} numberOfLines={1} ellipsizeMode="tail">
+    {user.name}
+  </Text>
 
           {!isBlocked && (
   (isDemoChat && user.id === "zults-demo") ? (
@@ -910,7 +907,7 @@ const styles = StyleSheet.create({
   },
   moreIcon: { width: 24, height: 24, tintColor: colors.foreground.default },
   userRow: { flexDirection: "row", alignItems: "center", gap: 12 },
-  backIcon: { width: 28, height: 28, tintColor: colors.foreground.default },
+  backIcon: { width: 24, height: 24, tintColor: colors.foreground.default },
   avatar: { width: 40, height: 40, borderRadius: 20 },
   username: { ...typography.bodyMedium, color: colors.foreground.default, flex: 1, includeFontPadding: false },
   typingBubble: {
@@ -954,6 +951,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginLeft: 8,
   },
+  backArea: {
+  flexDirection: "row",
+  alignItems: "center",
+  paddingVertical: 8,
+  paddingRight: 12, // ✅ adds tappable area behind avatar
+},
   sendIcon: { width: 20, height: 20, tintColor: colors.neutral[0] },
   blockOverlay: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0,0,0,0.6)" },
   blockedText: { ...typography.bodyMedium, color: colors.foreground.soft },
