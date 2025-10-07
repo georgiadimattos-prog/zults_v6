@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
   },
 
-  // Typography (front)
+  // ─── Front ───
   name: {
     ...typography.bodyMedium,
     fontSize: 16,
@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
 
-  // Back side
+  // ─── Back ───
   cardBack: {
     position: "absolute",
     width: CARD_WIDTH,
@@ -277,10 +277,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
+  // ─── Text (back side) ───
   testedOn: {
-    ...typography.bodyRegular,
-    fontSize: 15,
-    lineHeight: 20,
+    ...typography.captionLargeRegular, // ✅ 14 / 18 / -0.07
     color: colors.foreground.soft,
   },
   testedDate: {
@@ -288,6 +287,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 
+  // ─── Pills ───
   pillsBottom: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -302,9 +302,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   pillText: {
-    ...typography.bodyRegular,
-    fontSize: 14,
-    lineHeight: 18,
+    ...typography.captionLargeRegular, // ✅ 14pt matches expanded info hierarchy
     color: colors.foreground.default,
     textAlign: "center",
   },

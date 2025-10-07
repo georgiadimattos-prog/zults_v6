@@ -7,7 +7,7 @@ export default function RezultsActionButton({ status, onPress }) {
       return (
         <ZultsButton
           label="Request Rezults"
-          type="secondary"   // white pill
+          type="secondary"      // ✅ white pill
           size="medium"
           fullWidth={false}
           pill
@@ -19,7 +19,7 @@ export default function RezultsActionButton({ status, onPress }) {
       return (
         <ZultsButton
           label="Rezults Requested"
-          type="ghost"       // gray pill
+          type="ghost"          // ✅ subtle muted pill
           size="medium"
           fullWidth={false}
           pill
@@ -31,7 +31,7 @@ export default function RezultsActionButton({ status, onPress }) {
       return (
         <ZultsButton
           label="View Rezults"
-          type="brand"       // purple pill
+          type="brand"          // ✅ purple pill
           size="medium"
           fullWidth={false}
           pill
@@ -41,17 +41,18 @@ export default function RezultsActionButton({ status, onPress }) {
 
     case "stop":
       return (
-       <ZultsButton
-      label="Stop Sharing"
-      type="secondary"     // ✅ white pill with dark text
-      size="medium"         // bigger for emphasis
-      fullWidth={true}     // full width to replace input area
-      pill
-      onPress={onPress}
-    />
-  );
+        <ZultsButton
+          label="Stop Sharing"
+          type="secondary"       // ✅ white pill with dark text
+          size="medium"
+          fullWidth={true}       // ✅ full width replaces input area
+          pill
+          onPress={onPress}
+        />
+      );
 
     default:
       return null;
   }
 }
+

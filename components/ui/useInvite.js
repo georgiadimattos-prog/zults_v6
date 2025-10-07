@@ -1,22 +1,40 @@
 // components/ui/useInvite.js
-import { Share, Alert } from "react-native";
+import { Share, Alert, Platform } from "react-native";
 import { rezultsCache } from "../../cache/rezultsCache";
 
 export function useInvite() {
   const sendInvite = async () => {
     try {
-      const username = rezultsCache.card?.userName || "Jonster";
+      // ✅ Safely pull username or default
+      const username = rezultsCache.card?.userName?.trim() || "Jonster";
       const link = "https://apps.apple.com/gb/app/zults/id1540963918";
-      const message = `Download Zults and find me 💜 My username is: ${username}\n\nGet the app here: ${link}`;
 
-      await Share.share({
-        message,
-        url: link,
-        title: "Invite to Zults",
-      });
+      // ✅ Clean native message
+      const message =
+        `Join me on Zults 💜\n` +
+        `My username: ${username}\n\n` +
+        `Download the app here:\n${link}`;
+
+      // ✅ Build correct payload per platform
+      const shareOptions =
+        Platform.OS === "ios"
+          ? {
+              title: "Invite to Zults",
+              message,
+              url: link, // iOS uses this for link previews
+            }
+          : {
+              message, // Android only supports message
+            };
+
+      // ✅ Native share sheet
+      await Share.share(shareOptions);
     } catch (err) {
       console.error("Error sharing invite:", err);
-      Alert.alert("Error", "Something went wrong while trying to share the invite.");
+      Alert.alert(
+        "Error",
+        "Something went wrong while trying to share your invite."
+      );
     }
   };
 

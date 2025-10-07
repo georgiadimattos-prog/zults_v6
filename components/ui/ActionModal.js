@@ -27,22 +27,25 @@ export default function ActionModal({
       {/* Tap outside to close */}
       <TouchableWithoutFeedback onPress={onClose}>
         <BlurView intensity={40} tint="dark" style={styles.overlay}>
-          {/* Prevent closing when tapping inside content */}
           <TouchableWithoutFeedback>
             <View style={styles.container}>
               {/* Title */}
-              <Text
-                style={styles.title}
-                allowFontScaling={false} // 🚫 keep title fixed
-              >
-                {title}
-              </Text>
+              {title ? (
+                <Text
+                  style={styles.title}
+                  allowFontScaling
+                  maxFontSizeMultiplier={1.3}
+                >
+                  {title}
+                </Text>
+              ) : null}
 
               {/* Description */}
               {description ? (
                 <Text
                   style={styles.description}
-                  maxFontSizeMultiplier={1.2} // ✅ allow scaling but capped
+                  allowFontScaling
+                  maxFontSizeMultiplier={1.3}
                 >
                   {description}
                 </Text>
@@ -50,22 +53,21 @@ export default function ActionModal({
 
               {/* Action buttons */}
               {actions.map((action, idx) => (
-                <ZultsButton
-                  key={idx}
-                  label={action.label}
-                  type="primary"
-                  size="large"
-                  fullWidth
-                  onPress={() => {
-                    action.onPress?.();
-                    onClose();
-                  }}
-                />
+                <View key={idx} style={{ marginBottom: 12 }}>
+                  <ZultsButton
+                    label={action.label}
+                    type="primary"
+                    size="large"
+                    fullWidth
+                    onPress={() => {
+                      action.onPress?.();
+                      onClose();
+                    }}
+                  />
+                </View>
               ))}
 
-              <View style={{ height: 12 }} />
-
-              {/* Cancel button */}
+              {/* Cancel */}
               <ZultsButton
                 label="Cancel"
                 type="ghost"
@@ -90,18 +92,18 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.surface2,
     borderTopLeftRadius: 32,
     borderTopRightRadius: 32,
-    paddingTop: 24,
+    paddingTop: 28,         // ✅ Apple-like spacing
     paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingBottom: 32,
   },
   title: {
-    ...typography.largeTitleMedium, // ✅ same as screen titles
+    ...typography.title1Medium,    // ✅ 28 / 34 / -0.28 (Apple modal header)
     color: colors.foreground.default,
-    marginBottom: 16,
+    marginBottom: 12,
   },
   description: {
-    ...typography.bodyRegular, // ✅ same as subtitles
+    ...typography.bodyRegular,     // ✅ unified subtitle
     color: colors.foreground.soft,
-    marginBottom: 24,
+    marginBottom: 28,
   },
 });

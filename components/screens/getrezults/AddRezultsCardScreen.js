@@ -19,8 +19,7 @@ const PROVIDER_NAMES = {
 export default function AddRezultsCardScreen() {
   const navigation = useNavigation();
   const route = useRoute();
-  const { providerId, resultsLink } = route.params || {};
-
+  const { providerId } = route.params || {};
   const providerName = PROVIDER_NAMES[providerId] || "Your Provider";
 
   const handleAddRezults = () => {
@@ -30,7 +29,7 @@ export default function AddRezultsCardScreen() {
       isVerified: true,
       showRealName: true,
       providerName,
-      testDate: "12 Dec 2025",
+      testDate: "20 Oct 2025",
     };
 
     navigation.reset({
@@ -67,7 +66,7 @@ export default function AddRezultsCardScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
+        {/* ─── Header ─── */}
         <View style={styles.headerBlock}>
           <Text style={styles.title} allowFontScaling={false}>
             Your Rezults
@@ -75,9 +74,11 @@ export default function AddRezultsCardScreen() {
 
           <Text
             style={[typography.bodyRegular, styles.subtitle]}
+            allowFontScaling
             maxFontSizeMultiplier={1.3}
           >
-            By tapping Add Rezults, you confirm this information is your own and accurate.{" "}
+            By tapping <Text style={styles.highlight}>Add Rezults</Text>, you confirm this
+            information is your own and accurate.{" "}
             <Text
               style={styles.link}
               onPress={() => navigation.navigate("PolicyScreen")}
@@ -87,7 +88,7 @@ export default function AddRezultsCardScreen() {
           </Text>
         </View>
 
-        {/* Rezults Card Preview */}
+        {/* ─── Rezults Card Preview ─── */}
         <View style={styles.cardWrapper}>
           <RezultsCard
             realName="John Doe"
@@ -99,7 +100,7 @@ export default function AddRezultsCardScreen() {
         </View>
       </ScrollView>
 
-      {/* Footer actions */}
+      {/* ─── Footer ─── */}
       <ScreenFooter>
         <ZultsButton
           label="Add Rezults"
@@ -114,6 +115,7 @@ export default function AddRezultsCardScreen() {
           size="large"
           fullWidth
           onPress={handleCancel}
+          style={{ marginTop: 8 }}
         />
       </ScreenFooter>
     </ScreenWrapper>
@@ -127,28 +129,30 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16, // ✅ baseline gutter
   },
 
+  // ─── Header ───
   headerBlock: {
     marginTop: 32,
     marginBottom: 24,
   },
-
   title: {
-    ...typography.largeTitleMedium,      // ✅ 34 / 41 hero size
-    color: colors.foreground.default,    // ✅ white
-    marginBottom: 8,                     // ✅ tight rhythm
-    allowFontScaling: false,             // ✅ locked
+    ...typography.largeTitleMedium, // ✅ Apple-style hero title
+    color: colors.foreground.default,
+    marginBottom: 8,
   },
-
   subtitle: {
-    color: colors.foreground.soft,       // ✅ soft gray tone
+    color: colors.foreground.soft,
     flexWrap: "wrap",
   },
-
+  highlight: {
+    color: colors.foreground.default,
+    fontWeight: "500", // ✅ subtle visual anchor
+  },
   link: {
+    color: colors.info.onContainer, // ✅ Zults blue link
     textDecorationLine: "underline",
-    color: colors.info.onContainer,      // ✅ brand blue (same as elsewhere)
   },
 
+  // ─── Card Preview ───
   cardWrapper: {
     width: "100%",
     alignItems: "center",

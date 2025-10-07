@@ -42,7 +42,6 @@ export default function GetRezults_PasteLinkScreen() {
   const [selectedProvider, setSelectedProvider] = useState(null);
   const [showSheet, setShowSheet] = useState(false);
   const [link, setLink] = useState("");
-
   const inputRef = useRef(null);
 
   const handleContinue = () => {
@@ -56,8 +55,8 @@ export default function GetRezults_PasteLinkScreen() {
   const handleProviderSelect = (provider) => {
     setSelectedProvider(provider);
     setShowSheet(false);
-    setLink(provider.baseUrl);          // ✅ auto-fill base link
-    setTimeout(() => inputRef.current?.focus(), 300); // ✅ focus input after animation
+    setLink(provider.baseUrl);
+    setTimeout(() => inputRef.current?.focus(), 300);
   };
 
   return (
@@ -81,20 +80,23 @@ export default function GetRezults_PasteLinkScreen() {
             contentContainerStyle={[styles.content, { paddingBottom: 90 }]}
             keyboardShouldPersistTaps="handled"
           >
-            {/* Header */}
+            {/* ─── Header ─── */}
             <View style={styles.headerBlock}>
               <Text style={styles.title} allowFontScaling={false}>
                 Add your Rezults
               </Text>
+
               <Text
                 style={[typography.bodyRegular, styles.subtitle]}
+                allowFontScaling
                 maxFontSizeMultiplier={1.3}
               >
-                Find your STI results link from your provider and paste it below to turn it into your Rezults.
+                Find your STI results link from your provider and paste it below
+                to turn it into your Rezults.
               </Text>
             </View>
 
-            {/* Provider dropdown */}
+            {/* ─── Provider Dropdown ─── */}
             <TouchableOpacity
               onPress={() => {
                 Haptics.selectionAsync();
@@ -120,10 +122,7 @@ export default function GetRezults_PasteLinkScreen() {
                 </>
               ) : (
                 <Text
-                  style={[
-                    styles.dropdownText,
-                    { color: colors.foreground.soft },
-                  ]}
+                  style={[styles.dropdownText, { color: colors.foreground.soft }]}
                   maxFontSizeMultiplier={1.3}
                 >
                   Select your provider
@@ -132,7 +131,7 @@ export default function GetRezults_PasteLinkScreen() {
               <Image source={chevronDown} style={styles.chevron} />
             </TouchableOpacity>
 
-            {/* Link input */}
+            {/* ─── Link Input ─── */}
             {selectedProvider && (
               <ZultsInput
                 ref={inputRef}
@@ -147,7 +146,7 @@ export default function GetRezults_PasteLinkScreen() {
             )}
           </ScrollView>
 
-          {/* Footer */}
+          {/* ─── Footer ─── */}
           <ScreenFooter>
             <ZultsButton
               label="Continue"
@@ -157,6 +156,7 @@ export default function GetRezults_PasteLinkScreen() {
               onPress={handleContinue}
               disabled={!selectedProvider || link.trim().length < 5}
             />
+
             <TouchableOpacity
               style={{ marginTop: 12 }}
               onPress={() =>
@@ -167,12 +167,13 @@ export default function GetRezults_PasteLinkScreen() {
             >
               <Text
                 style={[
-                  typography.subheadlineRegular,
+                  typography.subheadlineRegular, // ✅ smaller Apple-style footnote link
                   {
                     color: colors.foreground.muted,
                     textAlign: "center",
                   },
                 ]}
+                allowFontScaling
                 maxFontSizeMultiplier={1.3}
               >
                 Don’t see your provider? Let us know.
@@ -180,7 +181,7 @@ export default function GetRezults_PasteLinkScreen() {
             </TouchableOpacity>
           </ScreenFooter>
 
-          {/* Provider picker modal */}
+          {/* ─── Provider Picker Modal ─── */}
           <Modal
             transparent
             visible={showSheet}
@@ -209,6 +210,7 @@ export default function GetRezults_PasteLinkScreen() {
                         />
                         <Text
                           style={styles.sheetText}
+                          allowFontScaling
                           maxFontSizeMultiplier={1.3}
                           numberOfLines={1}
                         >
@@ -231,32 +233,48 @@ const styles = StyleSheet.create({
   content: { paddingHorizontal: 16 },
   headerBlock: { marginTop: 32, marginBottom: 24 },
 
+  // ─── Title / Subtitle ───
   title: {
-    ...typography.largeTitleMedium,
+    ...typography.largeTitleMedium, // ✅ 32 / 36 / -0.64
     color: colors.foreground.default,
     marginBottom: 8,
-    allowFontScaling: false,
   },
-  subtitle: { marginTop: 8, flexWrap: "wrap" },
+  subtitle: {
+    marginTop: 8,
+    flexWrap: "wrap",
+  },
 
-  dropdown: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    borderRadius: 18,
-    backgroundColor: "rgba(255,255,255,0.12)",
-    paddingHorizontal: 18,
-    paddingVertical: 20,
-    marginBottom: 12,
-  },
-  dropdownText: {
-    ...typography.bodyRegular,
-    color: colors.foreground.default,
-    flex: 1,
-  },
-  chevron: { width: 22, height: 22, tintColor: colors.foreground.muted },
-  providerLogo: { width: 64, height: 64, marginRight: 14 },
+  // ─── Provider Dropdown ───
+dropdown: {
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "space-between",
+  borderRadius: 16,                         // ✅ same curvature as InfoCards
+  backgroundColor: colors.background.surface2, // ✅ same tone
+  paddingHorizontal: 16,
+  paddingVertical: 14,                      // ✅ matches InfoCard vertical padding
+  marginBottom: 12,
+},
 
+dropdownText: {
+  ...typography.headlineMedium,             // ✅ same typographic scale as InfoCard title
+  color: colors.foreground.default,
+  flex: 1,
+},
+
+providerLogo: {
+  width: 48,                                // ✅ same icon proportion as InfoCard icons
+  height: 48,
+  marginRight: 12,
+},
+
+chevron: {
+  width: 20,
+  height: 20,
+  tintColor: colors.foreground.muted,
+},
+
+  // ─── Modal ───
   overlay: {
     flex: 1,
     justifyContent: "flex-end",
@@ -270,11 +288,9 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   sheetTitle: {
-    ...typography.largeTitleMedium,
-    fontSize: 24,
-    lineHeight: 30,
+    ...typography.title1Medium, // ✅ Apple-style modal title (28 / 34)
     color: colors.foreground.default,
-    marginBottom: 16,
+    marginBottom: 24,
   },
   sheetItem: {
     flexDirection: "row",
@@ -287,8 +303,8 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   sheetText: {
-    ...typography.bodyRegular,
-    color: colors.foreground.default,
-    flexShrink: 1,
-  },
+  ...typography.headlineMedium,
+  color: colors.foreground.soft, // ✅ softer 60% white tone
+  flexShrink: 1,
+},
 });

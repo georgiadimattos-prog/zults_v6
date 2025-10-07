@@ -620,10 +620,10 @@ return (
           avatar: user.image || fallbackAvatar,
           realName: user.realName || user.name,
           providerName:
-            user.name === "Demo1"
+            user.name === "Melany"
               ? "Planned Parenthood"
               : "Sexual Health London",
-          testDate: "25 Sep 2025",
+          testDate: "20 Oct 2025",
           showExpand: true,
         });
       }}

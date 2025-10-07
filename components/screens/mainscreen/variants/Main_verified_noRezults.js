@@ -3,7 +3,6 @@ import { View, ScrollView, StatusBar, StyleSheet } from 'react-native';
 import { colors } from '../../../../theme';
 import UserProfileHeader from '../../../ui/UserProfileHeader';
 import RezultsCardPlaceholder from '../../../ui/RezultsCardPlaceholder';
-import ActivitiesHeader from '../../../ui/ActivitiesHeader';
 import ActivityRow from '../../../ui/ActivityRow';
 import NotificationCard from '../../../ui/NotificationCard';
 import VerifiedBadge from '../../../ui/VerifiedBadge';

@@ -47,8 +47,9 @@ export default function DeleteModal({ visible, onClose }) {
               </Text>
 
               {/* Description */}
-              <Text style={styles.description} maxFontSizeMultiplier={1.2}>
+              <Text style={styles.description} maxFontSizeMultiplier={1.3}>
                 This will permanently remove your Rezults and disable sharing.
+                You can always add them again later.
               </Text>
 
               {/* Actions */}
@@ -91,13 +92,14 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   title: {
-    ...typography.largeTitleMedium,   // ✅ unified modal title
-    color: colors.foreground.default,
-    marginBottom: 16,
+    ...typography.largeTitleMedium,   // ✅ same hero modal title
+    color: colors.foreground.default, // white
+    marginBottom: 12,                 // tighter for rhythm
   },
   description: {
-    ...typography.bodyRegular,        // ✅ unified modal subtitle
+    ...typography.bodyRegular,
     color: colors.foreground.soft,
     marginBottom: 24,
+    lineHeight: 20,
   },
 });

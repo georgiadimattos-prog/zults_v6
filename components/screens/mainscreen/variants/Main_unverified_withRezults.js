@@ -1,4 +1,3 @@
-// components/screens/mainscreen/variants/MainUnverifiedWithRezults.js
 import React, { useState, useRef } from "react";
 import {
   View,
@@ -34,12 +33,11 @@ export default function MainUnverifiedWithRezults({ onLinkPress, onSharePress })
   const [recentUsers, setRecentUsers] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [headerHeight, setHeaderHeight] = useState(0); // ✅ dynamic header height
+  const [headerHeight, setHeaderHeight] = useState(0);
 
-  // 🔄 animation controller for RezultsCard
   const fadeAnim = useRef(new Animated.Value(1)).current;
 
-  // 🔄 refresh whenever screen is focused
+  // refresh on focus
   useFocusEffect(
     React.useCallback(() => {
       let users = Object.keys(chatCache)
@@ -56,33 +54,33 @@ export default function MainUnverifiedWithRezults({ onLinkPress, onSharePress })
         .sort((a, b) => (a.lastTimestamp < b.lastTimestamp ? 1 : -1));
 
       if (users.length === 0 && !hasSeededDemo()) {
-  const demoId = "zults-demo";
-  chatCache[demoId] = {
-    user: {
-      id: demoId,
-      name: "Rezy",
-      image: zultsLogo,
-      isBot: true,
-    },
-    chatData: [],
-    chatState: { hasShared: false, hasRequested: false },
-    otherUserState: { hasShared: false, hasRequested: false },
-    blocked: false,
-    hasUnread: true,   // ✅ mark Rezy unread on seed
-  };
+        const demoId = "zults-demo";
+        chatCache[demoId] = {
+          user: {
+            id: demoId,
+            name: "Rezy",
+            image: zultsLogo,
+            isBot: true,
+          },
+          chatData: [],
+          chatState: { hasShared: false, hasRequested: false },
+          otherUserState: { hasShared: false, hasRequested: false },
+          blocked: false,
+          hasUnread: true,
+        };
 
-  users = [
-    {
-      id: demoId,
-      name: "Rezy",
-      avatar: zultsLogo,
-      lastTimestamp: "Now",
-      hasUnread: true,  // ✅ carry through to recentUsers
-    },
-  ];
+        users = [
+          {
+            id: demoId,
+            name: "Rezy",
+            avatar: zultsLogo,
+            lastTimestamp: "Now",
+            hasUnread: true,
+          },
+        ];
 
-  markDemoSeeded();
-}
+        markDemoSeeded();
+      }
 
       setRecentUsers(users);
     }, [])
@@ -110,7 +108,7 @@ export default function MainUnverifiedWithRezults({ onLinkPress, onSharePress })
     );
   };
 
-  // 🗑 handle Rezults deletion with animation
+  // delete Rezults with animation
   const handleDeleteRezults = () => {
     Animated.timing(fadeAnim, {
       toValue: 0,
@@ -127,16 +125,11 @@ export default function MainUnverifiedWithRezults({ onLinkPress, onSharePress })
     });
   };
 
-  // ✅ declare unreadUsers right here, before return
   const unreadUsers = recentUsers.filter((u) => u.hasUnread);
 
   return (
     <ScreenWrapper>
-      <StatusBar
-        barStyle="light-content"
-        backgroundColor="transparent"
-        translucent
-      />
+      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       <UserProfileHeader
         hideVerification
         onLayout={(e) => setHeaderHeight(e.nativeEvent.layout.height)}
@@ -144,91 +137,102 @@ export default function MainUnverifiedWithRezults({ onLinkPress, onSharePress })
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={[
-          styles.scrollContent,
-          { paddingTop: headerHeight }, // ✅ dynamic push-down
-        ]}
+        contentContainerStyle={[styles.scrollContent, { paddingTop: headerHeight }]}
       >
-        {/* Rezults block (actions + card + expiry) */}
-<View style={{ marginBottom: 12 }}></View>
+        {/* ─── Rezults Block ─── */}
+        <View style={{ marginBottom: 12 }} />
         <RezultsHeaderContainer
           onAdd={() => setShowAddModal(true)}
           onDelete={() => setShowDeleteModal(true)}
-          onWallet={() => navigation.navigate("AddToWallet")} // 👈 wire it here
+          onWallet={() => navigation.navigate("AddToWallet")}
         />
 
-        {/* Animated Rezults card */}
+        {/* ─── Animated Rezults Card ─── */}
         <Animated.View
-  style={{
-    opacity: fadeAnim,
-    transform: [{ scale: fadeAnim }],
-  }}
->
-  <RezultsCard
-  realName={rezultsCache.card?.realName || null}     // ✅ pull real name from cache
-  isVerified={rezultsCache.card?.isVerified || false} 
-  showRealName={rezultsCache.card?.showRealName || false}
-  providerName={rezultsCache.card?.providerName || "Unknown Provider"}
-  testDate={rezultsCache.card?.testDate || "Unknown Date"}
-/>
-  <View style={{ marginTop: 12 }}>
-    <ExpireContainer expiryDate="29 Sep 2025" daysLeft={43} />
-  </View>
-</Animated.View>
+          style={{
+            opacity: fadeAnim,
+            transform: [{ scale: fadeAnim }],
+          }}
+        >
+          <RezultsCard
+            realName={rezultsCache.card?.realName || null}
+            isVerified={rezultsCache.card?.isVerified || false}
+            showRealName={rezultsCache.card?.showRealName || false}
+            providerName={rezultsCache.card?.providerName || "Unknown Provider"}
+            testDate={rezultsCache.card?.testDate || "Unknown Date"}
+          />
+          <View style={{ marginTop: 12 }}>
+            <ExpireContainer expiryDate="20 Jan 2026" daysLeft={92} />
+          </View>
+        </Animated.View>
 
-<ZultsButton
-  label="Share"
-  type="primary"
-  size="large"
-  onPress={onSharePress}
-  style={{ marginTop: 16 }}   // 👈 spacing below expiry
-/>
+        {/* ─── Share Button ─── */}
+        <ZultsButton
+          label="Share"
+          type="primary"
+          size="large"
+          onPress={onSharePress}
+          style={{ marginTop: 16 }}
+        />
 
-{/* Activities Section */}
+        {/* ─── Activities Section ─── */}
 <View style={{ marginTop: 24 }}>
   <View style={styles.activitiesHeader}>
-    <Text style={styles.sectionTitle}>Activities</Text>
+    <Text
+      style={styles.sectionTitle}
+      allowFontScaling
+      maxFontSizeMultiplier={1.3}   // ✅ now scales naturally like all sub-titles
+    >
+      Activities
+    </Text>
     <TouchableOpacity
       onPress={() => navigation.navigate("Activities")}
       hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
     >
-      <Text style={styles.viewAll}>View All</Text>
+      <Text
+        style={styles.viewAll}
+        allowFontScaling
+        maxFontSizeMultiplier={1.3}
+      >
+        View All
+      </Text>
     </TouchableOpacity>
   </View>
 
   <TouchableOpacity
     style={styles.activitiesCard}
     activeOpacity={0.8}
-    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
     onPress={() => navigation.navigate("Activities")}
   >
     {recentUsers.length > 0 ? (
       <View style={styles.row}>
-        <View style={styles.avatarRow}>
-          {recentUsers.slice(0, 3).map((user, index) => (
-            <Image
-              key={user.id}
-              source={user.avatar}
-              style={[styles.avatar, { marginLeft: index === 0 ? 0 : -12 }]}
-            />
-          ))}
-          {recentUsers.length > 3 && (
-            <View style={[styles.avatar, styles.extraAvatar]}>
-              <Text style={styles.extraText}>+{recentUsers.length - 3}</Text>
-            </View>
-          )}
-        </View>
-
-        <Text style={styles.activityText}>
+        {renderAvatars()}
+        <Text
+          style={styles.activityText}
+          allowFontScaling
+          maxFontSizeMultiplier={1.3}  // ✅ ensure activity text also scales
+        >
           {unreadUsers.length > 0
-            ? `${unreadUsers.length} unread message${unreadUsers.length > 1 ? "s" : ""}`
+            ? `${unreadUsers.length} unread message${
+                unreadUsers.length > 1 ? "s" : ""
+              }`
             : "No recent activity"}
         </Text>
       </View>
     ) : (
       <View>
-        <Text style={styles.emptyTitle}>No recent activity</Text>
-        <Text style={styles.emptySubtitle}>
+        <Text
+          style={styles.emptyTitle}
+          allowFontScaling
+          maxFontSizeMultiplier={1.3}
+        >
+          No recent activity
+        </Text>
+        <Text
+          style={styles.emptySubtitle}
+          allowFontScaling
+          maxFontSizeMultiplier={1.3}
+        >
           You’ll see Rezults shared here
         </Text>
       </View>
@@ -236,15 +240,16 @@ export default function MainUnverifiedWithRezults({ onLinkPress, onSharePress })
   </TouchableOpacity>
 </View>
 
+        {/* ─── Notifications ─── */}
         <NotificationCard />
       </ScrollView>
 
-      {/* Confirm Modal */}
+      {/* ─── Confirm Modal ─── */}
       <ConfirmModal
         visible={showAddModal}
         onClose={() => setShowAddModal(false)}
-        title="Add a new Rezults?"
-        description="By adding a new Rezults, your current card will be replaced with the latest one."
+        title="Add New?"
+        description="By adding a new Rezults, your current one will be replaced with the latest one."
         confirmLabel="Continue"
         onConfirm={() => {
           setShowAddModal(false);
@@ -252,7 +257,7 @@ export default function MainUnverifiedWithRezults({ onLinkPress, onSharePress })
         }}
       />
 
-      {/* Delete Modal */}
+      {/* ─── Delete Modal ─── */}
       <DeleteModal
         visible={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
@@ -266,24 +271,34 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 16,
     paddingBottom: 32,
-    gap: 20,   // 👈 section rhythm, was 24
+    gap: 20,
+  },
+
+  // ─── Activities ───
+  activitiesHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginHorizontal: 4,
+    marginBottom: 12,
   },
   sectionTitle: {
-  ...typography.headlineMedium,
-  color: colors.foreground.default,
-},
-  activitiesCard: {
-  backgroundColor: colors.background.surface2,
-  borderRadius: 16,
-  paddingHorizontal: 16,
-  paddingVertical: 16,  // 👈 reduced from 20 → 16 for balance
-  alignItems: "center",
-  justifyContent: "center",
-},
-  avatarRow: {
-    flexDirection: "row",
-    alignItems: "center",
+    ...typography.title4Medium,       // ✅ 18 / 24 / -0.18 Apple section header
+    color: colors.foreground.default,
   },
+  viewAll: {
+    ...typography.subheadlineRegular, // ✅ 14 / 18 / -0.07 small link
+    color: colors.info.onContainer,   // ✅ Zults blue
+  },
+  activitiesCard: {
+    backgroundColor: colors.background.surface2,
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  avatarRow: { flexDirection: "row", alignItems: "center" },
   avatar: {
     width: 36,
     height: 36,
@@ -302,37 +317,24 @@ const styles = StyleSheet.create({
     color: colors.foreground.default,
     fontWeight: "600",
   },
-  activitiesHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginHorizontal: 4,
-    marginBottom: 12,  // 👈 bumped from 8 → 12 for cleaner rhythm
-  },
-  viewAll: {
-  ...typography.captionSmallRegular,   // 👈 lighter, smaller
-  color: colors.brand.accent,
-},
   row: {
-  flexDirection: "row",
-  alignItems: "center",
-  justifyContent: "space-between",
-  width: "100%",
-},
-activityText: {
-  ...typography.subheadlineRegular,
-  color: colors.foreground.soft,   // 👈 lighter than default
-  marginLeft: 12,
-},
-emptyTitle: {
-  ...typography.subheadlineMedium,
-  color: colors.foreground.default,
-  textAlign: "center",
-  marginBottom: 4,
-},
-emptySubtitle: {
-  ...typography.subheadlineRegular,
-  color: colors.foreground.muted,
-  textAlign: "center",
-},
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  activityText: {
+    ...typography.bodyRegular,
+    color: colors.foreground.soft,
+    marginLeft: 12,
+  },
+  emptyTitle: {
+    ...typography.subheadlineMedium,
+    color: colors.foreground.default,
+    textAlign: "center",
+    marginBottom: 4,
+  },
+  emptySubtitle: {
+    ...typography.subheadlineRegular,
+    color: colors.foreground.muted,
+    textAlign: "center",
+  },
 });

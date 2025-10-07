@@ -22,24 +22,39 @@ export default function ChatTopActions({ status, onRequest, onTooltip, highlight
   return (
     <View style={styles.container}>
       {status === "request" && (
-        <TouchableOpacity style={styles.button} onPress={onRequest}>
-          <Text style={styles.buttonText}>Request Rezults</Text>
+        <TouchableOpacity
+          style={[styles.button, styles.primary]}
+          onPress={onRequest}
+          activeOpacity={0.85}
+        >
+          <Text style={styles.buttonText} allowFontScaling maxFontSizeMultiplier={1.3}>
+            Request Rezults
+          </Text>
         </TouchableOpacity>
       )}
 
       {status === "requested" && (
         <View style={[styles.button, styles.disabled]}>
-          <Text style={styles.buttonText}>Requested</Text>
+          <Text style={styles.buttonText} allowFontScaling maxFontSizeMultiplier={1.3}>
+            Requested
+          </Text>
         </View>
       )}
 
       {status === "view" && (
         <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
           <TouchableOpacity
-            style={[styles.button, highlightViewCTA && { backgroundColor: colors.brand.purple1 }]}
+            style={[
+              styles.button,
+              styles.primary,
+              highlightViewCTA && { backgroundColor: colors.brand.purple1 },
+            ]}
             onPress={onTooltip}
+            activeOpacity={0.85}
           >
-            <Text style={[styles.buttonText, { color: "#fff" }]}>View Rezults</Text>
+            <Text style={[styles.buttonText, { color: "#fff" }]} allowFontScaling maxFontSizeMultiplier={1.3}>
+              View Rezults
+            </Text>
           </TouchableOpacity>
         </Animated.View>
       )}
@@ -54,17 +69,27 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 12,
   },
+
+  // ─── Buttons ───
   button: {
-  paddingHorizontal: 20,
-  paddingVertical: 10,
-  borderRadius: 9999,   // 👈 full pill
-  backgroundColor: colors.brand.purple1,
-},
-buttonText: {
-  ...typography.buttonMediumMedium,
-  color: colors.button.activeLabelPrimary,
-},
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 9999, // full pill
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  primary: {
+    backgroundColor: colors.foreground.default, // white button base
+  },
   disabled: {
-    opacity: 0.4,
+    backgroundColor: "rgba(255,255,255,0.1)",
+  },
+
+  // ─── Text ───
+  buttonText: {
+    ...typography.buttonMediumMedium, // ✅ 15 / 20 medium weight
+    color: colors.background.surface1, // black text for white button
+    includeFontPadding: false,
+    textAlign: "center",
   },
 });

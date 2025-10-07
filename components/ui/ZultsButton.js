@@ -24,11 +24,20 @@ export default function ZultsButton({
     style,
   ];
 
-  const textStyles = [
-    styles.textBase,
-    styles[`text_${size}`],
-    styles[`text_${type}${disabled ? "Disabled" : "Active"}`],
-  ];
+  const textStyle =
+    size === "large"
+      ? disabled
+        ? typography.buttonLargeRegular
+        : typography.buttonLargeMedium
+      : size === "small"
+      ? disabled
+        ? typography.buttonSmallRegular
+        : typography.buttonSmallMedium
+      : disabled
+      ? typography.buttonMediumRegular
+      : typography.buttonMediumMedium;
+
+  const colorStyle = styles[`text_${type}${disabled ? "Disabled" : "Active"}`];
 
   const handlePress = () => {
     if (!disabled) {
@@ -48,20 +57,17 @@ export default function ZultsButton({
         {icon && iconPosition === "left" && (
           <Image
             source={icon}
-            style={[styles.icon, { tintColor: textStyles?.color || "#C2C2C2" }]}
+            style={[styles.icon, { tintColor: colorStyle.color }]}
             resizeMode="contain"
           />
         )}
-        <Text
-          style={textStyles}
-          maxFontSizeMultiplier={1.2}   // ✅ cap scaling
-        >
+        <Text style={[textStyle, colorStyle]} maxFontSizeMultiplier={1.2}>
           {label}
         </Text>
         {icon && iconPosition === "right" && (
           <Image
             source={icon}
-            style={[styles.icon, { tintColor: textStyles?.color || "#C2C2C2" }]}
+            style={[styles.icon, { tintColor: colorStyle.color }]}
             resizeMode="contain"
           />
         )}
@@ -71,7 +77,6 @@ export default function ZultsButton({
 }
 
 const styles = StyleSheet.create({
-  // Base
   base: {
     justifyContent: "center",
     alignItems: "center",
@@ -88,89 +93,30 @@ const styles = StyleSheet.create({
   },
 
   // Sizes
-  large: {
-    height: 56,
-    paddingHorizontal: 20,
-    borderRadius: 12,
-  },
-  medium: {
-    height: 48,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-  },
-  small: {
-    height: 40,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-  },
+  large: { height: 56, paddingHorizontal: 20, borderRadius: 12 },
+  medium: { height: 48, paddingHorizontal: 20, borderRadius: 10 },
+  small: { height: 40, paddingHorizontal: 20, borderRadius: 8 },
 
   // Variants
-  primaryActive: {
-    backgroundColor: colors.neutral[0],
-  },
-  primaryDisabled: {
-    backgroundColor: "#7B7B7B",
-  },
+  primaryActive: { backgroundColor: colors.neutral[0] },
+  primaryDisabled: { backgroundColor: "#7B7B7B" },
 
-  secondaryActive: {
-    backgroundColor: "#292929",
-  },
-  secondaryDisabled: {
-    backgroundColor: "#292929",
-  },
+  secondaryActive: { backgroundColor: "#292929" },
+  secondaryDisabled: { backgroundColor: "#292929" },
 
-  ghostActive: {
-    backgroundColor: "transparent",
-  },
-  ghostDisabled: {
-    backgroundColor: "transparent",
-  },
+  ghostActive: { backgroundColor: "transparent" },
+  ghostDisabled: { backgroundColor: "transparent" },
 
-  brandActive: {
-    backgroundColor: colors.brand.purple1,
-  },
-  brandDisabled: {
-    backgroundColor: "#7B7B7B",
-  },
+  brandActive: { backgroundColor: colors.brand.purple1 },
+  brandDisabled: { backgroundColor: "#7B7B7B" },
 
-  // Text
-  textBase: {
-    textAlign: "center",
-  },
-  text_large: {
-    ...typography.buttonLargeMedium,   // ✅ now medium weight
-  },
-  text_medium: {
-    ...typography.buttonMediumMedium, // ✅ now medium weight
-  },
-  text_small: {
-    ...typography.buttonSmallMedium,  // ✅ now medium weight
-  },
-
-  // Text colors per variant
-  text_primaryActive: {
-    color: colors.button.activeLabelPrimary,
-  },
-  text_primaryDisabled: {
-    color: "#404040",
-  },
-  text_secondaryActive: {
-    color: "#D5D5D5",
-  },
-  text_secondaryDisabled: {
-    color: "#5D5D5D",
-  },
-  text_ghostActive: {
-    color: "#C2C2C2",
-    fontFamily: "ZultsDiatype-Medium",
-  },
-  text_ghostDisabled: {
-    color: "#5D5D5D",
-  },
-  text_brandActive: {
-    color: colors.neutral[0],
-  },
-  text_brandDisabled: {
-    color: "#404040",
-  },
+  // Text colors
+  text_primaryActive: { color: colors.button.activeLabelPrimary },
+  text_primaryDisabled: { color: "#404040" },
+  text_secondaryActive: { color: "#D5D5D5" },
+  text_secondaryDisabled: { color: "#5D5D5D" },
+  text_ghostActive: { color: "#C2C2C2" },
+  text_ghostDisabled: { color: "#5D5D5D" },
+  text_brandActive: { color: colors.neutral[0] },
+  text_brandDisabled: { color: "#404040" },
 });

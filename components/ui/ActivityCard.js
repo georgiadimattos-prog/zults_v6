@@ -8,54 +8,74 @@ export default function ActivityCard({ user, onPress, onToggleFavorite }) {
   return (
     <View style={styles.card}>
       {/* Whole row clickable except the star */}
-      <TouchableOpacity style={styles.mainContent} onPress={onPress} activeOpacity={0.8}>
+      <TouchableOpacity style={styles.mainContent} onPress={onPress} activeOpacity={0.85}>
         <Image source={user.avatar} style={styles.avatar} />
 
         <View style={styles.textSection}>
+          {/* ─── Top Row: Name + Right cluster ─── */}
           <View style={styles.topRow}>
-            <Text style={styles.name}>{user.name}</Text>
+            <Text
+              style={styles.name}
+              allowFontScaling
+              maxFontSizeMultiplier={1.3}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {user.name}
+            </Text>
 
-            {/* 👇 Right-side cluster */}
             <View style={styles.rightCluster}>
-  <Text style={styles.date}>{user.date}</Text>
+              <Text
+                style={styles.date}
+                allowFontScaling
+                maxFontSizeMultiplier={1.2}
+              >
+                {user.date}
+              </Text>
 
-  {user.unreadCount > 0 && (
-    <View style={styles.unreadBadge}>
-      <Text style={styles.unreadText}>{user.unreadCount}</Text>
-    </View>
-  )}
+              {user.unreadCount > 0 && (
+                <View style={styles.unreadBadge}>
+                  <Text style={styles.unreadText}>{user.unreadCount}</Text>
+                </View>
+              )}
 
-  {user.isBot ? (
-    <Image
-      source={require("../../assets/images/pin-icon.png")} // add pin asset
-      style={[styles.starIcon, { tintColor: colors.brand.purple1 }]}
-    />
-  ) : (
-    onToggleFavorite && (
-      <TouchableOpacity
-        onPress={onToggleFavorite}
-        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-        style={styles.starButton}
-      >
-        <Image
-          source={user.favorite ? starFilled : star}
-          style={[
-            styles.starIcon,
-            {
-              tintColor: user.favorite
-                ? colors.brand.purple1
-                : colors.foreground.muted,
-            },
-          ]}
-        />
-      </TouchableOpacity>
-    )
-  )}
-</View>
+              {user.isBot ? (
+                <Image
+                  source={require("../../assets/images/pin-icon.png")}
+                  style={[styles.starIcon, { tintColor: colors.brand.purple1 }]}
+                />
+              ) : (
+                onToggleFavorite && (
+                  <TouchableOpacity
+                    onPress={onToggleFavorite}
+                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                    style={styles.starButton}
+                  >
+                    <Image
+                      source={user.favorite ? starFilled : star}
+                      style={[
+                        styles.starIcon,
+                        {
+                          tintColor: user.favorite
+                            ? colors.brand.purple1
+                            : colors.foreground.muted,
+                        },
+                      ]}
+                    />
+                  </TouchableOpacity>
+                )
+              )}
+            </View>
           </View>
 
-          {/* 👇 message preview always truncates if too long */}
-          <Text style={styles.message} numberOfLines={1} ellipsizeMode="tail">
+          {/* ─── Message preview ─── */}
+          <Text
+            style={styles.message}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            allowFontScaling
+            maxFontSizeMultiplier={1.3}
+          >
             {user.message}
           </Text>
         </View>
@@ -68,10 +88,10 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: "row",
     alignItems: "center",
-    minHeight: 64,                               // 👈 ensures breathing room
-    paddingVertical: 12,                         // 👈 adapts better to large fonts
+    minHeight: 64,
+    paddingVertical: 12,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "rgba(255,255,255,0.1)",  // softer divider
+    borderBottomColor: "rgba(255,255,255,0.1)",
   },
   avatar: {
     width: 48,
@@ -79,35 +99,36 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     marginRight: 12,
   },
-  textSection: {
-    flex: 1,
-  },
+  textSection: { flex: 1 },
   topRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 6,
+    marginBottom: 4,
   },
   rightCluster: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8, // 👈 equal spacing
+    gap: 8,
   },
+
+  // ─── Typography ───
   name: {
-    ...typography.bodyMedium,
+    ...typography.headlineMedium, // 16 / 20 / -0.08
     color: colors.foreground.default,
   },
   date: {
-    ...typography.captionSmallRegular,
+    ...typography.captionSmallRegular, // 12 / 16
     color: colors.foreground.muted,
   },
   message: {
-  ...typography.bodyRegular,
-  fontSize: 15,       // ⬇️ down from 16
-  lineHeight: 18,     // balanced compact line height
-  color: colors.foreground.muted, // 👈 lighter preview text
-  includeFontPadding: false,
-},
+    ...typography.captionLargeRegular, // 14 / 18
+    color: colors.foreground.soft,
+    opacity: 0.6,
+    includeFontPadding: false,
+  },
+
+  // ─── Icons + badges ───
   unreadBadge: {
     backgroundColor: colors.brand.purple1,
     minWidth: 20,
@@ -115,24 +136,15 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 4, // 👈 makes sure 2-digit numbers fit
+    paddingHorizontal: 4,
   },
   unreadText: {
-    color: "#FFFFFF",
+    color: "#FFF",
     fontSize: 12,
     fontWeight: "600",
     textAlign: "center",
   },
-  starIcon: {
-    width: 20,
-    height: 20,
-  },
-  starButton: {
-    padding: 4,
-  },
-  mainContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    flex: 1,
-  },
+  starIcon: { width: 20, height: 20 },
+  starButton: { padding: 4 },
+  mainContent: { flexDirection: "row", alignItems: "center", flex: 1 },
 });

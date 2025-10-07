@@ -81,7 +81,7 @@ export default function RezultsTooltipDemo() {
                 tests on 20 Oct 2025.
               </Text>
 
-              <Text style={styles.expandedTitle} allowFontScaling={1.3}>
+              <Text style={styles.expandedTitle} allowFontScaling maxFontSizeMultiplier={1.3}>
                 Infection Window Periods
               </Text>
               <Text style={styles.expandedText} allowFontScaling maxFontSizeMultiplier={1.3}>
@@ -94,7 +94,7 @@ export default function RezultsTooltipDemo() {
                 • HIV ≈ 6 weeks
               </Text>
 
-              <Text style={styles.expandedTitle} allowFontScaling={1.3}>
+              <Text style={styles.expandedTitle} allowFontScaling maxFontSizeMultiplier={1.3}>
                 ID Verification
               </Text>
               <Text style={styles.expandedText} allowFontScaling maxFontSizeMultiplier={1.3}>
@@ -181,22 +181,20 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   expandedTitle: {
-    ...typography.bodyMedium,
-    fontSize: 16,
-    fontWeight: "600",
-    color: colors.foreground.default,
-    marginTop: 12,
-    marginBottom: 6,
-  },
-  expandedText: {
-    ...typography.bodyRegular,
-    fontSize: 15,
-    lineHeight: 20,
-    color: colors.foreground.soft,
-    marginBottom: 8,
-  },
-  link: {
-    color: colors.info.onContainer,
-    textDecorationLine: "underline",
-  },
+  ...typography.title4Medium,        // 18 / 24 / -0.18
+  color: colors.foreground.default,  // white
+  marginTop: 12,
+  marginBottom: 6,
+},
+
+expandedText: {
+  ...typography.captionLargeRegular, // 14 / 18 / -0.07
+  color: colors.foreground.soft,     // soft gray (60%)
+  marginBottom: 8,
+},
+
+link: {
+  color: colors.info.onContainer,    // Zults blue
+  textDecorationLine: "underline",
+},
 });

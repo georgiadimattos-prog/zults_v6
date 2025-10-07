@@ -1,4 +1,3 @@
-/* components/ui/NoRezultsModal.js */
 import React from "react";
 import {
   Modal,
@@ -22,24 +21,34 @@ export default function NoRezultsModal({ visible, onClose }) {
       animationType="fade"
       onRequestClose={onClose}
     >
-      {/* Tap outside to close */}
+      {/* ─── Tap outside to close ─── */}
       <TouchableWithoutFeedback onPress={onClose}>
-        <BlurView intensity={40} tint="dark" style={styles.overlay}>
-          {/* Capture taps inside */}
+        <View style={styles.overlay}>
+          <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
+
+          {/* ─── Capture taps inside ─── */}
           <TouchableWithoutFeedback>
             <View style={styles.container}>
-              {/* Title */}
-              <Text style={styles.title} allowFontScaling={false}>
-                No Rezults Yet
+              {/* ─── Title ─── */}
+              <Text
+                style={styles.title}
+                allowFontScaling
+                maxFontSizeMultiplier={1.3}
+              >
+                Oops…
               </Text>
 
-              {/* Description */}
-              <Text style={styles.description} maxFontSizeMultiplier={1.2}>
-                You don’t have any Rezults yet. Please get tested and add Rezults
-                before sharing.
+              {/* ─── Description ─── */}
+              <Text
+                style={styles.description}
+                allowFontScaling
+                maxFontSizeMultiplier={1.3}
+              >
+                You don’t have any Rezults yet.{"\n"}
+                Get tested with one of our partner providers to add your Rezults.
               </Text>
 
-              {/* Primary → Go to provider selection */}
+              {/* ─── Primary Button ─── */}
               <ZultsButton
                 label="Get Rezults"
                 type="primary"
@@ -51,9 +60,9 @@ export default function NoRezultsModal({ visible, onClose }) {
                 }}
               />
 
-              <View style={{ height: 12 }} />
+              <View style={{ height: 8 }} />
 
-              {/* Secondary → Dismiss */}
+              {/* ─── Secondary Button ─── */}
               <ZultsButton
                 label="Maybe Later"
                 type="ghost"
@@ -63,7 +72,7 @@ export default function NoRezultsModal({ visible, onClose }) {
               />
             </View>
           </TouchableWithoutFeedback>
-        </BlurView>
+        </View>
       </TouchableWithoutFeedback>
     </Modal>
   );
@@ -78,18 +87,21 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.surface2,
     borderTopLeftRadius: 32,
     borderTopRightRadius: 32,
-    paddingTop: 24,
+    paddingTop: 28,
     paddingHorizontal: 20,
     paddingBottom: 32,
   },
+
+  // ─── Typography ───
   title: {
-    ...typography.largeTitleMedium, // ✅ unified modal title
+    ...typography.title1Medium, // ✅ Apple modal size (28 / 34 / -0.28)
     color: colors.foreground.default,
     marginBottom: 12,
   },
   description: {
-    ...typography.bodyRegular, // ✅ unified modal subtitle
+    ...typography.bodyRegular, // ✅ subtitle style
     color: colors.foreground.soft,
+    lineHeight: 20,
     marginBottom: 24,
   },
 });

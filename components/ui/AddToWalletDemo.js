@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { colors, typography } from "../../theme";
-import ZultsButton from "./ZultsButton"; // ✅ your brand button
+import ZultsButton from "./ZultsButton";
 
 export default function AddToWalletDemo() {
   const [visible, setVisible] = useState(false);
@@ -23,18 +23,18 @@ export default function AddToWalletDemo() {
 
   return (
     <View style={styles.container}>
-      {/* Fake Add to Wallet button */}
+      {/* ─── Add to Wallet CTA ─── */}
       <Pressable style={styles.walletButton} onPress={() => setVisible(true)}>
         <Image
           source={require("../../assets/images/user-verification-icon.png")}
           style={styles.walletIcon}
         />
-        <Text style={[styles.walletText, typography.buttonLargeMedium]}>
+        <Text style={styles.walletText} allowFontScaling maxFontSizeMultiplier={1.3}>
           Add to Apple Wallet
         </Text>
       </Pressable>
 
-      {/* Modal with Zults card preview */}
+      {/* ─── Modal ─── */}
       <Modal visible={visible} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.cardContainer}>
@@ -42,7 +42,7 @@ export default function AddToWalletDemo() {
               colors={[colors.background.surface1, "#000"]}
               style={styles.card}
             >
-              {/* Zults logo */}
+              {/* Logo */}
               <Image
                 source={require("../../assets/images/icon-logo-zults.png")}
                 style={styles.logo}
@@ -51,16 +51,28 @@ export default function AddToWalletDemo() {
 
               {/* Username */}
               <View style={{ marginTop: 20 }}>
-                <Text style={[styles.label, typography.subheadlineRegular]}>
+                <Text
+                  style={[typography.captionLargeRegular, styles.label]}
+                  allowFontScaling
+                  maxFontSizeMultiplier={1.3}
+                >
                   Username
                 </Text>
-                <Text style={[styles.value, typography.title3Medium]}>
+                <Text
+                  style={[typography.title3Medium, styles.value]}
+                  allowFontScaling
+                  maxFontSizeMultiplier={1.3}
+                >
                   Jonster
                 </Text>
               </View>
 
               {/* Subtitle */}
-              <Text style={[styles.subText, typography.subheadlineRegular]}>
+              <Text
+                style={[typography.subheadlineRegular, styles.subText]}
+                allowFontScaling
+                maxFontSizeMultiplier={1.3}
+              >
                 Scan to view Rezults
               </Text>
 
@@ -72,14 +84,14 @@ export default function AddToWalletDemo() {
               />
             </LinearGradient>
 
-            {/* ✅ Use ZultsButton for consistency */}
+            {/* Buttons */}
             <ZultsButton
               label="Add"
               type="brand"
               size="large"
               onPress={handleAdd}
               fullWidth={false}
-              style={{ marginBottom: 10 }}
+              style={{ marginBottom: 8 }}
             />
             <ZultsButton
               label="Cancel"
@@ -92,11 +104,15 @@ export default function AddToWalletDemo() {
         </View>
       </Modal>
 
-      {/* Temporary confirmation popup */}
+      {/* ─── Toast confirmation ─── */}
       {added && (
         <View style={styles.toast}>
-          <Text style={[styles.toastText, typography.bodyMedium]}>
-            ✅ Rezults Card added to Wallet
+          <Text
+            style={[typography.bodyMedium, styles.toastText]}
+            allowFontScaling
+            maxFontSizeMultiplier={1.3}
+          >
+            ✅ Rezults added to Wallet
           </Text>
         </View>
       )}
@@ -107,28 +123,29 @@ export default function AddToWalletDemo() {
 const styles = StyleSheet.create({
   container: { alignItems: "center", marginTop: 20 },
 
+  // ─── Wallet Button ───
   walletButton: {
-  flexDirection: "row",
-  alignItems: "center",
-  backgroundColor: "transparent",              // 👈 remove fill
-  borderWidth: 1,                              // 👈 add subtle outline
-  borderColor: "rgba(255,255,255,0.15)",       // 👈 faint border
-  paddingHorizontal: 14,
-  paddingVertical: 8,
-  borderRadius: 16,                            // 👈 rounder button feel
-},
-walletText: {
-  ...typography.buttonMediumRegular,
-  color: colors.foreground.muted,              // 👈 softer text
-},
-walletIcon: {
-  width: 18,
-  height: 18,
-  marginRight: 6,
-  tintColor: colors.foreground.muted,          // 👈 icon matches muted text
-},
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "transparent",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.15)",
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 16,
+  },
+  walletText: {
+    ...typography.buttonMediumRegular,
+    color: colors.foreground.muted,
+  },
+  walletIcon: {
+    width: 18,
+    height: 18,
+    marginRight: 6,
+    tintColor: colors.foreground.muted,
+  },
 
-
+  // ─── Modal Card ───
   modalOverlay: {
     flex: 1,
     justifyContent: "center",
@@ -137,7 +154,7 @@ walletIcon: {
   },
   cardContainer: {
     width: "85%",
-    backgroundColor: "white",
+    backgroundColor: colors.background.surface2,
     borderRadius: 20,
     overflow: "hidden",
     alignItems: "center",
@@ -172,9 +189,9 @@ walletIcon: {
     alignSelf: "center",
     backgroundColor: "white",
     borderRadius: 8,
-    padding: 10,
   },
 
+  // ─── Toast ───
   toast: {
     position: "absolute",
     bottom: 40,
@@ -184,6 +201,6 @@ walletIcon: {
     borderRadius: 12,
   },
   toastText: {
-    color: "white",
+    color: colors.foreground.default,
   },
 });

@@ -11,13 +11,10 @@ import { colors, typography } from "../../theme";
 const screenWidth = Dimensions.get("window").width;
 const CONTAINER_WIDTH = screenWidth - 32; // ✅ match RezultsCard + Share button
 
-export default function ExpireContainer({
-  expiryDate = "29 Sep 2025",
-}) {
-  const daysLeft = 43; // ✅ demo lock
-  const percentLeft = daysLeft / 90;
+export default function ExpireContainer({ expiryDate = "20 Jan 2026" }) {
+  const daysLeft = 75; // demo lock
+  const percentLeft = daysLeft / 92;
 
-  // animate fill
   const progress = useSharedValue(0);
   useEffect(() => {
     progress.value = withTiming(percentLeft, { duration: 1200 });
@@ -29,15 +26,23 @@ export default function ExpireContainer({
 
   return (
     <View style={styles.wrapper}>
+      {/* ─── Header row ─── */}
       <View style={styles.row}>
-        <Text style={styles.label} maxFontSizeMultiplier={1.2}>
+        <Text style={styles.label} allowFontScaling={1.3}>
           Expires
         </Text>
-        <Text style={styles.date} maxFontSizeMultiplier={1.2}>
+        <Text
+          style={styles.date}
+          allowFontScaling
+          maxFontSizeMultiplier={1.2}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+        >
           {expiryDate}
         </Text>
       </View>
 
+      {/* ─── Progress bar ─── */}
       <View style={styles.progressWrapper}>
         <View style={styles.progressBg} />
         <Animated.View style={[styles.fillWrapper, animatedStyle]}>
@@ -48,8 +53,10 @@ export default function ExpireContainer({
             style={styles.progressFill}
           />
         </Animated.View>
+
+        {/* ─── Centered “days left” label ─── */}
         <View style={styles.progressLabelWrapper}>
-          <Text style={styles.progressText} maxFontSizeMultiplier={1.2}>
+          <Text style={styles.progressText} allowFontScaling maxFontSizeMultiplier={1.2}>
             {daysLeft} days left
           </Text>
         </View>
@@ -73,15 +80,18 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
+
+  // ─── Title & Date ───
   label: {
-    ...typography.bodyMedium,     // ✅ body size (scales to 1.2)
-    fontWeight: "500",
+    ...typography.title4Medium,     // ✅ 18 / 24 / -0.18
     color: colors.foreground.default,
   },
   date: {
-    ...typography.bodyRegular,    // ✅ subtitle baseline
-    color: colors.foreground.default,
+    ...typography.captionLargeRegular, // ✅ 14 / 18
+    color: colors.foreground.soft,
   },
+
+  // ─── Progress bar ───
   progressWrapper: {
     width: "100%",
     height: 24,
@@ -108,8 +118,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   progressText: {
-    ...typography.subheadlineRegular,  // ✅ smaller, but scales to 1.2
-    color: "#FFF",
-    opacity: 0.8,
+    fontFamily: typography.captionSmallRegular.fontFamily, // ✅ Zults Diatype regular
+    fontSize: 12,
+    lineHeight: 16,
+    color: "rgba(255,255,255,0.8)", // ✅ 80% white opacity
+    textAlign: "center",
   },
 });

@@ -36,12 +36,12 @@ export default function ConfirmModal({
 
               {/* Description */}
               {description ? (
-                <Text style={styles.description} maxFontSizeMultiplier={1.2}>
+                <Text style={styles.description} maxFontSizeMultiplier={1.3}>
                   {description}
                 </Text>
               ) : null}
 
-              {/* Confirm button */}
+              {/* Confirm */}
               <ZultsButton
                 label={confirmLabel}
                 type="primary"
@@ -55,7 +55,7 @@ export default function ConfirmModal({
 
               <View style={{ height: 12 }} />
 
-              {/* Cancel button */}
+              {/* Cancel */}
               <ZultsButton
                 label="Cancel"
                 type="ghost"
@@ -82,16 +82,17 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 32,
     paddingTop: 24,
     paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingBottom: 32, // ✅ unified modal bottom padding
   },
   title: {
-    ...typography.largeTitleMedium, // ✅ same as screen titles
+    ...typography.largeTitleMedium,  // ✅ hero modal title
     color: colors.foreground.default,
-    marginBottom: 16,
+    marginBottom: 12,                // ✅ tighter vertical rhythm
   },
   description: {
-    ...typography.bodyRegular, // ✅ matches subtitle baseline
+    ...typography.bodyRegular,       // ✅ subtitle baseline
     color: colors.foreground.soft,
     marginBottom: 24,
+    lineHeight: 20,
   },
 });

@@ -170,13 +170,14 @@ export default function ActivitiesScreen() {
     <ScreenWrapper>
       <Navbar />
 
-      {/* Header Block */}
+      {/* ─── Header Block ─── */}
       <View style={styles.headerBlock}>
         <Text style={styles.pageTitle} allowFontScaling={false}>
           Activities
         </Text>
       </View>
 
+      {/* ─── Tabs ─── */}
       <View style={styles.tabsContainer}>
         {["All", "Unread", "Favorites"].map((tab) => (
           <TouchableOpacity
@@ -188,7 +189,9 @@ export default function ActivitiesScreen() {
               numberOfLines={1}
               ellipsizeMode="tail"
               adjustsFontSizeToFit
-              minimumFontScale={0.85}
+              allowFontScaling
+              maxFontSizeMultiplier={1.3}
+              minimumFontScale={0.9}
               style={filter === tab.toLowerCase() ? styles.tabActiveText : styles.tabInactiveText}
             >
               {tab}
@@ -197,6 +200,7 @@ export default function ActivitiesScreen() {
         ))}
       </View>
 
+      {/* ─── List ─── */}
       <FlatList
         data={activities.filter((item) =>
           filter === "unread" ? item.hasUnread : filter === "favorites" ? item.favorite : true
@@ -205,7 +209,7 @@ export default function ActivitiesScreen() {
         renderItem={renderItem}
         contentContainerStyle={{ paddingTop: 16, paddingHorizontal: 16, paddingBottom: 160 }}
         ListEmptyComponent={
-          <Text style={styles.empty}>
+          <Text style={styles.empty} allowFontScaling maxFontSizeMultiplier={1.3}>
             {filter === "all"
               ? "No recent activity"
               : filter === "unread"
@@ -215,6 +219,7 @@ export default function ActivitiesScreen() {
         }
       />
 
+      {/* ─── Footer ─── */}
       <View style={styles.footer}>
         <ZultsButton
           label="Get Full Access"
@@ -222,7 +227,6 @@ export default function ActivitiesScreen() {
           size="medium"
           fullWidth={false}
           onPress={() => navigation.navigate("PolicyScreen")}
-          style={{ borderRadius: 0 }}
         />
       </View>
     </ScreenWrapper>
@@ -233,7 +237,7 @@ const styles = StyleSheet.create({
   headerBlock: {
     marginTop: 32,
     marginBottom: 16,
-    paddingHorizontal: 16, // ✅ unified with other screens
+    paddingHorizontal: 16,
   },
   pageTitle: {
     ...typography.largeTitleMedium,
@@ -271,10 +275,10 @@ const styles = StyleSheet.create({
     color: colors.foreground.soft,
   },
   empty: {
-    ...typography.subheadlineRegular,
+    ...typography.captionLargeRegular,
     textAlign: "center",
     marginTop: 200,
-    color: colors.foreground.muted,
+    color: colors.foreground.soft,
   },
   deleteButton: {
     backgroundColor: colors.error.container,
@@ -287,5 +291,11 @@ const styles = StyleSheet.create({
     marginVertical: 4,
   },
   deleteIcon: { width: 24, height: 24, tintColor: colors.error.onContainer },
-  footer: { position: "absolute", bottom: 40, left: 0, right: 0, alignItems: "center" },
+  footer: {
+    position: "absolute",
+    bottom: 40,
+    left: 0,
+    right: 0,
+    alignItems: "center",
+  },
 });
