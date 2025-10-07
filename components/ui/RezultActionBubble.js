@@ -47,13 +47,11 @@ export default function RezultActionBubble({
   const isFromUser = direction === "from-user";
   const isFromOther = direction === "from-other";
   const isSystemMessage = type === "cancel-request";
-
-  // ✅ Detect Rezy dark chat
   const isRezyChat = chatUserId === "zults-demo";
 
   if (type === "typing") return <TypingIndicator avatar={avatar} />;
 
-  // --- Plain text / note bubble
+  // ─── Plain text / note bubble ───
   if (type === "note" || type === "text") {
     return (
       <View
@@ -69,7 +67,7 @@ export default function RezultActionBubble({
             style={[
               styles.messageBubble,
               isFromUser ? styles.bubbleRight : styles.bubbleLeft,
-              isRezyChat && isFromOther && styles.rezyBubbleLeft, // 👈 dark-theme fix
+              isRezyChat && isFromOther && styles.rezyBubbleLeft,
             ]}
           >
             <Text
@@ -83,10 +81,17 @@ export default function RezultActionBubble({
               {text}
             </Text>
           </View>
+
+          {/* ✅ Timestamp handled separately for Rezy vs Demo */}
           <Text
             style={[
-              isFromUser ? styles.timestampRight : styles.timestampLeft,
-              isRezyChat && isFromOther && { color: "rgba(255,255,255,0.6)" },
+              isRezyChat
+                ? isFromUser
+                  ? styles.timestampUserRezy
+                  : styles.timestampOtherRezy
+                : isFromUser
+                ? styles.timestampUserDemo
+                : styles.timestampOtherDemo,
             ]}
             allowFontScaling
             maxFontSizeMultiplier={1.2}
@@ -99,7 +104,7 @@ export default function RezultActionBubble({
     );
   }
 
-  // --- Rezults-related bubbles
+  // ─── Rezults-related bubbles ───
   let label = "";
   let subtext = "";
 
@@ -135,7 +140,6 @@ export default function RezultActionBubble({
       {isFromOther && !isSystemMessage && (
         <Image source={avatar || fallbackAvatar} style={styles.avatar} />
       )}
-
       <View style={styles.contentBlock}>
         {!isSystemMessage && (
           <Text
@@ -156,7 +160,7 @@ export default function RezultActionBubble({
             styles.messageBubble,
             isFromUser ? styles.bubbleRight : styles.bubbleLeft,
             type === "stop-share" && { backgroundColor: "#3A3A3C" },
-            isRezyChat && isFromOther && styles.rezyBubbleLeft, // 👈 dark bubble
+            isRezyChat && isFromOther && styles.rezyBubbleLeft,
           ]}
         >
           <Text
@@ -188,9 +192,13 @@ export default function RezultActionBubble({
         {!isSystemMessage && (
           <Text
             style={[
-              styles.timestamp,
-              type === "stop-share" && isFromUser && { color: "#A8A8A8" },
-              isRezyChat && isFromOther && { color: "rgba(255,255,255,0.55)" },
+              isRezyChat
+                ? isFromUser
+                  ? styles.timestampUserRezy
+                  : styles.timestampOtherRezy
+                : isFromUser
+                ? styles.timestampUserDemo
+                : styles.timestampOtherDemo,
             ]}
             allowFontScaling
             maxFontSizeMultiplier={1.2}
@@ -260,7 +268,7 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 0,
   },
   rezyBubbleLeft: {
-    backgroundColor: "rgba(255,255,255,0.12)", // ✅ softer dark bubble for Rezy
+    backgroundColor: "rgba(255,255,255,0.12)",
   },
 
   // --- Text
@@ -301,30 +309,47 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
 
-  timestamp: {
-  ...typography.chatMeta,
-  fontSize: 9,               // ⬇️ slightly smaller for visual balance
-  lineHeight: 12,            // tighter vertical space
-  color: "rgba(255,255,255,0.38)", // ✅ slightly dimmer white
-  fontWeight: "400",
-  marginTop: 3,
-  letterSpacing: 0.2,        // ✅ optical fine-tune
-  alignSelf: "flex-end",
-},
+  // ✅ Rezy (dark chat)
+  timestampUserRezy: {
+    alignSelf: "flex-end",
+    marginTop: 3,
+    color: "#707070",
+    fontSize: 9,
+    lineHeight: 12,
+    letterSpacing: 0.2,
+    textAlign: "right",
+  },
+  timestampOtherRezy: {
+    alignSelf: "flex-start",
+    marginTop: 3,
+    color: "rgba(255,255,255,0.55)",
+    fontSize: 9,
+    lineHeight: 12,
+    letterSpacing: 0.2,
+    textAlign: "left",
+  },
 
-timestampLeft: {
-  alignSelf: "flex-start",
-  color: "rgba(255,255,255,0.38)", // ✅ left-side Rezy bubbles
-  fontSize: 9,
-  lineHeight: 12,
-},
-
-timestampRight: {
-  alignSelf: "flex-end",
-  color: "#707070",          // ✅ softer grey for green (user) bubbles
-  fontSize: 9,
-  lineHeight: 12,
-},
+  // ✅ Demo 1–4 (light chat)
+  timestampUserDemo: {
+    alignSelf: "flex-end",
+    marginTop: 4,
+    marginRight: 2,
+    color: "#7A7A7A",
+    fontSize: 9,
+    lineHeight: 12,
+    letterSpacing: 0.2,
+    textAlign: "right",
+  },
+  timestampOtherDemo: {
+    alignSelf: "flex-start",
+    marginTop: 4,
+    marginLeft: 2,
+    color: "#7A7A7A",
+    fontSize: 9,
+    lineHeight: 12,
+    letterSpacing: 0.2,
+    textAlign: "left",
+  },
 
   typingBubble: {
     backgroundColor: "#f0f0f0",

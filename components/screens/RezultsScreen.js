@@ -51,10 +51,22 @@ function RezultsScreen() {
       <View style={styles.userInfo}>
         {avatar && <Image source={avatar} style={styles.avatar} />}
         {realName === "Melany J Rabideau" ? (
-          <Text style={styles.username}>{realName}</Text>
+          <Text
+            style={styles.username}
+            allowFontScaling
+            maxFontSizeMultiplier={1.3} // ✅ scales like body text
+          >
+            {realName}
+          </Text>
         ) : (
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Text style={styles.username}>{username}</Text>
+            <Text
+              style={styles.username}
+              allowFontScaling
+              maxFontSizeMultiplier={1.3} // ✅ scales like body text
+            >
+              {username}
+            </Text>
             <Image
               source={require("../../assets/images/verified-icon.png")}
               style={styles.verifiedIcon}
@@ -206,7 +218,7 @@ const styles = StyleSheet.create({
     ...typography.bodyMedium,
     fontSize: 16,
     fontWeight: "600",
-    color: colors.foreground.default, // bright white
+    color: colors.foreground.default,
     marginTop: 12,
     marginBottom: 6,
   },
@@ -214,7 +226,7 @@ const styles = StyleSheet.create({
     ...typography.bodyRegular,
     fontSize: 15,
     lineHeight: 20,
-    color: colors.foreground.soft, // off-white
+    color: colors.foreground.soft,
     marginBottom: 8,
   },
 });

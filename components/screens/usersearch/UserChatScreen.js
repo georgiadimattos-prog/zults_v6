@@ -589,9 +589,14 @@ return (
           </TouchableOpacity>
 
           <Image source={user.image || fallbackAvatar} style={styles.avatar} />
-          <Text style={styles.username} numberOfLines={1} ellipsizeMode="tail">
-            {user.name}
-          </Text>
+          <Text
+  style={styles.username}
+  numberOfLines={1}
+  ellipsizeMode="tail"
+  allowFontScaling={false} // ✅ locked for Apple baseline
+>
+  {user.name}
+</Text>
 
           {!isBlocked && (
   (isDemoChat && user.id === "zults-demo") ? (

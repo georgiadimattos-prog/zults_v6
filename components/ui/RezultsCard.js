@@ -1,4 +1,4 @@
-// ✅ RezultsCard.js (final Zults baseline)
+// ✅ RezultsCard.js (with impactful blur + fade)
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -9,6 +9,7 @@ import {
   Image,
 } from "react-native";
 import { Video } from "expo-av";
+import { BlurView } from "expo-blur";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -21,6 +22,8 @@ import { colors, typography } from "../../theme";
 import logoIcon from "../../assets/images/rezults-icon.png";
 import expandIcon from "../../assets/images/expandIcon.png";
 import collapseIcon from "../../assets/images/collapseIcon.png";
+
+const AnimatedBlurView = Animated.createAnimatedComponent(BlurView);
 
 const screenWidth = Dimensions.get("window").width;
 const CARD_WIDTH = screenWidth - 32;
@@ -62,7 +65,7 @@ export default function RezultsCard({
     iconRotate.value = withTiming(next ? 180 : 0, { duration: 300 });
   };
 
-  // quick flip teaser
+  // teaser flip
   useEffect(() => {
     const timer = setTimeout(() => {
       rotate.value = withTiming(180, { duration: 600 });
@@ -92,10 +95,27 @@ export default function RezultsCard({
     transform: [{ rotate: `${iconRotate.value}deg` }],
   }));
 
+  // 💫 Strong blur + dim overlay
+  const blurDimStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(rotate.value, [0, 90, 180], [0, 0.7, 1]),
+  }));
+
+  const blurIntensity = useAnimatedStyle(() => ({
+    opacity: interpolate(rotate.value, [0, 90, 180], [0, 0.9, 1]),
+  }));
+
+  // subtle fade + scale for front content
+  const contentFadeStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(rotate.value, [0, 90, 180], [1, 0.6, 0.3]),
+    transform: [
+      { scale: interpolate(rotate.value, [0, 180], [1, 0.95]) },
+    ],
+  }));
+
   return (
     <TouchableWithoutFeedback onPress={flipCard}>
       <Animated.View style={[styles.container, entryAnimStyle, styles.tooltipBorder]}>
-        {/* Front */}
+        {/* ─── Front ─── */}
         <Animated.View style={[styles.cardFront, frontAnimatedStyle]}>
           <Video
             source={videoSource}
@@ -106,7 +126,9 @@ export default function RezultsCard({
             resizeMode="cover"
           />
           <Image source={logoIcon} style={styles.logo} resizeMode="contain" />
-          <View style={styles.overlay}>
+
+          {/* front content (fades softly on flip) */}
+          <Animated.View style={[styles.overlay, contentFadeStyle]}>
             <View>
               {isVerified && showRealName && realName && (
                 <Text
@@ -132,10 +154,32 @@ export default function RezultsCard({
             >
               Show Rezults
             </Text>
-          </View>
+          </Animated.View>
+
+          {/* 💜 Impactful Blur Layer */}
+          <Animated.View
+            pointerEvents="none"
+            style={[
+              StyleSheet.absoluteFill,
+              {
+                borderRadius: 20,
+                backgroundColor: "rgba(0,0,0,0.45)", // dark dim
+              },
+              blurDimStyle,
+            ]}
+          />
+          <AnimatedBlurView
+            tint="dark"
+            intensity={80}
+            style={[
+              StyleSheet.absoluteFill,
+              { borderRadius: 20 },
+              blurIntensity,
+            ]}
+          />
         </Animated.View>
 
-        {/* Back */}
+        {/* ─── Back ─── */}
         <Animated.View style={[styles.cardBack, backAnimatedStyle]}>
           <View style={styles.backHeader}>
             <Text
@@ -228,8 +272,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "flex-end",
   },
-
-  // ─── Front ───
   name: {
     ...typography.bodyMedium,
     fontSize: 16,
@@ -250,8 +292,6 @@ const styles = StyleSheet.create({
     color: colors.foreground.soft,
     fontWeight: "500",
   },
-
-  // ─── Back ───
   cardBack: {
     position: "absolute",
     width: CARD_WIDTH,
@@ -276,18 +316,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-
-  // ─── Text (back side) ───
   testedOn: {
-    ...typography.captionLargeRegular, // ✅ 14 / 18 / -0.07
+    ...typography.captionLargeRegular,
     color: colors.foreground.soft,
   },
   testedDate: {
     color: colors.foreground.default,
     fontWeight: "600",
   },
-
-  // ─── Pills ───
   pillsBottom: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -302,7 +338,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   pillText: {
-    ...typography.captionLargeRegular, // ✅ 14pt matches expanded info hierarchy
+    ...typography.captionLargeRegular,
     color: colors.foreground.default,
     textAlign: "center",
   },
