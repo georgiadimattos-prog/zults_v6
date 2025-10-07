@@ -26,6 +26,7 @@ import { NavbarBackRightText } from "../../ui/Navbar";
 import SMSTab from "./tabs/SMSTab";
 import LinkTab from "./tabs/LinkTab";
 import { useInvite } from "../../ui/useInvite";
+import { chatCache } from "../../../cache/chatCache";
 
 export default function ShareScreen({ navigation }) {
   const { sendInvite } = useInvite();
@@ -65,8 +66,19 @@ export default function ShareScreen({ navigation }) {
   const NAVBAR_HEIGHT = 30;
 
   const handleUserPress = (user) => {
-    navigation.navigate("UserChat", { user });
-  };
+  const key = user.id || `user-${user.name}`;
+  if (!chatCache[key]) {
+    chatCache[key] = {
+      user,
+      chatData: [],
+      chatState: { hasShared: false, hasRequested: false },
+      otherUserState: { hasShared: false, hasRequested: false },
+      blocked: false,
+      hasUnread: false,
+    };
+  }
+  navigation.navigate("UserChat", { user });
+};
 
   const renderTabContent = () => {
     if (activeTab === "Users") {

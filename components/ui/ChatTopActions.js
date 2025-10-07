@@ -1,9 +1,10 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { View, TouchableOpacity, Text, StyleSheet, Animated } from "react-native";
 import { colors, typography } from "../../theme";
 
 export default function ChatTopActions({ status, onRequest, onTooltip, highlightViewCTA }) {
   const pulseAnim = useRef(new Animated.Value(1)).current;
+  const [lockRequested, setLockRequested] = useState(false);
 
   useEffect(() => {
     if (highlightViewCTA && status === "view") {
@@ -19,12 +20,25 @@ export default function ChatTopActions({ status, onRequest, onTooltip, highlight
     }
   }, [highlightViewCTA, status]);
 
+  // 🕒 Temporary lock after pressing "Request Rezults"
+  useEffect(() => {
+    if (lockRequested) {
+      const t = setTimeout(() => setLockRequested(false), 5000);
+      return () => clearTimeout(t);
+    }
+  }, [lockRequested]);
+
   return (
     <View style={styles.container}>
+      {/* 🟢 Request Rezults */}
       {status === "request" && (
         <TouchableOpacity
           style={[styles.button, styles.primary]}
-          onPress={onRequest}
+          onPress={() => {
+            if (lockRequested) return; // prevent spam
+            setLockRequested(true);
+            onRequest?.();
+          }}
           activeOpacity={0.85}
         >
           <Text style={styles.buttonText} allowFontScaling maxFontSizeMultiplier={1.3}>
@@ -33,14 +47,16 @@ export default function ChatTopActions({ status, onRequest, onTooltip, highlight
         </TouchableOpacity>
       )}
 
-      {status === "requested" && (
+      {/* 🟡 Rezults Requested */}
+      {(status === "requested" || lockRequested) && (
         <View style={[styles.button, styles.disabled]}>
           <Text style={styles.buttonText} allowFontScaling maxFontSizeMultiplier={1.3}>
-            Requested
+            Rezults Requested
           </Text>
         </View>
       )}
 
+      {/* 🩵 View Rezults */}
       {status === "view" && (
         <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
           <TouchableOpacity
@@ -52,7 +68,11 @@ export default function ChatTopActions({ status, onRequest, onTooltip, highlight
             onPress={onTooltip}
             activeOpacity={0.85}
           >
-            <Text style={[styles.buttonText, { color: "#fff" }]} allowFontScaling maxFontSizeMultiplier={1.3}>
+            <Text
+              style={[styles.buttonText, { color: "#fff" }]}
+              allowFontScaling
+              maxFontSizeMultiplier={1.3}
+            >
               View Rezults
             </Text>
           </TouchableOpacity>
@@ -69,26 +89,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 12,
   },
-
-  // ─── Buttons ───
   button: {
     paddingHorizontal: 20,
     paddingVertical: 10,
-    borderRadius: 9999, // full pill
+    borderRadius: 9999,
     justifyContent: "center",
     alignItems: "center",
   },
   primary: {
-    backgroundColor: colors.foreground.default, // white button base
+    backgroundColor: colors.foreground.default,
   },
   disabled: {
     backgroundColor: "rgba(255,255,255,0.1)",
   },
-
-  // ─── Text ───
   buttonText: {
-    ...typography.buttonMediumMedium, // ✅ 15 / 20 medium weight
-    color: colors.background.surface1, // black text for white button
+    ...typography.buttonMediumMedium,
+    color: colors.background.surface1,
     includeFontPadding: false,
     textAlign: "center",
   },

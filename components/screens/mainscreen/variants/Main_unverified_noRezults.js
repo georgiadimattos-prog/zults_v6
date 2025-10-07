@@ -79,7 +79,9 @@ export default function MainUnverifiedNoRezults({ onLinkPress, onSharePress }) {
   );
 
   useEffect(() => {
-    const sub = DeviceEventEmitter.addListener("chat-updated", () => {
+  const sub = DeviceEventEmitter.addListener("chat-updated", () => {
+    // 🩵 Schedule the UI update safely for the next frame
+    requestAnimationFrame(() => {
       let users = Object.keys(chatCache)
         .filter((k) => {
           const v = chatCache[k];
@@ -100,8 +102,10 @@ export default function MainUnverifiedNoRezults({ onLinkPress, onSharePress }) {
 
       setRecentUsers(users);
     });
-    return () => sub.remove();
-  }, []);
+  });
+
+  return () => sub.remove();
+}, []);
 
   const renderAvatars = () => {
     const display = recentUsers.slice(0, 4);

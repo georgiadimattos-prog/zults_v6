@@ -37,76 +37,104 @@ export default function MainUnverifiedWithRezults({ onLinkPress, onSharePress })
 
   const fadeAnim = useRef(new Animated.Value(1)).current;
 
-  // refresh on focus
-  useFocusEffect(
-    React.useCallback(() => {
-      let users = Object.keys(chatCache)
-        .map((username) => {
-          const chat = chatCache[username] || {};
-          const lastMsg = chat.chatData?.[chat.chatData.length - 1];
-          return {
-            id: username,
-            name: chat.user?.name || username,
-            avatar: chat.user?.image || zultsLogo,
-            lastTimestamp: lastMsg ? lastMsg.timestamp : "",
-          };
-        })
-        .sort((a, b) => (a.lastTimestamp < b.lastTimestamp ? 1 : -1));
-
-      if (users.length === 0 && !hasSeededDemo()) {
-        const demoId = "zults-demo";
-        chatCache[demoId] = {
-          user: {
-            id: demoId,
-            name: "Rezy",
-            image: zultsLogo,
-            isBot: true,
-          },
-          chatData: [],
-          chatState: { hasShared: false, hasRequested: false },
-          otherUserState: { hasShared: false, hasRequested: false },
-          blocked: false,
-          hasUnread: true,
+// 🟣 Refresh on focus
+useFocusEffect(
+  React.useCallback(() => {
+    let users = Object.keys(chatCache)
+      .map((username) => {
+        const chat = chatCache[username] || {};
+        const lastMsg = chat.chatData?.[chat.chatData.length - 1];
+        return {
+          id: username,
+          name: chat.user?.name || username,
+          avatar: chat.user?.image || zultsLogo,
+          lastTimestamp: lastMsg ? lastMsg.timestamp : "",
         };
+      })
+      .sort((a, b) => (a.lastTimestamp < b.lastTimestamp ? 1 : -1));
 
-        users = [
-          {
-            id: demoId,
-            name: "Rezy",
-            avatar: zultsLogo,
-            lastTimestamp: "Now",
-            hasUnread: true,
-          },
-        ];
+    if (users.length === 0 && !hasSeededDemo()) {
+      const demoId = "zults-demo";
+      chatCache[demoId] = {
+        user: {
+          id: demoId,
+          name: "Rezy",
+          image: zultsLogo,
+          isBot: true,
+        },
+        chatData: [],
+        chatState: { hasShared: false, hasRequested: false },
+        otherUserState: { hasShared: false, hasRequested: false },
+        blocked: false,
+        hasUnread: true,
+      };
 
-        markDemoSeeded();
-      }
+      users = [
+        {
+          id: demoId,
+          name: "Rezy",
+          avatar: zultsLogo,
+          lastTimestamp: "Now",
+          hasUnread: true,
+        },
+      ];
 
-      setRecentUsers(users);
-    }, [])
+      markDemoSeeded();
+    }
+
+    setRecentUsers(users);
+
+    // 🩵 add safe “chat-updated” listener (fixes cross-render setState error)
+    const sub = DeviceEventEmitter.addListener("chat-updated", () => {
+      requestAnimationFrame(() => {
+        let updatedUsers = Object.keys(chatCache)
+          .filter((k) => {
+            const v = chatCache[k];
+            return v && typeof v === "object" && v.user;
+          })
+          .map((username) => {
+            const chat = chatCache[username] || {};
+            const lastMsg = chat.chatData?.[chat.chatData.length - 1];
+            return {
+              id: username,
+              name: chat.user?.name || username,
+              avatar: chat.user?.image || zultsLogo,
+              lastTimestamp: lastMsg ? lastMsg.timestamp : "",
+              hasUnread: chat.hasUnread ?? false,
+            };
+          })
+          .sort((a, b) => (a.lastTimestamp < b.lastTimestamp ? 1 : -1));
+
+        setRecentUsers(updatedUsers);
+      });
+    });
+
+    return () => sub.remove();
+  }, [])
+);
+
+// 🧩 Render avatars
+const renderAvatars = () => {
+  const display = recentUsers.slice(0, 4);
+  const extra = recentUsers.length - display.length;
+
+  return (
+    <View style={styles.avatarRow}>
+      {display.map((user, index) => (
+        <Image
+          key={user.id}
+          source={user.avatar}
+          style={[styles.avatar, { marginLeft: index === 0 ? 0 : -12 }]}
+        />
+      ))}
+      {extra > 0 && (
+        <View style={[styles.avatar, styles.extraAvatar]}>
+          <Text style={styles.extraText}>+{extra}</Text>
+        </View>
+      )}
+    </View>
   );
-
-  const renderAvatars = () => {
-    const display = recentUsers.slice(0, 4);
-    const extra = recentUsers.length - display.length;
-
-    return (
-      <View style={styles.avatarRow}>
-        {display.map((user, index) => (
-          <Image
-            key={user.id}
-            source={user.avatar}
-            style={[styles.avatar, { marginLeft: index === 0 ? 0 : -12 }]}
-          />
-        ))}
-        {extra > 0 && (
-          <View style={[styles.avatar, styles.extraAvatar]}>
-            <Text style={styles.extraText}>+{extra}</Text>
-          </View>
-        )}
-      </View>
-    );
-  };
+};
 
   // delete Rezults with animation
   const handleDeleteRezults = () => {
