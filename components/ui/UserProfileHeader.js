@@ -1,4 +1,3 @@
-// components/ui/UserProfileHeader.js
 import React from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
@@ -11,21 +10,31 @@ export default function UserProfileHeader({ onLayout }) {
   const navigation = useNavigation();
 
   return (
-    <BlurView intensity={15} tint="dark" style={styles.header} onLayout={onLayout}>
-      {/* Left side: avatar + username */}
+    <BlurView intensity={20} tint="dark" style={styles.header} onLayout={onLayout}>
+      {/* ─── Left: avatar + username ─── */}
       <View style={styles.headerLeft}>
         <Image source={tomas} style={styles.avatar} />
         <View style={styles.profileText}>
-          <Text style={styles.username}>Jonster</Text>
+          <Text
+            style={styles.username}
+            allowFontScaling={false} // ✅ lock Apple-style username
+          >
+            Jonster
+          </Text>
         </View>
       </View>
 
-      {/* Right side: settings button */}
+      {/* ─── Right: settings button ─── */}
       <TouchableOpacity
         style={styles.settingsButton}
         onPress={() => navigation.navigate("Settings")}
+        activeOpacity={0.8}
       >
-        <Image source={settingsIcon} style={styles.settingsIcon} resizeMode="contain" />
+        <Image
+          source={settingsIcon}
+          style={styles.settingsIcon}
+          resizeMode="contain"
+        />
       </TouchableOpacity>
     </BlurView>
   );
@@ -37,10 +46,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 16,
-    paddingTop: 25,
-    paddingBottom: 25,
-    backgroundColor: "#0b0b0b07", // Surface1 (#0B0B0B) with alpha
-    position: "absolute",             // ✅ make it overlay if you want
+    paddingTop: 24,
+    paddingBottom: 24,
+    backgroundColor: "rgba(11,11,11,0.07)", // ✅ dark overlay for consistency
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
@@ -59,13 +68,16 @@ const styles = StyleSheet.create({
     marginLeft: 12,
   },
   username: {
-    ...typography.title3Medium,  // 🔄 match Settings header style
+    ...typography.title3Medium, // ✅ same as Settings header
     color: colors.foreground.default,
   },
   settingsButton: {
-    padding: 8,
-    borderRadius: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: colors.background.surface2,
+    justifyContent: "center",
+    alignItems: "center",
   },
   settingsIcon: {
     width: 20,

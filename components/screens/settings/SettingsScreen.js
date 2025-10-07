@@ -25,41 +25,64 @@ import UnverifiedBadge from "../../ui/UnverifiedBadge";
 export default function SettingsScreen({ navigation }) {
   return (
     <ScreenWrapper>
-      {/* ✅ Navbar at the top with back arrow */}
+      {/* ✅ Navbar */}
       <Navbar onBackPress={() => navigation.goBack()} />
 
-      {/* ✅ Profile header (centered layout) */}
+      {/* ✅ Profile header */}
       <View style={styles.headerCentered}>
         <Image source={tomas} style={styles.avatarLarge} />
-        <Text style={styles.usernameCentered}>Jonster</Text>
+        <Text
+          style={styles.usernameCentered}
+          allowFontScaling={false} // ✅ lock for optical rhythm
+        >
+          Jonster
+        </Text>
 
-        {/* ✅ Use badge component from ui */}
+        {/* ✅ Unverified / Verified badge */}
         <UnverifiedBadge />
         {/* <VerifiedBadge /> if verified */}
       </View>
 
-      {/* Scrollable content */}
+      {/* ✅ Scrollable grid content */}
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.grid}>
           <TouchableOpacity style={styles.card}>
             <View style={styles.iconBox}>
               <Image source={userIcon} style={styles.icon} resizeMode="contain" />
             </View>
-            <Text style={styles.cardLabel}>Personal details</Text>
+            <Text
+              style={styles.cardLabel}
+              allowFontScaling
+              maxFontSizeMultiplier={1.3}
+            >
+              Personal details
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.card}>
             <View style={styles.iconBox}>
               <Image source={keyIcon} style={styles.icon} resizeMode="contain" />
             </View>
-            <Text style={styles.cardLabel}>Privacy settings</Text>
+            <Text
+              style={styles.cardLabel}
+              allowFontScaling
+              maxFontSizeMultiplier={1.3}
+            >
+              Privacy settings
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.card}>
             <View style={styles.iconBox}>
               <Image source={infoIcon} style={styles.icon} resizeMode="contain" />
             </View>
-            <Text style={styles.cardLabel}>Legal info</Text>
+            <Text
+              style={styles.cardLabel}
+              allowFontScaling
+              maxFontSizeMultiplier={1.3}
+            >
+              Legal info
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.card}>
@@ -70,7 +93,13 @@ export default function SettingsScreen({ navigation }) {
                 resizeMode="contain"
               />
             </View>
-            <Text style={styles.cardLabel}>Support</Text>
+            <Text
+              style={styles.cardLabel}
+              allowFontScaling
+              maxFontSizeMultiplier={1.3}
+            >
+              Support
+            </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -84,7 +113,13 @@ export default function SettingsScreen({ navigation }) {
           fullWidth
           onPress={() => console.log("Log Out")}
         />
-        <Text style={styles.version}>Version 2.0.0</Text>
+        <Text
+          style={styles.version}
+          allowFontScaling
+          maxFontSizeMultiplier={1.2} // ✅ small label cap
+        >
+          Version 2.0.0
+        </Text>
       </ScreenFooter>
     </ScreenWrapper>
   );
@@ -96,11 +131,11 @@ const styles = StyleSheet.create({
     paddingBottom: 120,
   },
 
-  /// ✅ Centered header
+  // ✅ Centered header
   headerCentered: {
     alignItems: "center",
     marginTop: 24,
-    marginBottom: 32,
+    marginBottom: 32, // ✅ matches other hero spacing
   },
   avatarLarge: {
     width: 80,
@@ -109,18 +144,18 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   usernameCentered: {
-    ...typography.title3Medium, // ✅ same as ProfileHeader
+    ...typography.title3Medium,
     color: colors.foreground.default,
     marginBottom: 12,
   },
 
-  // Grid
+  // ✅ Grid of cards
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
-    marginBottom: 40,
     marginTop: 12,
+    marginBottom: 40,
   },
   card: {
     width: "48%",
@@ -150,7 +185,7 @@ const styles = StyleSheet.create({
     color: colors.foreground.default,
   },
 
-  // Footer
+  // ✅ Footer
   version: {
     ...typography.captionSmallRegular,
     color: colors.foreground.muted,

@@ -48,9 +48,9 @@ export default function SMSTab({ navigation }) {
       keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={false}
     >
-      {/* Card container */}
+      {/* ─── Card container ─── */}
       <View style={styles.card}>
-        {/* Phone input */}
+        {/* ─── Phone input ─── */}
         <View style={styles.inputWrapper}>
           <TextInput
             style={[styles.input, typography.inputText]}
@@ -59,7 +59,8 @@ export default function SMSTab({ navigation }) {
             placeholder="Add phone number"
             placeholderTextColor={colors.foreground.muted}
             keyboardType="phone-pad"
-            maxFontSizeMultiplier={1.2}
+            allowFontScaling
+            maxFontSizeMultiplier={1.2} // ✅ input field text cap
             onFocus={() => {
               if (!phone) {
                 setPhone("+447123456789"); // 👈 demo number prefilled
@@ -68,21 +69,26 @@ export default function SMSTab({ navigation }) {
           />
         </View>
 
-        {/* Info row */}
+        {/* ─── Info row ─── */}
         <View style={styles.infoRow}>
           <Image source={infoIcon} style={styles.infoIcon} />
-          <Text style={styles.infoText}>
-  <Animated.Text
-    style={[styles.infoHighlight, { transform: [{ scale: pulseAnim }] }]}
-    maxFontSizeMultiplier={1.2}
-  >
-    1 of 1
-  </Animated.Text>{" "}
-  SMS available this week
-</Text>
+          <Text
+            style={styles.infoText}
+            allowFontScaling
+            maxFontSizeMultiplier={1.2} // ✅ small UI label
+          >
+            <Animated.Text
+              style={[styles.infoHighlight, { transform: [{ scale: pulseAnim }] }]}
+              allowFontScaling
+              maxFontSizeMultiplier={1.2}
+            >
+              1 of 1
+            </Animated.Text>{" "}
+            SMS available this week
+          </Text>
         </View>
 
-        {/* Continue button */}
+        {/* ─── Continue button ─── */}
         <ZultsButton
           label="Continue"
           type="primary"
@@ -125,7 +131,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#0D3E2D",
     borderRadius: 12,
-    padding: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
   },
   infoIcon: {
     width: 16,

@@ -94,7 +94,7 @@ export function NavbarBackInvite({ onBackPress }) {
             numberOfLines={1}
             ellipsizeMode="tail"
             allowFontScaling
-            maxFontSizeMultiplier={1.3}
+            maxFontSizeMultiplier={1.2}
           >
             Invite
           </Text>
@@ -173,7 +173,7 @@ export function NavbarBackRightText({ onBackPress, rightText, onRightPress }) {
             numberOfLines={2}
             ellipsizeMode="clip"
             allowFontScaling
-            maxFontSizeMultiplier={1.3}
+            maxFontSizeMultiplier={1.2}
           >
             {rightText != null ? String(rightText) : ""}
           </Text>

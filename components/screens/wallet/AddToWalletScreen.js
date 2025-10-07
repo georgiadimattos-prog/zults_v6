@@ -20,13 +20,13 @@ export default function AddToWalletScreen({ navigation }) {
     Animated.parallel([
       Animated.timing(scaleAnim, {
         toValue: 1,
-        duration: 300,
+        duration: 320,
         easing: Easing.out(Easing.ease),
         useNativeDriver: true,
       }),
       Animated.timing(opacityAnim, {
         toValue: 1,
-        duration: 300,
+        duration: 320,
         easing: Easing.out(Easing.ease),
         useNativeDriver: true,
       }),
@@ -50,18 +50,19 @@ export default function AddToWalletScreen({ navigation }) {
                 style={styles.logo}
                 resizeMode="contain"
               />
+
               <View style={styles.userField}>
                 <Text
                   style={[
-                    typography.captionSmallRegular,
-                    { color: "rgba(255,255,255,0.6)" },
+                    typography.labelSmall,
+                    { color: colors.foreground.muted, marginBottom: 2 },
                   ]}
                 >
                   Username
                 </Text>
                 <Text
                   style={[
-                    typography.title3Medium,
+                    typography.titleMedium,
                     { color: colors.foreground.default },
                   ]}
                 >
@@ -74,12 +75,18 @@ export default function AddToWalletScreen({ navigation }) {
             <View style={styles.qrSection}>
               <Text
                 style={[
-                  typography.subheadlineRegular,
-                  { color: colors.foreground.soft, marginBottom: 16 },
+                  typography.bodyMedium,
+                  {
+                    color: colors.foreground.soft,
+                    marginBottom: 18,
+                    textAlign: "center",
+                    letterSpacing: 0.2,
+                  },
                 ]}
               >
                 Scan to view Rezults
               </Text>
+
               <View style={styles.qrContainer}>
                 <Image
                   source={require("../../../assets/images/qr-code.png")}
@@ -99,7 +106,6 @@ export default function AddToWalletScreen({ navigation }) {
                 onPress={() => navigation.goBack()}
                 style={{ alignSelf: "center", paddingHorizontal: 30 }}
               />
-              {/* Cancel removed 👆 */}
             </View>
           </Animated.View>
         </TouchableWithoutFeedback>
@@ -118,11 +124,11 @@ const styles = StyleSheet.create({
   card: {
     width: 370,
     height: 520,
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
     paddingVertical: 40,
     backgroundColor: colors.background.surface2,
-    borderRadius: 20,
-    borderWidth: 1.2,
+    borderRadius: 24, // ✅ matches RezultsCard curvature
+    borderWidth: 1,
     borderColor: colors.background.surface3,
     alignItems: "stretch",
     shadowColor: "#000",
@@ -131,10 +137,20 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 6,
   },
+  headerRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    width: "100%",
+    marginBottom: 32,
+  },
   logo: {
     width: 102,
     height: 36,
     alignSelf: "flex-start",
+  },
+  userField: {
+    alignItems: "flex-end",
   },
   qrSection: {
     marginTop: "auto",
@@ -145,23 +161,16 @@ const styles = StyleSheet.create({
     height: 156,
     padding: 12,
     backgroundColor: colors.neutral[0],
-    borderRadius: 12,
+    borderRadius: 10, // ✅ aligned to RezultsCard geometry
     justifyContent: "center",
     alignItems: "center",
   },
-  qr: { width: "100%", height: "100%" },
+  qr: {
+    width: "100%",
+    height: "100%",
+  },
   actions: {
-    marginTop: 30,
+    marginTop: 40,
     width: "100%",
-  },
-  headerRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    width: "100%",
-    marginBottom: 20,
-  },
-  userField: {
-    alignItems: "flex-end",
   },
 });

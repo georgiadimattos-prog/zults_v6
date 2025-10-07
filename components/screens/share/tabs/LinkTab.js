@@ -94,10 +94,16 @@ export default function LinkTab() {
 
   return (
     <View style={styles.content}>
-      {/* Share-link card */}
+      {/* ─── Share-link card ─── */}
       <View style={styles.card}>
         <View style={styles.cardHeader}>
-          <Text style={styles.cardTitle}>Rezults-link</Text>
+          <Text
+            style={styles.cardTitle}
+            allowFontScaling={false} // ✅ lock card title
+          >
+            Rezults-link
+          </Text>
+
           <View style={styles.statusPill}>
             <Animated.View
               style={[
@@ -113,6 +119,8 @@ export default function LinkTab() {
                 styles.statusText,
                 { color: linkActive ? "#00D775" : "#FA5F21" },
               ]}
+              allowFontScaling
+              maxFontSizeMultiplier={1.2} // ✅ micro text cap
             >
               {linkActive ? "Online" : "Offline"}
             </Text>
@@ -130,14 +138,13 @@ export default function LinkTab() {
         ) : (
           <View>
             {/* ✅ Link row as full touch area */}
-            <TouchableOpacity
-              style={styles.linkBox}
-              onPress={handleCopyAndShare}
-            >
+            <TouchableOpacity style={styles.linkBox} onPress={handleCopyAndShare}>
               <Text
                 style={styles.linkText}
                 numberOfLines={1}
                 ellipsizeMode="middle"
+                allowFontScaling
+                maxFontSizeMultiplier={1.3} // ✅ user content
               >
                 {link}
               </Text>
@@ -165,10 +172,16 @@ export default function LinkTab() {
         }}
       />
 
-      {/* Toast */}
+      {/* ✅ Toast */}
       {toast ? (
         <Animated.View style={[styles.toast, { opacity: fadeAnim }]}>
-          <Text style={styles.toastText}>{toast}</Text>
+          <Text
+            style={styles.toastText}
+            allowFontScaling
+            maxFontSizeMultiplier={1.2} // ✅ small label cap
+          >
+            {toast}
+          </Text>
         </Animated.View>
       ) : null}
     </View>
@@ -177,7 +190,7 @@ export default function LinkTab() {
 
 const styles = StyleSheet.create({
   content: {
-   flex: 1,
+    flex: 1,
   },
   card: {
     backgroundColor: colors.background.surface3,

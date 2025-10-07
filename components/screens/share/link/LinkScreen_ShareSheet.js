@@ -1,24 +1,24 @@
-import React from 'react';
-import { View, Text, StyleSheet, Share } from 'react-native';
-import { useRoute } from '@react-navigation/native';
-import { colors, typography } from '../../../../theme';
-import ScreenWrapper from '../../../ui/ScreenWrapper';
-import Navbar from '../../../ui/Navbar';
-import ZultsButton from '../../../ui/ZultsButton';
+import React from "react";
+import { View, Text, StyleSheet, Share } from "react-native";
+import { useRoute } from "@react-navigation/native";
+import { colors, typography } from "../../../../theme";
+import ScreenWrapper from "../../../ui/ScreenWrapper";
+import Navbar from "../../../ui/Navbar";
+import ZultsButton from "../../../ui/ZultsButton";
 
 export default function LinkScreenShareSheet() {
   const route = useRoute();
-  const link = route.params?.link || 'https://demorezultslink';
+  const link = route.params?.link || "https://demorezultslink";
 
   const handleShare = async () => {
     try {
       await Share.share({
         message: `Here’s my Rezults link: ${link}`,
         url: link,
-        title: 'My Rezults',
+        title: "My Rezults",
       });
     } catch (error) {
-      console.log('Error sharing:', error);
+      console.log("Error sharing:", error);
     }
   };
 
@@ -27,12 +27,23 @@ export default function LinkScreenShareSheet() {
       <Navbar />
 
       <View style={styles.content}>
-        <Text
-          style={styles.subtitle}
-          maxFontSizeMultiplier={1.2}
-        >
-          You can share your Rezults link directly from here.
-        </Text>
+        {/* ─── Page title + subtitle ─── */}
+        <View style={styles.headerBlock}>
+          <Text
+            style={typography.largeTitleMedium}
+            allowFontScaling={false} // ✅ lock Apple titles
+          >
+            Rezults-link
+          </Text>
+
+          <Text
+            style={[typography.bodyRegular, styles.subtitle]}
+            allowFontScaling
+            maxFontSizeMultiplier={1.3} // ✅ accessible body text
+          >
+            You can share your Rezults link directly from here.
+          </Text>
+        </View>
 
         <ZultsButton
           label="Share Link"
@@ -48,13 +59,16 @@ export default function LinkScreenShareSheet() {
 
 const styles = StyleSheet.create({
   content: {
+    flex: 1,
     paddingHorizontal: 16,
-    marginTop: 24,
+  },
+  headerBlock: {
+    marginTop: 32,
+    marginBottom: 24,
   },
   subtitle: {
-    ...typography.bodyRegular,
+    marginTop: 8,
     color: colors.foreground.soft,
-    marginBottom: 24,
-    textAlign: 'center',
+    textAlign: "center",
   },
 });
