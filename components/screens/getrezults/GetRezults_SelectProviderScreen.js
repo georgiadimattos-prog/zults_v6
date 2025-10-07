@@ -51,7 +51,7 @@ export default function GetRezults_SelectProviderScreen() {
           title="Need to get tested?"
           description="See providers you can test with to get Rezults."
           icon={labIcon}
-          onPress={() => navigation.navigate("ProvidersList")}
+          onPress={() => navigation.navigate("NeedToGetTested")}
         />
       </ScrollView>
     </ScreenWrapper>

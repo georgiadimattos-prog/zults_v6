@@ -20,6 +20,7 @@ import GetRezults_LoadingScreen from "./components/screens/getrezults/GetRezults
 import GetRezults_HowToFindLinkScreen from "./components/screens/getrezults/GetRezults_HowToFindLinkScreen";
 import AddRezultsCardScreen from "./components/screens/getrezults/AddRezultsCardScreen";
 import PolicyScreen from "./components/screens/getrezults/PolicyScreen";
+import NeedToGetTestedScreen from "./components/screens/getrezults/NeedToGetTestedScreen";
 
 // Share flow
 import ShareScreen from "./components/screens/share/ShareScreen";
@@ -105,6 +106,11 @@ export default function App() {
             name="GetRezultsSelectProvider"
             component={GetRezults_SelectProviderScreen}
           />
+          <Stack.Screen
+  name="NeedToGetTested"
+  component={NeedToGetTestedScreen}
+  options={{ headerShown: false }}
+/>
           <Stack.Screen
             name="GetRezultsPasteLink"
             component={GetRezults_PasteLinkScreen}
