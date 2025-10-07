@@ -1,4 +1,4 @@
-// ✅ RezultsCard.js (clean baseline)
+// ✅ RezultsCard.js (final Zults baseline)
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -31,7 +31,7 @@ export default function RezultsCard({
   isVerified = false,
   showRealName = false,
   providerName = "Planned Parenthood",
-  testDate = "25 Sep 2025",
+  testDate = "20 Oct 2025",
   videoSource = require("../../assets/videos/Card_All_GlowingBorder_25sec.mp4"),
   showExpand = false,
   onExpand,
@@ -62,7 +62,7 @@ export default function RezultsCard({
     iconRotate.value = withTiming(next ? 180 : 0, { duration: 300 });
   };
 
-  // 🔁 quick flip teaser
+  // quick flip teaser
   useEffect(() => {
     const timer = setTimeout(() => {
       rotate.value = withTiming(180, { duration: 600 });
@@ -109,19 +109,44 @@ export default function RezultsCard({
           <View style={styles.overlay}>
             <View>
               {isVerified && showRealName && realName && (
-                <Text style={styles.name}>{realName}</Text>
+                <Text
+                  style={styles.name}
+                  allowFontScaling
+                  maxFontSizeMultiplier={1.3}
+                >
+                  {realName}
+                </Text>
               )}
-              <Text style={styles.provider}>{providerName}</Text>
+              <Text
+                style={styles.provider}
+                allowFontScaling
+                maxFontSizeMultiplier={1.3}
+              >
+                {providerName}
+              </Text>
             </View>
-            <Text style={styles.link}>Show Rezults</Text>
+            <Text
+              style={styles.link}
+              allowFontScaling
+              maxFontSizeMultiplier={1.3}
+            >
+              Show Rezults
+            </Text>
           </View>
         </Animated.View>
 
         {/* Back */}
         <Animated.View style={[styles.cardBack, backAnimatedStyle]}>
           <View style={styles.backHeader}>
-            <Text style={styles.testedOn}>
-              Tested on <Text style={styles.testedDate}>{testDate}</Text>
+            <Text
+              style={styles.testedOn}
+              allowFontScaling
+              maxFontSizeMultiplier={1.3}
+            >
+              Tested on{" "}
+              <Text style={styles.testedDate} allowFontScaling>
+                {testDate}
+              </Text>
             </Text>
 
             {showExpand && (
@@ -147,12 +172,16 @@ export default function RezultsCard({
               "Hepatitis B",
               "Hepatitis C",
               "Gardnerella",
-              "Trichomoniasis",
               "Ureaplasma",
-              "Mycoplasma",
             ].map((label, idx) => (
               <View key={idx} style={styles.pill}>
-                <Text style={styles.pillText}>{label}</Text>
+                <Text
+                  style={styles.pillText}
+                  allowFontScaling
+                  maxFontSizeMultiplier={1.3}
+                >
+                  {label}
+                </Text>
               </View>
             ))}
           </View>
@@ -200,28 +229,29 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
   },
 
-  // 💜 Unified typography system
+  // Typography (front)
   name: {
     ...typography.bodyMedium,
     fontSize: 16,
     lineHeight: 20,
     fontWeight: "600",
-    color: colors.foreground.default, // bright white
+    color: colors.foreground.default,
   },
   provider: {
     ...typography.bodyRegular,
     fontSize: 15,
     lineHeight: 20,
-    color: colors.foreground.soft, // off-white
+    color: colors.foreground.soft,
   },
   link: {
     ...typography.bodyMedium,
     fontSize: 15,
     lineHeight: 20,
-    color: colors.foreground.soft, // off-white for subtle call to action
+    color: colors.foreground.soft,
     fontWeight: "500",
   },
 
+  // Back side
   cardBack: {
     position: "absolute",
     width: CARD_WIDTH,
@@ -247,26 +277,24 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
-  // 💬 Text inside back side
   testedOn: {
     ...typography.bodyRegular,
     fontSize: 15,
     lineHeight: 20,
-    color: colors.foreground.soft, // off-white
+    color: colors.foreground.soft,
   },
   testedDate: {
-    color: colors.foreground.default, // bright white for emphasis
+    color: colors.foreground.default,
     fontWeight: "600",
   },
 
-  // 🟣 Pills area
   pillsBottom: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 4,
   },
   pill: {
-    backgroundColor: "rgba(255,255,255,0.08)", // subtle soft gray
+    backgroundColor: "rgba(255,255,255,0.08)",
     borderRadius: 20,
     paddingHorizontal: 8,
     paddingVertical: 3,
@@ -277,7 +305,7 @@ const styles = StyleSheet.create({
     ...typography.bodyRegular,
     fontSize: 14,
     lineHeight: 18,
-    color: colors.foreground.default, // white text for clarity
+    color: colors.foreground.default,
     textAlign: "center",
   },
 });

@@ -89,34 +89,34 @@ export const typography = {
     fontFamily: fonts.medium,
     fontSize: 16,
     lineHeight: 20,
-    letterSpacing: -0.08,
+    letterSpacing: 0,
   },
   headlineRegular: {
     fontFamily: fonts.regular,
     fontSize: 16,
     lineHeight: 20,
-    letterSpacing: -0.08,
+    letterSpacing: 0,
   },
 
   // 🔹 Body → Page subtitles
   bodyMedium: {
     fontFamily: fonts.medium,
-    fontSize: 16,
+    fontSize: 15,
     lineHeight: 20,
-    letterSpacing: -0.08,
+    letterSpacing: 0,
     includeFontPadding: false,
     allowFontScaling: true,
-    maxFontSizeMultiplier: 1.2,        // ✅ capped scaling
+    maxFontSizeMultiplier: 1.3,        // ✅ capped scaling
     color: colors.foreground.soft,     // ✅ softer grey
   },
   bodyRegular: {
     fontFamily: fonts.regular,
-    fontSize: 16,
+    fontSize: 15,
     lineHeight: 20,
-    letterSpacing: -0.08,
+    letterSpacing: 0,
     includeFontPadding: false,
     allowFontScaling: true,
-    maxFontSizeMultiplier: 1.2,
+    maxFontSizeMultiplier: 1.3,
     color: colors.foreground.soft,
   },
 
@@ -125,7 +125,7 @@ export const typography = {
     fontFamily: fonts.medium,
     fontSize: 14,
     lineHeight: 18,
-    letterSpacing: -0.07,
+    letterSpacing: 0,
     includeFontPadding: false,
     allowFontScaling: true,
   },
@@ -133,7 +133,7 @@ export const typography = {
     fontFamily: fonts.regular,
     fontSize: 14,
     lineHeight: 18,
-    letterSpacing: -0.07,
+    letterSpacing: 0,
     includeFontPadding: false,
     allowFontScaling: true,
   },
@@ -143,13 +143,13 @@ export const typography = {
     fontFamily: fonts.medium,
     fontSize: 14,
     lineHeight: 18,
-    letterSpacing: -0.07,
+    letterSpacing: 0,
   },
   captionLargeRegular: {
     fontFamily: fonts.regular,
     fontSize: 14,
     lineHeight: 16,
-    letterSpacing: -0.07,
+    letterSpacing: 0,
   },
 
   // Caption Small
@@ -207,12 +207,12 @@ export const typography = {
   // 🔹 Inputs
   inputText: {
   fontFamily: fonts.regular,
-  fontSize: 16,
+  fontSize: 15,
   lineHeight: 20,
-  letterSpacing: -0.08,
+  letterSpacing: 0,
   includeFontPadding: false,
   allowFontScaling: true,
-  maxFontSizeMultiplier: 1.2,
+  maxFontSizeMultiplier: 1.3,
   color: colors.foreground.default, // white text
 },
 };

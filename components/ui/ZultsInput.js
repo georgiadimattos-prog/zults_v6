@@ -19,18 +19,19 @@ export default function ZultsInput({
       <View style={styles.inputWrapper}>
         {icon && <Image source={icon} style={styles.icon} />}
         <TextInput
-          style={[styles.input, typography.inputText]}
-          value={value}
-          onChangeText={onChangeText}
-          placeholder={placeholder}
-          placeholderTextColor={colors.foreground.muted}
-          keyboardType={keyboardType}
-          secureTextEntry={secureTextEntry}
-          autoCapitalize="none"
-          autoCorrect={false}
-          maxFontSizeMultiplier={1.2}
-          {...props}
-        />
+  style={[styles.input, typography.inputText]}
+  value={value}
+  onChangeText={onChangeText}
+  placeholder={placeholder}
+  placeholderTextColor={colors.foreground.muted}
+  keyboardType={keyboardType}
+  secureTextEntry={secureTextEntry}
+  autoCapitalize="none"
+  autoCorrect={false}
+  allowFontScaling={true}             // ✅ scales like all body text
+  maxFontSizeMultiplier={1.3}        // ✅ unified baseline
+  {...props}
+/>
       </View>
     </View>
   );
@@ -38,7 +39,7 @@ export default function ZultsInput({
 
 const styles = StyleSheet.create({
   label: {
-    ...typography.subheadlineRegular,
+    ...typography.bodyRegular,
     color: colors.foreground.soft,
     marginBottom: 6,
   },
@@ -46,11 +47,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.05)',   // ✅ subtle filled bg
+    backgroundColor: 'rgba(255,255,255,0.1)',
     paddingHorizontal: 14,
     paddingVertical: 12,
-    borderWidth: 1,                              // ✅ stroke line
-    borderColor: 'rgba(255,255,255,0.15)',       // ✅ subtle stroke
   },
   input: {
     flex: 1,

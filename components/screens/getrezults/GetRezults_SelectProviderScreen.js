@@ -26,22 +26,22 @@ export default function GetRezults_SelectProviderScreen() {
           <Text style={typography.largeTitleMedium} allowFontScaling={false}>
             Get Rezults
           </Text>
-          <Text style={typography.bodyRegular} maxFontSizeMultiplier={1.2}>
+          <Text style={typography.bodyRegular} maxFontSizeMultiplier={1.3}>
             Choose an option below to get started.
           </Text>
         </View>
 
         {/* Info Cards */}
         <InfoCard
-          title="Add Rezults"
-          description="Link your test provider to turn your STI results into Rezults."
+          title="Already tested?"
+          description="Find your test provider to turn your STI results into Rezults."
           icon={cardIcon}
           onPress={() => navigation.navigate("GetRezultsPasteLink")}
         />
 
         <InfoCard
           title="Need to get tested?"
-          description="See providers you can test with and connect your Rezults."
+          description="See providers you can test with to get Rezults."
           icon={labIcon}
           onPress={() => navigation.navigate("ProvidersList")}
         />

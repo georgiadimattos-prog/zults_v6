@@ -100,7 +100,7 @@ export function NavbarBackInvite({ onBackPress }) {
       }}
       numberOfLines={1}
       ellipsizeMode="tail"
-      maxFontSizeMultiplier={1.2}
+      maxFontSizeMultiplier={1.3}
     >
       Invite
     </Text>
@@ -172,13 +172,14 @@ export function NavbarBackRightText({ onBackPress, rightText, onRightPress }) {
           style={{ paddingHorizontal: 8, paddingVertical: 6 }} // ✅ flexible, not fixed size
         >
           <Text
-            style={styles.rightText}
-            numberOfLines={1}     // ✅ stays on one line
-            ellipsizeMode="tail"  // ✅ adds "…" if too long
-            maxFontSizeMultiplier={1.2}
-          >
-            {rightText != null ? String(rightText) : ''}
-          </Text>
+  style={[styles.rightText, { textAlign: 'right' }]}
+  numberOfLines={2}          // ✅ allow up to 2 lines
+  ellipsizeMode="clip"       // ✅ no "..."
+  maxFontSizeMultiplier={1.3}
+  allowFontScaling={true}
+>
+  {rightText != null ? String(rightText) : ''}
+</Text>
         </TouchableOpacity>
       </View>
     </View>

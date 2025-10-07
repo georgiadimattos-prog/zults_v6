@@ -7,11 +7,8 @@ import RezultsCard from "../../ui/RezultsCard";
 import ZultsButton from "../../ui/ZultsButton";
 import Navbar from "../../ui/Navbar";
 import ScreenFooter from "../../ui/ScreenFooter";
-
-// ✅ import the cache
 import { rezultsCache } from "../../../cache/rezultsCache";
 
-// Provider map (so we can display correct name)
 const PROVIDER_NAMES = {
   pp: "Planned Parenthood",
   shl: "Sexual Health London",
@@ -29,12 +26,12 @@ export default function AddRezultsCardScreen() {
   const handleAddRezults = () => {
     rezultsCache.hasRezults = true;
     rezultsCache.card = {
-  realName: "John Doe",
-  isVerified: true,
-  showRealName: true,
-  providerName,
-  testDate: "12 Dec 2025",
-};
+      realName: "John Doe",
+      isVerified: true,
+      showRealName: true,
+      providerName,
+      testDate: "12 Dec 2025",
+    };
 
     navigation.reset({
       index: 0,
@@ -70,13 +67,17 @@ export default function AddRezultsCardScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Page title + subtitle */}
+        {/* Header */}
         <View style={styles.headerBlock}>
-          <Text style={typography.largeTitleMedium} allowFontScaling={false}>
+          <Text style={styles.title} allowFontScaling={false}>
             Your Rezults
           </Text>
-          <Text style={typography.bodyRegular} maxFontSizeMultiplier={1.2}>
-            By clicking Add Rezults, you confirm this information is your own and accurate.{" "}
+
+          <Text
+            style={[typography.bodyRegular, styles.subtitle]}
+            maxFontSizeMultiplier={1.3}
+          >
+            By tapping Add Rezults, you confirm this information is your own and accurate.{" "}
             <Text
               style={styles.link}
               onPress={() => navigation.navigate("PolicyScreen")}
@@ -87,17 +88,18 @@ export default function AddRezultsCardScreen() {
         </View>
 
         {/* Rezults Card Preview */}
-        <View style={{ width: "100%", alignItems: "center", marginTop: 24 }}>
+        <View style={styles.cardWrapper}>
           <RezultsCard
-  realName="John Doe"
-  isVerified={true}
-  showRealName={true}
-  providerName={providerName}
-  testDate="12 Dec 2025"
-/>
+            realName="John Doe"
+            isVerified={true}
+            showRealName={true}
+            providerName={providerName}
+            testDate="12 Dec 2025"
+          />
         </View>
       </ScrollView>
 
+      {/* Footer actions */}
       <ScreenFooter>
         <ZultsButton
           label="Add Rezults"
@@ -122,14 +124,34 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     paddingBottom: 120,
-    paddingHorizontal: 16,
+    paddingHorizontal: 16, // ✅ baseline gutter
   },
+
   headerBlock: {
     marginTop: 32,
     marginBottom: 24,
   },
+
+  title: {
+    ...typography.largeTitleMedium,      // ✅ 34 / 41 hero size
+    color: colors.foreground.default,    // ✅ white
+    marginBottom: 8,                     // ✅ tight rhythm
+    allowFontScaling: false,             // ✅ locked
+  },
+
+  subtitle: {
+    color: colors.foreground.soft,       // ✅ soft gray tone
+    flexWrap: "wrap",
+  },
+
   link: {
     textDecorationLine: "underline",
-    color: colors.brand.primary,
+    color: colors.info.onContainer,      // ✅ brand blue (same as elsewhere)
+  },
+
+  cardWrapper: {
+    width: "100%",
+    alignItems: "center",
+    marginTop: 24,
   },
 });

@@ -102,10 +102,12 @@ const styles = StyleSheet.create({
     color: colors.foreground.muted,
   },
   message: {
-    ...typography.bodyRegular,
-    color: colors.foreground.muted, // 👈 lighter preview text
-    lineHeight: typography.bodyRegular.fontSize + 4,
-  },
+  ...typography.bodyRegular,
+  fontSize: 15,       // ⬇️ down from 16
+  lineHeight: 18,     // balanced compact line height
+  color: colors.foreground.muted, // 👈 lighter preview text
+  includeFontPadding: false,
+},
   unreadBadge: {
     backgroundColor: colors.brand.purple1,
     minWidth: 20,

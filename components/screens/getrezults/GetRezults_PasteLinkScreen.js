@@ -1,85 +1,63 @@
-import React, { useState, useMemo, useRef } from "react";
+import React, { useState, useRef } from "react";
 import {
   View,
   Text,
   StyleSheet,
+  TouchableOpacity,
+  Image,
   KeyboardAvoidingView,
   Platform,
   TouchableWithoutFeedback,
   Keyboard,
-  TouchableOpacity,
-  Image,
-  Animated,
-  ScrollView as RNScrollView,
-  Linking, // 👈 Correct way
+  Modal,
+  ScrollView,
+  Linking,
 } from "react-native";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import { BlurView } from "expo-blur";
 import * as Haptics from "expo-haptics";
 import { colors, typography } from "../../../theme";
-import ZultsButton from "../../ui/ZultsButton";
 import ScreenWrapper from "../../ui/ScreenWrapper";
 import ScreenFooter from "../../ui/ScreenFooter";
 import { NavbarBackRightText } from "../../ui/Navbar";
 import ZultsInput from "../../ui/ZultsInput";
+import ZultsButton from "../../ui/ZultsButton";
 
 // Logos
 import shlLogo from "../../../assets/images/SHL.png";
 import randoxLogo from "../../../assets/images/Randox.png";
 import nhsLogo from "../../../assets/images/NHS.png";
 import ppLogo from "../../../assets/images/pp-logo.png";
+import chevronDown from "../../../assets/images/chevron-down.png";
 
-const PROVIDER_NAMES = {
-  shl: "Sexual Health London",
-  randox: "Randox Health",
-  nhs: "NHS",
-  pp: "Planned Parenthood",
-};
-
-const COMMON_INSTRUCTIONS =
-  "Tap “Share results link” in your results report and paste it here. Only your latest results link can be used.";
+const PROVIDERS = [
+  { id: "pp", name: "Planned Parenthood", logo: ppLogo, baseUrl: "https://plannedparenthood.demo/" },
+  { id: "shl", name: "Sexual Health London", logo: shlLogo, baseUrl: "https://www.shl.uk/" },
+  { id: "nhs", name: "NHS", logo: nhsLogo, baseUrl: "https://www.nhs.uk/" },
+  { id: "randox", name: "Randox Health", logo: randoxLogo, baseUrl: "https://www.randoxhealth.com/" },
+];
 
 export default function GetRezults_PasteLinkScreen() {
   const navigation = useNavigation();
-  const route = useRoute();
-
-  const [selectedProvider, setSelectedProvider] = useState(
-    route.params?.providerId ?? null
-  );
+  const [selectedProvider, setSelectedProvider] = useState(null);
+  const [showSheet, setShowSheet] = useState(false);
   const [link, setLink] = useState("");
 
-  const providers = [
-  { id: "pp", name: "Planned Parenthood", logo: ppLogo }, // 👈 first
-  { id: "shl", name: "Sexual Health London", logo: shlLogo },
-  { id: "nhs", name: "NHS", logo: nhsLogo },
-  { id: "randox", name: "Randox Health", logo: randoxLogo },
-];
-
-  const providerName = useMemo(
-    () => (selectedProvider ? PROVIDER_NAMES[selectedProvider] : "Your Provider"),
-    [selectedProvider]
-  );
-
-  const subtitle = selectedProvider
-    ? `From ${providerName}. ${COMMON_INSTRUCTIONS}`
-    : "Select your test provider to continue.";
+  const inputRef = useRef(null);
 
   const handleContinue = () => {
     if (!link || !selectedProvider) return;
     navigation.navigate("GetRezultsLoading", {
-      providerId: selectedProvider,
+      providerId: selectedProvider.id,
       resultsLink: link,
     });
   };
 
-  const handlePress = (providerId) => {
-    Haptics.selectionAsync();
-    if (selectedProvider === providerId) {
-      setSelectedProvider(null);
-    } else {
-      setSelectedProvider(providerId);
-    }
+  const handleProviderSelect = (provider) => {
+    setSelectedProvider(provider);
+    setShowSheet(false);
+    setLink(provider.baseUrl);          // ✅ auto-fill base link
+    setTimeout(() => inputRef.current?.focus(), 300); // ✅ focus input after animation
   };
 
   return (
@@ -93,167 +71,224 @@ export default function GetRezults_PasteLinkScreen() {
             rightText="How to find your link?"
             onRightPress={() =>
               navigation.navigate("GetRezultsHowToFindLink", {
-                providerId: selectedProvider,
+                providerId: selectedProvider?.id,
               })
             }
           />
 
-          <KeyboardAwareScrollView
-            contentContainerStyle={[styles.content, { flexGrow: 1, paddingBottom: 90 }]}
-            keyboardShouldPersistTaps="handled"
-            enableOnAndroid={true}
-            extraScrollHeight={-170}
+          <ScrollView
             showsVerticalScrollIndicator={false}
+            contentContainerStyle={[styles.content, { paddingBottom: 90 }]}
+            keyboardShouldPersistTaps="handled"
           >
-            {/* Page title + subtitle */}
+            {/* Header */}
             <View style={styles.headerBlock}>
-              <Text style={typography.largeTitleMedium} allowFontScaling={false}>
-                Add Rezults
+              <Text style={styles.title} allowFontScaling={false}>
+                Add your Rezults
               </Text>
-              <Text style={typography.bodyRegular} maxFontSizeMultiplier={1.2}>
-                {subtitle}
+              <Text
+                style={[typography.bodyRegular, styles.subtitle]}
+                maxFontSizeMultiplier={1.3}
+              >
+                Find your STI results link from your provider and paste it below to turn it into your Rezults.
               </Text>
             </View>
 
-            {/* Provider carousel */}
-            <RNScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.carousel}
+            {/* Provider dropdown */}
+            <TouchableOpacity
+              onPress={() => {
+                Haptics.selectionAsync();
+                setShowSheet(true);
+              }}
+              activeOpacity={0.9}
+              style={styles.dropdown}
             >
-              {providers.map((provider) => {
-                const isSelected = selectedProvider === provider.id;
-                const scaleAnim = useRef(new Animated.Value(1)).current;
-
-                return (
-                  <TouchableOpacity
-                    key={provider.id}
-                    activeOpacity={0.9}
-                    onPress={() => handlePress(provider.id)}
+              {selectedProvider ? (
+                <>
+                  <Image
+                    source={selectedProvider.logo}
+                    style={styles.providerLogo}
+                    resizeMode="contain"
+                  />
+                  <Text
+                    style={styles.dropdownText}
+                    numberOfLines={1}
+                    maxFontSizeMultiplier={1.3}
                   >
-                    <Animated.View
-                      style={[
-                        styles.card,
-                        { transform: [{ scale: scaleAnim }] },
-                        isSelected && styles.cardSelected,
-                      ]}
-                    >
-                      <BlurView intensity={60} tint="dark" style={StyleSheet.absoluteFill} />
-                      <View style={styles.radioCircle}>
-                        {isSelected && <View style={styles.radioDot} />}
-                      </View>
-                      <Image
-                        source={provider.logo}
-                        style={styles.logo}
-                        resizeMode="contain"
-                      />
-                    </Animated.View>
-                  </TouchableOpacity>
-                );
-              })}
-            </RNScrollView>
+                    {selectedProvider.name}
+                  </Text>
+                </>
+              ) : (
+                <Text
+                  style={[
+                    styles.dropdownText,
+                    { color: colors.foreground.soft },
+                  ]}
+                  maxFontSizeMultiplier={1.3}
+                >
+                  Select your provider
+                </Text>
+              )}
+              <Image source={chevronDown} style={styles.chevron} />
+            </TouchableOpacity>
 
-            {/* Input only if provider selected */}
+            {/* Link input */}
             {selectedProvider && (
               <ZultsInput
-    value={link}
-    onChangeText={setLink}
-    placeholder="Paste link here..."
-    keyboardType="url"
-    style={{ marginBottom: 70 }} // 👈 added space so it stays above footer
-    placeholderTextColor={colors.foreground.muted}
-    maxFontSizeMultiplier={1.2}
-  />
+                ref={inputRef}
+                value={link}
+                onChangeText={setLink}
+                placeholder="Paste your results link..."
+                keyboardType="url"
+                style={{ marginTop: 10 }}
+                placeholderTextColor={colors.foreground.muted}
+                maxFontSizeMultiplier={1.3}
+              />
             )}
-          </KeyboardAwareScrollView>
+          </ScrollView>
 
+          {/* Footer */}
           <ScreenFooter>
-  <ZultsButton
-    label="Add Rezults"
-    type="primary"
-    size="large"
-    fullWidth
-    onPress={handleContinue}
-    disabled={!selectedProvider || link.trim().length < 5}
-  />
+            <ZultsButton
+              label="Continue"
+              type="primary"
+              size="large"
+              fullWidth
+              onPress={handleContinue}
+              disabled={!selectedProvider || link.trim().length < 5}
+            />
+            <TouchableOpacity
+              style={{ marginTop: 12 }}
+              onPress={() =>
+                Linking.openURL(
+                  "mailto:support@myrezults.com?subject=Request a new provider"
+                )
+              }
+            >
+              <Text
+                style={[
+                  typography.subheadlineRegular,
+                  {
+                    color: colors.foreground.muted,
+                    textAlign: "center",
+                  },
+                ]}
+                maxFontSizeMultiplier={1.3}
+              >
+                Don’t see your provider? Let us know.
+              </Text>
+            </TouchableOpacity>
+          </ScreenFooter>
 
-  {/* Subtle footer link */}
-  <TouchableOpacity
-    style={{ marginTop: 12 }}
-    onPress={() =>
-      Linking.openURL(
-        "mailto:support@myrezults.com?subject=Request a new provider&body=Hi Zults team, I can’t find my provider in the list. Please add... Thank you.")
-    }
-  >
-    <Text
-      style={[
-        typography.subheadlineRegular,
-        { color: colors.foreground.muted, textAlign: "center" },
-      ]}
-    >
-      Don’t see your provider? Let us know.
-    </Text>
-  </TouchableOpacity>
-</ScreenFooter>
+          {/* Provider picker modal */}
+          <Modal
+            transparent
+            visible={showSheet}
+            animationType="fade"
+            onRequestClose={() => setShowSheet(false)}
+          >
+            <TouchableWithoutFeedback onPress={() => setShowSheet(false)}>
+              <BlurView intensity={40} tint="dark" style={styles.overlay}>
+                <TouchableWithoutFeedback>
+                  <View style={styles.sheetContainer}>
+                    <Text style={styles.sheetTitle} allowFontScaling={false}>
+                      Choose your provider
+                    </Text>
+
+                    {PROVIDERS.map((p) => (
+                      <TouchableOpacity
+                        key={p.id}
+                        onPress={() => handleProviderSelect(p)}
+                        style={styles.sheetItem}
+                        activeOpacity={0.9}
+                      >
+                        <Image
+                          source={p.logo}
+                          style={styles.sheetLogo}
+                          resizeMode="contain"
+                        />
+                        <Text
+                          style={styles.sheetText}
+                          maxFontSizeMultiplier={1.3}
+                          numberOfLines={1}
+                        >
+                          {p.name}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </TouchableWithoutFeedback>
+              </BlurView>
+            </TouchableWithoutFeedback>
+          </Modal>
         </ScreenWrapper>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
 }
 
-const CARD_WIDTH = 180;
-const CARD_HEIGHT = 120;
-
 const styles = StyleSheet.create({
-  headerBlock: {
-    marginTop: 32,
-    marginBottom: 24,
+  content: { paddingHorizontal: 16 },
+  headerBlock: { marginTop: 32, marginBottom: 24 },
+
+  title: {
+    ...typography.largeTitleMedium,
+    color: colors.foreground.default,
+    marginBottom: 8,
+    allowFontScaling: false,
   },
-  carousel: {
-    paddingRight: 8,
-    marginBottom: 24,
-  },
-  card: {
-    width: CARD_WIDTH,
-    height: CARD_HEIGHT,
-    borderRadius: 20,
-    marginRight: 12,
-    padding: 20,
-    justifyContent: "center",
+  subtitle: { marginTop: 8, flexWrap: "wrap" },
+
+  dropdown: {
+    flexDirection: "row",
     alignItems: "center",
-    overflow: "hidden",
-    shadowColor: "#000",
-    shadowOpacity: 0.12,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 4,
+    justifyContent: "space-between",
+    borderRadius: 18,
+    backgroundColor: "rgba(255,255,255,0.12)",
+    paddingHorizontal: 18,
+    paddingVertical: 20,
+    marginBottom: 12,
   },
-  cardSelected: {
-    shadowColor: colors.brand.primary,
-    shadowOpacity: 0.25,
+  dropdownText: {
+    ...typography.bodyRegular,
+    color: colors.foreground.default,
+    flex: 1,
   },
-  logo: {
-    width: 108,
-    height: 60,
+  chevron: { width: 22, height: 22, tintColor: colors.foreground.muted },
+  providerLogo: { width: 64, height: 64, marginRight: 14 },
+
+  overlay: {
+    flex: 1,
+    justifyContent: "flex-end",
   },
-  radioCircle: {
-    position: "absolute",
-    top: 8,
-    right: 8,
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: "#292929",
+  sheetContainer: {
+    backgroundColor: colors.background.surface2,
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
+    paddingTop: 24,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
+  sheetTitle: {
+    ...typography.largeTitleMedium,
+    fontSize: 24,
+    lineHeight: 30,
+    color: colors.foreground.default,
+    marginBottom: 16,
+  },
+  sheetItem: {
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
+    paddingVertical: 18,
   },
-  radioDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: colors.neutral[0],
+  sheetLogo: {
+    width: 64,
+    height: 64,
+    marginRight: 16,
   },
-  content: {
-    paddingHorizontal: 16,
+  sheetText: {
+    ...typography.bodyRegular,
+    color: colors.foreground.default,
+    flexShrink: 1,
   },
 });

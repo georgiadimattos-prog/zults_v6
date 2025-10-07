@@ -44,7 +44,7 @@ export default function RezultsActionButton({ status, onPress }) {
        <ZultsButton
       label="Stop Sharing"
       type="secondary"     // ✅ white pill with dark text
-      size="large"         // bigger for emphasis
+      size="medium"         // bigger for emphasis
       fullWidth={true}     // full width to replace input area
       pill
       onPress={onPress}

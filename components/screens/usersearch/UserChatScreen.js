@@ -595,7 +595,7 @@ return (
 
           {!isBlocked && (
   (isDemoChat && user.id === "zults-demo") ? (
-    !chatCache[user.id]?.hasViewedDemoRezults ? (
+    highlightTopCTA && !chatCache[user.id]?.hasViewedDemoRezults ? (
       <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
         <RezultsActionButton
           status="view"

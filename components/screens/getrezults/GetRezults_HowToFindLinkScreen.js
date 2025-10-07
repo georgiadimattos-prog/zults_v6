@@ -54,20 +54,27 @@ export default function GetRezults_HowToFindLinkScreen() {
           <Text style={typography.largeTitleMedium} allowFontScaling={false}>
             How to find your link
           </Text>
-          <Text style={typography.bodyRegular} maxFontSizeMultiplier={1.2}>
-            Follow these steps in your {providerName} account to find and copy your results link.
-          </Text>
+          <Text
+  style={[styles.subtitle, typography.bodyRegular]}
+  maxFontSizeMultiplier={1.3}
+>
+  Follow these steps in your {providerName} account to find and copy your results link.
+</Text>
         </View>
 
         {/* Steps */}
         {steps.map((s, i) => (
   <View key={i} style={styles.stepRow}>
     <Text style={styles.stepNumber}>{i + 1}.</Text>
-    <Text style={styles.stepText} maxFontSizeMultiplier={1.2}>
-      {s}
-    </Text>
+    {/* 👇 add this wrapper to contain and wrap the text properly */}
+    <View style={{ flex: 1 }}>
+      <Text style={styles.stepText} maxFontSizeMultiplier={1.3}>
+        {s}
+      </Text>
+    </View>
   </View>
 ))}
+
 
         {/* Video tutorial section */}
         <View style={styles.videoContainer}>
@@ -122,9 +129,15 @@ stepNumber: {
   marginRight: 8,
 },
 stepText: {
-  flex: 1,
+  flex: 1,                 // ✅ ensures text stays within row
+  flexWrap: 'wrap',        // ✅ wraps long lines
   ...typography.bodyRegular,
   color: colors.foreground.soft,
   lineHeight: 22,
+},
+subtitle: {
+  flexShrink: 1,
+  flexWrap: 'wrap',
+  marginRight: 16, // optional, just adds breathing space on small devices
 },
 });

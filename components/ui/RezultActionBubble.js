@@ -291,37 +291,42 @@ const styles = StyleSheet.create({
   },
 
   messageTextUser: {
-    ...typography.chatMessage,
-    color: '#2C2C2C',
-  },
-  messageTextOther: {
-    ...typography.chatMessage,
-    color: '#FFFFFF',
-  },
+  ...typography.chatMessage,
+  fontSize: 15,       // 👈 up from ~14
+  lineHeight: 22,     // 👈 proportional spacing
+  color: '#2C2C2C',
+},
+messageTextOther: {
+  ...typography.chatMessage,
+  fontSize: 15,
+  lineHeight: 22,
+  color: '#FFFFFF',
+},
 
   label: {
-    ...typography.chatMessageBold,
-    marginBottom: 2,
-    color: '#2C2C2C',
-    flexShrink: 1,
-    flexWrap: 'wrap',
-    includeFontPadding: true,
-    allowFontScaling: true,
-    maxFontSizeMultiplier: 1.2,
-  },
-  labelOther: {
-    ...typography.chatMessageBold,
-    marginBottom: 2,
-    color: '#FFFFFF',
-    flexShrink: 1,
-    flexWrap: 'wrap',
-    includeFontPadding: true,
-    allowFontScaling: true,
-    maxFontSizeMultiplier: 1.2,
-  },
+  ...typography.chatMessageBold,
+  fontSize: 15,          // 👈 keep this AFTER the spread
+  lineHeight: 20,
+  includeFontPadding: false,
+  allowFontScaling: true,
+  maxFontSizeMultiplier: 1.3,  // 👈 optional bump for flexibility
+},
+
+labelOther: {
+  ...typography.chatMessageBold,
+  fontSize: 15,
+  lineHeight: 20,
+  marginBottom: 1,
+  color: '#FFFFFF',
+  flexShrink: 1,
+  flexWrap: 'wrap',
+  includeFontPadding: false,
+  allowFontScaling: true,
+  maxFontSizeMultiplier: 1.1,
+},
   subtext: {
     ...typography.chatMessage,
-    fontSize: 14,
+    fontSize: 15,
     color: '#6E6E6E',
     flexShrink: 1,
     flexWrap: 'wrap',
@@ -331,7 +336,7 @@ const styles = StyleSheet.create({
   },
   subtextOther: {
   ...typography.chatMessage,
-  fontSize: 14,
+  fontSize: 15,
   color: '#B1B1B1', // softer contrast
   flexShrink: 1,
   flexWrap: 'wrap',
