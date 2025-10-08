@@ -20,7 +20,16 @@ export default function AddRezultsCardScreen() {
   const navigation = useNavigation();
   const route = useRoute();
   const { providerId } = route.params || {};
-  const providerName = PROVIDER_NAMES[providerId] || "Your Provider";
+  const PROVIDERS = {
+  pp: "Planned Parenthood",
+  soapoli: "Soapoli-Online",
+  shl: "Sexual Health London",
+  shuk: "SH.UK",
+  testme: "TestMe",
+  openhouse: "Open House",
+};
+
+const providerName = PROVIDERS[providerId] || "Your Provider";
 
   const handleAddRezults = () => {
     rezultsCache.hasRezults = true;
@@ -28,7 +37,7 @@ export default function AddRezultsCardScreen() {
       realName: "John Doe",
       isVerified: true,
       showRealName: true,
-      providerName,
+      providerName, // ✅ dynamically applied
       testDate: "20 Oct 2025",
     };
 

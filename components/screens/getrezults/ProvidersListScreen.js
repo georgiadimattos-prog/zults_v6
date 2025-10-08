@@ -55,7 +55,7 @@ const PROVIDERS = [
     url: "https://www.sh.uk/",
   },
   {
-    name: "TestMe",
+    name: "TestForMe",
     logo: testMeLogo,
     flag: flagDE,
     url: "https://www.testforme.de/",

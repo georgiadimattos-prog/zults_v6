@@ -264,6 +264,11 @@ useEffect(() => {
     setOtherUserState(saved.otherUserState || { hasShared: false, hasRequested: false });
     if (saved.blocked) setIsBlocked(true);
 
+    // 💜 restore global sharing state if active
+if (rezultsCache.isSharing) {
+  setChatState((prev) => ({ ...prev, hasShared: true }));
+}
+
     chatCache[key].hasUnread = false;
     DeviceEventEmitter.emit("chat-updated");
 
@@ -450,10 +455,13 @@ const startRequestFlow = () => {
 
   console.log("▶️ Starting request flow for", user.id);
 
+  // 💜 Read Rezults state once but never modify it
+  const userHasRezults = rezultsCache.hasRezults;
+
   // 🕒 store when this demo request began
-if (user && user.id && chatCache[user.id]) {
-  chatCache[user.id].lastRequestStarted = Date.now();
-}
+  if (user && user.id && chatCache[user.id]) {
+    chatCache[user.id].lastRequestStarted = Date.now();
+  }
 
   // Clear existing timers
   requestTimers.current.forEach((t) => clearTimeout(t));
@@ -476,31 +484,29 @@ if (user && user.id && chatCache[user.id]) {
 
       setOtherUserState({ hasRequested: true, hasShared: false });
 
-      setChatData((prev) => {
-        const updated = [
-          ...prev,
-          {
-            id: Date.now().toString(),
-            type: "request",
-            direction: "from-other", // 👈 incoming from the bot
-            username: user.name || "Demo User",
-            avatar: user.image || fallbackAvatar,
-            timestamp: getLocalTime(),
-          },
-        ];
-        chatCache[user.id] = {
-          ...(chatCache[user.id] || {}),
-          user,
-          chatData: updated,
-          hasUnread: true,
-        };
-        setTimeout(() => DeviceEventEmitter.emit("chat-updated"), 0);
-        return updated;
-      });
+      setChatData((prev) => [
+        ...prev,
+        {
+          id: Date.now().toString(),
+          type: "request",
+          direction: "from-other",
+          username: user.name || "Demo User",
+          avatar: user.image || fallbackAvatar,
+          timestamp: getLocalTime(),
+        },
+      ]);
+
+      chatCache[user.id] = {
+        ...(chatCache[user.id] || {}),
+        user,
+        chatData: [...(chatCache[user.id]?.chatData || []), ...chatData],
+        hasUnread: true,
+      };
+      DeviceEventEmitter.emit("chat-updated");
     }, 5000)
   );
 
-  // After 10s -> Demo bot shares Rezults
+  // After 10s -> Demo bot shares Rezults (based on whether user had Rezults)
   requestTimers.current.push(
     setTimeout(() => {
       removeTyping();
@@ -509,27 +515,30 @@ if (user && user.id && chatCache[user.id]) {
 
       setOtherUserState({ hasRequested: false, hasShared: true });
 
-      setChatData((prev) => {
-        const updated = [
-          ...prev,
-          {
-            id: Date.now().toString(),
-            type: "share",
-            direction: "from-other", // 👈 incoming from the bot
-            username: user.name || "Demo User",
-            avatar: user.image || fallbackAvatar,
-            timestamp: getLocalTime(),
-          },
-        ];
-        chatCache[user.id] = {
-          ...(chatCache[user.id] || {}),
-          user,
-          chatData: updated,
-          hasUnread: true,
-        };
-        setTimeout(() => DeviceEventEmitter.emit("chat-updated"), 0);
-        return updated;
-      });
+      const shareType = userHasRezults ? "share" : "note";
+
+      setChatData((prev) => [
+        ...prev,
+        {
+          id: Date.now().toString(),
+          type: shareType,
+          direction: "from-other",
+          username: user.name || "Demo User",
+          avatar: user.image || fallbackAvatar,
+          timestamp: getLocalTime(),
+          text: userHasRezults
+            ? undefined
+            : "User currently has no Rezults to share.",
+        },
+      ]);
+
+      chatCache[user.id] = {
+        ...(chatCache[user.id] || {}),
+        user,
+        chatData: [...(chatCache[user.id]?.chatData || []), ...chatData],
+        hasUnread: true,
+      };
+      DeviceEventEmitter.emit("chat-updated");
 
       // After 15s -> Demo bot stops sharing
       requestTimers.current.push(
@@ -539,32 +548,31 @@ if (user && user.id && chatCache[user.id]) {
           setOtherUserState({ hasShared: false, hasRequested: false });
           setChatState({ hasShared: false, hasRequested: false });
 
-          setChatData((prev) => {
-            const updated = [
-              ...prev,
-              {
-                id: Date.now().toString(),
-                type: "stop-share",
-                direction: "from-other", // 👈 incoming from the bot
-                username: user.name || "Demo User",
-                avatar: user.image || fallbackAvatar,
-                timestamp: getLocalTime(),
-              },
-            ];
-            chatCache[user.id] = {
-              ...(chatCache[user.id] || {}),
-              user,
-              chatData: updated,
-              hasUnread: true,
-            };
-            setTimeout(() => DeviceEventEmitter.emit("chat-updated"), 0);
-            return updated;
-          });
+          setChatData((prev) => [
+            ...prev,
+            {
+              id: Date.now().toString(),
+              type: "stop-share",
+              direction: "from-other",
+              username: user.name || "Demo User",
+              avatar: user.image || fallbackAvatar,
+              timestamp: getLocalTime(),
+            },
+          ]);
+
+          chatCache[user.id] = {
+            ...(chatCache[user.id] || {}),
+            user,
+            chatData: [...(chatCache[user.id]?.chatData || []), ...chatData],
+            hasUnread: true,
+          };
+          DeviceEventEmitter.emit("chat-updated");
         }, 15000)
       );
     }, 10000)
   );
 };
+
 
 
 
@@ -858,6 +866,7 @@ return (
               status="stop"
               onPress={() => {
                 setChatState((prev) => ({ ...prev, hasShared: false }));
+                rezultsCache.isSharing = false; // 💜 persist global stop state
                 setChatData((prev) => [
                   ...prev,
                   {
@@ -909,6 +918,10 @@ return (
                       avatar: currentUser.avatar,
                       timestamp: getLocalTime(),
                     };
+
+                    // 💜 persist global share state so it survives navigation
+                    rezultsCache.isSharing = true;
+                    
                     const noteMsg =
                       message.trim().length > 0
                         ? {
@@ -926,6 +939,7 @@ return (
                       shareMsg,
                       ...(noteMsg ? [noteMsg] : []),
                     ]);
+                    DeviceEventEmitter.emit("chat-updated"); // 💜 notify main screen
                     setMessage("");
                     startShareFlow();
                   } else {

@@ -1,3 +1,4 @@
+// components/screens/getrezults/GetRezults_PasteLinkScreen.js
 import React, { useState, useRef } from "react";
 import {
   View,
@@ -23,18 +24,23 @@ import { NavbarBackRightText } from "../../ui/Navbar";
 import ZultsInput from "../../ui/ZultsInput";
 import ZultsButton from "../../ui/ZultsButton";
 
-// Logos
-import shlLogo from "../../../assets/images/SHL.png";
-import randoxLogo from "../../../assets/images/Randox.png";
-import nhsLogo from "../../../assets/images/NHS.png";
+// Provider logos
 import ppLogo from "../../../assets/images/pp-logo.png";
+import soapoliLogo from "../../../assets/images/soapoli.png";
+import shlLogo from "../../../assets/images/SHL.png";
+import shUKLogo from "../../../assets/images/SHUK.png";
+import testMeLogo from "../../../assets/images/testforme.png";
+import openHouseLogo from "../../../assets/images/openhouse.png";
 import chevronDown from "../../../assets/images/chevron-down.png";
 
+// ✅ Unified providers list — same as ProvidersListScreen
 const PROVIDERS = [
-  { id: "pp", name: "Planned Parenthood", logo: ppLogo, baseUrl: "https://plannedparenthood.demo/" },
-  { id: "shl", name: "Sexual Health London", logo: shlLogo, baseUrl: "https://www.shl.uk/" },
-  { id: "nhs", name: "NHS", logo: nhsLogo, baseUrl: "https://www.nhs.uk/" },
-  { id: "randox", name: "Randox Health", logo: randoxLogo, baseUrl: "https://www.randoxhealth.com/" },
+  { id: "pp", name: "Planned Parenthood", logo: ppLogo, baseUrl: "https://www.plannedparenthood/demo" },
+  { id: "soapoli", name: "Soapoli-Online", logo: soapoliLogo, baseUrl: "https://www.soapoli-online/demo" },
+  { id: "shl", name: "Sexual Health London", logo: shlLogo, baseUrl: "https://www.shl/demo" },
+  { id: "shuk", name: "SH.UK", logo: shUKLogo, baseUrl: "https://www.shuk/demo" },
+  { id: "testme", name: "TestForMe", logo: testMeLogo, baseUrl: "https://www.testforme/demo" },
+  { id: "openhouse", name: "Open House", logo: openHouseLogo, baseUrl: "https://openhouse/demo" },
 ];
 
 export default function GetRezults_PasteLinkScreen() {
@@ -80,23 +86,22 @@ export default function GetRezults_PasteLinkScreen() {
             contentContainerStyle={[styles.content, { paddingBottom: 90 }]}
             keyboardShouldPersistTaps="handled"
           >
-            {/* ─── Header ─── */}
+            {/* Header */}
             <View style={styles.headerBlock}>
               <Text style={styles.title} allowFontScaling={false}>
                 Add your Rezults
               </Text>
-
               <Text
                 style={[typography.bodyRegular, styles.subtitle]}
                 allowFontScaling
                 maxFontSizeMultiplier={1.3}
               >
-                Find your STI results link from your provider and paste it below
-                to turn it into your Rezults.
+                Choose your test provider and paste your results link to turn it
+                into your Rezults.
               </Text>
             </View>
 
-            {/* ─── Provider Dropdown ─── */}
+            {/* Provider Dropdown */}
             <TouchableOpacity
               onPress={() => {
                 Haptics.selectionAsync();
@@ -131,7 +136,7 @@ export default function GetRezults_PasteLinkScreen() {
               <Image source={chevronDown} style={styles.chevron} />
             </TouchableOpacity>
 
-            {/* ─── Link Input ─── */}
+            {/* Link Input */}
             {selectedProvider && (
               <ZultsInput
                 ref={inputRef}
@@ -146,7 +151,7 @@ export default function GetRezults_PasteLinkScreen() {
             )}
           </ScrollView>
 
-          {/* ─── Footer ─── */}
+          {/* Footer */}
           <ScreenFooter>
             <ZultsButton
               label="Continue"
@@ -167,7 +172,7 @@ export default function GetRezults_PasteLinkScreen() {
             >
               <Text
                 style={[
-                  typography.subheadlineRegular, // ✅ smaller Apple-style footnote link
+                  typography.subheadlineRegular,
                   {
                     color: colors.foreground.muted,
                     textAlign: "center",
@@ -181,7 +186,7 @@ export default function GetRezults_PasteLinkScreen() {
             </TouchableOpacity>
           </ScreenFooter>
 
-          {/* ─── Provider Picker Modal ─── */}
+          {/* Provider Picker Modal */}
           <Modal
             transparent
             visible={showSheet}
@@ -232,10 +237,8 @@ export default function GetRezults_PasteLinkScreen() {
 const styles = StyleSheet.create({
   content: { paddingHorizontal: 16 },
   headerBlock: { marginTop: 32, marginBottom: 24 },
-
-  // ─── Title / Subtitle ───
   title: {
-    ...typography.largeTitleMedium, // ✅ 32 / 36 / -0.64
+    ...typography.largeTitleMedium,
     color: colors.foreground.default,
     marginBottom: 8,
   },
@@ -243,38 +246,31 @@ const styles = StyleSheet.create({
     marginTop: 8,
     flexWrap: "wrap",
   },
-
-  // ─── Provider Dropdown ───
-dropdown: {
-  flexDirection: "row",
-  alignItems: "center",
-  justifyContent: "space-between",
-  borderRadius: 16,                         // ✅ same curvature as InfoCards
-  backgroundColor: colors.background.surface2, // ✅ same tone
-  paddingHorizontal: 16,
-  paddingVertical: 14,                      // ✅ matches InfoCard vertical padding
-  marginBottom: 12,
-},
-
-dropdownText: {
-  ...typography.headlineMedium,             // ✅ same typographic scale as InfoCard title
-  color: colors.foreground.default,
-  flex: 1,
-},
-
-providerLogo: {
-  width: 48,                                // ✅ same icon proportion as InfoCard icons
-  height: 48,
-  marginRight: 12,
-},
-
-chevron: {
-  width: 20,
-  height: 20,
-  tintColor: colors.foreground.muted,
-},
-
-  // ─── Modal ───
+  dropdown: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderRadius: 16,
+    backgroundColor: colors.background.surface2,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    marginBottom: 12,
+  },
+  dropdownText: {
+    ...typography.headlineMedium,
+    color: colors.foreground.default,
+    flex: 1,
+  },
+  providerLogo: {
+    width: 48,
+    height: 48,
+    marginRight: 12,
+  },
+  chevron: {
+    width: 20,
+    height: 20,
+    tintColor: colors.foreground.muted,
+  },
   overlay: {
     flex: 1,
     justifyContent: "flex-end",
@@ -288,7 +284,7 @@ chevron: {
     paddingBottom: 20,
   },
   sheetTitle: {
-    ...typography.title1Medium, // ✅ Apple-style modal title (28 / 34)
+    ...typography.title1Medium,
     color: colors.foreground.default,
     marginBottom: 24,
   },
@@ -303,8 +299,8 @@ chevron: {
     marginRight: 16,
   },
   sheetText: {
-  ...typography.headlineMedium,
-  color: colors.foreground.soft, // ✅ softer 60% white tone
-  flexShrink: 1,
-},
+    ...typography.headlineMedium,
+    color: colors.foreground.soft,
+    flexShrink: 1,
+  },
 });
