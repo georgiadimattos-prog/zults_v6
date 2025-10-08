@@ -1,9 +1,8 @@
 // components/ui/useDemoChat.js
 import { useRef } from "react";
 import { chatCache } from "../../cache/chatCache";
-import faq from "../../assets/data/faq.json";
-import synonyms from "../../assets/data/synonyms.json";
 import { DeviceEventEmitter } from "react-native";
+import { handleRezyAI } from "../activities/RezyAIHandler"; // 👈 NEW IMPORT
 
 // helper for scheduling
 const scheduleMessage = (delay, fn) => setTimeout(fn, delay);
@@ -13,20 +12,6 @@ const createId = (prefix = "demo") =>
 // ✅ Local time formatter
 const getLocalTime = () =>
   new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-
-function normalizeQuestion(question) {
-  const lowerQ = question.toLowerCase().trim();
-  if (synonyms[lowerQ]) return synonyms[lowerQ];
-  return lowerQ;
-}
-
-function findAnswer(question) {
-  const normalized = normalizeQuestion(question);
-  for (const key in faq) {
-    if (normalized.includes(key)) return faq[key];
-  }
-  return "I’m not sure about that 🤔 but I can share trusted info about Rezults and sexual health!";
-}
 
 export function useDemoChat() {
   const typingIdRef = useRef(null);
@@ -75,7 +60,7 @@ export function useDemoChat() {
       }, 300);
     };
 
-    // ---- Messages in flat order ----
+    // ---- Intro Messages ----
     pushMessage({
       id: createId(),
       type: "text",
@@ -107,7 +92,7 @@ export function useDemoChat() {
           direction: "from-other",
           username: "Rezy",
           avatar: user.image,
-          text: "Someone you can chat about sexual health without shame or awkwardness.",
+          text: "Someone you can chat with about sexual health without shame or awkwardness.",
           timestamp: getLocalTime(),
         });
       });
@@ -161,7 +146,6 @@ export function useDemoChat() {
           text: "Alright, enough talking. See the View Rezults button up top?",
           timestamp: getLocalTime(),
         });
-
         setHighlightTopCTA?.(true);
       });
     });
@@ -184,27 +168,34 @@ export function useDemoChat() {
     });
   };
 
-  const handleUserMessage = (user, setChatData, flatListRef, message) => {
+  // 👇 now async + powered by OpenAI
+  const handleUserMessage = async (user, setChatData, flatListRef, message) => {
     const key = user.id || user.name || "default";
-    const answer = findAnswer(message);
 
     addTyping(setChatData, user);
-    setTimeout(() => {
+    try {
+      const answer = await handleRezyAI(message); // 👈 AI REPLY HERE
+
+      setTimeout(() => {
+        removeTyping(setChatData);
+        const botReply = {
+          id: createId(),
+          type: "text",
+          direction: "from-other",
+          username: "Rezy",
+          avatar: user.image,
+          text: answer,
+          timestamp: getLocalTime(),
+        };
+        setChatData((prev) => [...prev, botReply]);
+        chatCache[key].chatData.push(botReply);
+        chatCache[key].hasUnread = true;
+        flatListRef?.current?.scrollToEnd({ animated: true });
+      }, 1200);
+    } catch (error) {
+      console.error("Rezy AI error:", error);
       removeTyping(setChatData);
-      const botReply = {
-        id: createId(),
-        type: "text",
-        direction: "from-other",
-        username: "Rezy",
-        avatar: user.image,
-        text: answer,
-        timestamp: getLocalTime(),
-      };
-      setChatData((prev) => [...prev, botReply]);
-      chatCache[key].chatData.push(botReply);
-      chatCache[key].hasUnread = true;
-      flatListRef?.current?.scrollToEnd({ animated: true });
-    }, 1500);
+    }
   };
 
   return { seedDemoChat, handleUserMessage };
