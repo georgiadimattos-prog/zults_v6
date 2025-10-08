@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Image,
   Animated,
+  DeviceEventEmitter,
 } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { Swipeable } from "react-native-gesture-handler";
@@ -15,7 +16,6 @@ import Navbar from "../../ui/Navbar";
 import ScreenWrapper from "../../ui/ScreenWrapper";
 import ZultsButton from "../../ui/ZultsButton";
 import ActivityCard from "../../ui/ActivityCard";
-
 import { chatCache } from "../../../cache/chatCache";
 import zultsLogo from "../../../assets/images/zults.png";
 
@@ -32,23 +32,13 @@ export default function ActivitiesScreen() {
     if (chatCache[id]) chatCache[id].favorite = !chatCache[id].favorite;
   };
 
-  useFocusEffect(
-    React.useCallback(() => {
-      buildActivities();
-    }, [])
-  );
-
   const buildActivities = () => {
-    const keys = Object.keys(chatCache).filter((k) => {
-      const v = chatCache[k];
-      return v && typeof v === "object" && v.user;
-    });
-
+    const keys = Object.keys(chatCache).filter((k) => chatCache[k]?.user);
     const data = keys.map((key) => {
-      const chat = chatCache[key] || {};
+      const chat = chatCache[key];
       const lastMsg = chat.chatData?.[chat.chatData.length - 1];
-
       let lastText = "No activity yet";
+
       if (chat.user?.isBot && chat.user?.id === "zults-demo") {
         lastText = "Ask me anything about sexual health...";
       } else if (lastMsg) {
@@ -68,14 +58,14 @@ export default function ActivitiesScreen() {
               ? "You stopped sharing Rezults"
               : `${chat.user?.name || key} stopped sharing Rezults`;
         } else {
-          lastText = lastMsg.type;
+          lastText = lastMsg.text || lastMsg.type;
         }
       }
 
       return {
         id: chat.user?.id || key,
         name: chat.user?.name || key,
-        avatar: chat.user?.image,
+        avatar: chat.user?.image || zultsLogo,
         lastText,
         lastTimestamp: lastMsg ? lastMsg.timestamp : "",
         hasUnread: chat.hasUnread ?? false,
@@ -110,6 +100,15 @@ export default function ActivitiesScreen() {
     setActivities(data);
   };
 
+  // 🔹 Build list when focused + listen only for GLOBAL updates
+  useFocusEffect(
+    React.useCallback(() => {
+      buildActivities();
+      const subGlobal = DeviceEventEmitter.addListener("chat-updated", buildActivities);
+      return () => subGlobal.remove();
+    }, [])
+  );
+
   const handleDelete = (id) => {
     setActivities((prev) => prev.filter((item) => item.id !== id));
     delete chatCache[id];
@@ -121,7 +120,6 @@ export default function ActivitiesScreen() {
       outputRange: [1.05, 1, 0.8],
       extrapolate: "clamp",
     });
-
     const opacity = dragX.interpolate({
       inputRange: [-100, -20, 0],
       outputRange: [1, 0.9, 0],
@@ -153,14 +151,14 @@ export default function ActivitiesScreen() {
           favorite: item.favorite,
           isBot: item.isBot,
         }}
-        onPress={() => {
+        onPress={() =>
           navigation.navigate("UserChat", {
             user: item.isBot
               ? { id: "zults-demo", name: "Rezy", image: zultsLogo, isBot: true }
               : chatCache[item.id]?.user,
             from: "Activities",
-          });
-        }}
+          })
+        }
         onToggleFavorite={() => toggleFavorite(item.id)}
       />
     </Swipeable>
@@ -170,14 +168,14 @@ export default function ActivitiesScreen() {
     <ScreenWrapper>
       <Navbar />
 
-      {/* ─── Header Block ─── */}
+      {/* Header */}
       <View style={styles.headerBlock}>
         <Text style={styles.pageTitle} allowFontScaling={false}>
           Activities
         </Text>
       </View>
 
-      {/* ─── Tabs ─── */}
+      {/* Tabs */}
       <View style={styles.tabsContainer}>
         {["All", "Unread", "Favorites"].map((tab) => (
           <TouchableOpacity
@@ -187,11 +185,9 @@ export default function ActivitiesScreen() {
           >
             <Text
               numberOfLines={1}
-              ellipsizeMode="tail"
               adjustsFontSizeToFit
               allowFontScaling
               maxFontSizeMultiplier={1.3}
-              minimumFontScale={0.9}
               style={filter === tab.toLowerCase() ? styles.tabActiveText : styles.tabInactiveText}
             >
               {tab}
@@ -200,7 +196,7 @@ export default function ActivitiesScreen() {
         ))}
       </View>
 
-      {/* ─── List ─── */}
+      {/* List */}
       <FlatList
         data={activities.filter((item) =>
           filter === "unread" ? item.hasUnread : filter === "favorites" ? item.favorite : true
@@ -219,7 +215,7 @@ export default function ActivitiesScreen() {
         }
       />
 
-      {/* ─── Footer ─── */}
+      {/* Footer */}
       <View style={styles.footer}>
         <ZultsButton
           label="Get Full Access"

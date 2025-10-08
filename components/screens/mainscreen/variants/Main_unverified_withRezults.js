@@ -8,6 +8,7 @@ import {
   Text,
   Image,
   Animated,
+  DeviceEventEmitter,
 } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { colors, typography } from "../../../../theme";
@@ -16,11 +17,7 @@ import RezultsCard from "../../../ui/RezultsCard";
 import NotificationCard from "../../../ui/NotificationCard";
 import ZultsButton from "../../../ui/ZultsButton";
 import ScreenWrapper from "../../../ui/ScreenWrapper";
-import {
-  chatCache,
-  hasSeededDemo,
-  markDemoSeeded,
-} from "../../../../cache/chatCache";
+import { chatCache, hasSeededDemo, markDemoSeeded } from "../../../../cache/chatCache";
 import zultsLogo from "../../../../assets/images/zults.png";
 import { rezultsCache } from "../../../../cache/rezultsCache";
 import ExpireContainer from "../../../ui/ExpireContainer";
@@ -34,70 +31,19 @@ export default function MainUnverifiedWithRezults({ onLinkPress, onSharePress })
   const [showAddModal, setShowAddModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [headerHeight, setHeaderHeight] = useState(0);
-
   const fadeAnim = useRef(new Animated.Value(1)).current;
 
-// 🟣 Refresh on focus
-useFocusEffect(
-  React.useCallback(() => {
-    let users = Object.keys(chatCache)
-      .map((username) => {
-        const chat = chatCache[username] || {};
-        const lastMsg = chat.chatData?.[chat.chatData.length - 1];
-        return {
-          id: username,
-          name: chat.user?.name || username,
-          avatar: chat.user?.image || zultsLogo,
-          lastTimestamp: lastMsg ? lastMsg.timestamp : "",
-        };
-      })
-      .sort((a, b) => (a.lastTimestamp < b.lastTimestamp ? 1 : -1));
-
-    if (users.length === 0 && !hasSeededDemo()) {
-      const demoId = "zults-demo";
-      chatCache[demoId] = {
-        user: {
-          id: demoId,
-          name: "Rezy",
-          image: zultsLogo,
-          isBot: true,
-        },
-        chatData: [],
-        chatState: { hasShared: false, hasRequested: false },
-        otherUserState: { hasShared: false, hasRequested: false },
-        blocked: false,
-        hasUnread: true,
-      };
-
-      users = [
-        {
-          id: demoId,
-          name: "Rezy",
-          avatar: zultsLogo,
-          lastTimestamp: "Now",
-          hasUnread: true,
-        },
-      ];
-
-      markDemoSeeded();
-    }
-
-    setRecentUsers(users);
-
-    // 🩵 add safe “chat-updated” listener (fixes cross-render setState error)
-    const sub = DeviceEventEmitter.addListener("chat-updated", () => {
-      requestAnimationFrame(() => {
-        let updatedUsers = Object.keys(chatCache)
-          .filter((k) => {
-            const v = chatCache[k];
-            return v && typeof v === "object" && v.user;
-          })
-          .map((username) => {
-            const chat = chatCache[username] || {};
+  useFocusEffect(
+    React.useCallback(() => {
+      const buildList = () => {
+        let users = Object.keys(chatCache)
+          .filter((k) => chatCache[k]?.user)
+          .map((key) => {
+            const chat = chatCache[key];
             const lastMsg = chat.chatData?.[chat.chatData.length - 1];
             return {
-              id: username,
-              name: chat.user?.name || username,
+              id: key,
+              name: chat.user?.name || key,
               avatar: chat.user?.image || zultsLogo,
               lastTimestamp: lastMsg ? lastMsg.timestamp : "",
               hasUnread: chat.hasUnread ?? false,
@@ -105,38 +51,39 @@ useFocusEffect(
           })
           .sort((a, b) => (a.lastTimestamp < b.lastTimestamp ? 1 : -1));
 
-        setRecentUsers(updatedUsers);
-      });
-    });
+        if (users.length === 0 && !hasSeededDemo()) {
+          const demoId = "zults-demo";
+          chatCache[demoId] = {
+            user: { id: demoId, name: "Rezy", image: zultsLogo, isBot: true },
+            chatData: [],
+            chatState: { hasShared: false, hasRequested: false },
+            otherUserState: { hasShared: false, hasRequested: false },
+            blocked: false,
+            hasUnread: true,
+          };
+          users = [
+            {
+              id: demoId,
+              name: "Rezy",
+              avatar: zultsLogo,
+              lastTimestamp: "Now",
+              hasUnread: true,
+            },
+          ];
+          markDemoSeeded();
+        }
 
-    return () => sub.remove();
-  }, [])
-);
+        setRecentUsers(users);
+      };
 
-// 🧩 Render avatars
-const renderAvatars = () => {
-  const display = recentUsers.slice(0, 4);
-  const extra = recentUsers.length - display.length;
-
-  return (
-    <View style={styles.avatarRow}>
-      {display.map((user, index) => (
-        <Image
-          key={user.id}
-          source={user.avatar}
-          style={[styles.avatar, { marginLeft: index === 0 ? 0 : -12 }]}
-        />
-      ))}
-      {extra > 0 && (
-        <View style={[styles.avatar, styles.extraAvatar]}>
-          <Text style={styles.extraText}>+{extra}</Text>
-        </View>
-      )}
-    </View>
+      buildList();
+      const subGlobal = DeviceEventEmitter.addListener("chat-updated", buildList);
+      return () => subGlobal.remove();
+    }, [])
   );
-};
 
-  // delete Rezults with animation
+  const unreadUsers = recentUsers.filter((u) => u.hasUnread);
+
   const handleDeleteRezults = () => {
     Animated.timing(fadeAnim, {
       toValue: 0,
@@ -145,19 +92,34 @@ const renderAvatars = () => {
     }).start(() => {
       rezultsCache.hasRezults = false;
       rezultsCache.card = null;
-
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "MainScreen" }],
-      });
+      navigation.reset({ index: 0, routes: [{ name: "MainScreen" }] });
     });
   };
 
-  const unreadUsers = recentUsers.filter((u) => u.hasUnread);
+  const renderAvatars = () => {
+    const display = recentUsers.slice(0, 4);
+    const extra = recentUsers.length - display.length;
+    return (
+      <View style={styles.avatarRow}>
+        {display.map((user, i) => (
+          <Image
+            key={user.id}
+            source={user.avatar}
+            style={[styles.avatar, { marginLeft: i === 0 ? 0 : -12 }]}
+          />
+        ))}
+        {extra > 0 && (
+          <View style={[styles.avatar, styles.extraAvatar]}>
+            <Text style={styles.extraText}>+{extra}</Text>
+          </View>
+        )}
+      </View>
+    );
+  };
 
   return (
     <ScreenWrapper>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+      <StatusBar barStyle="light-content" translucent />
       <UserProfileHeader
         hideVerification
         onLayout={(e) => setHeaderHeight(e.nativeEvent.layout.height)}
@@ -167,21 +129,13 @@ const renderAvatars = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[styles.scrollContent, { paddingTop: headerHeight }]}
       >
-        {/* ─── Rezults Block ─── */}
-        <View style={{ marginBottom: 12 }} />
         <RezultsHeaderContainer
           onAdd={() => setShowAddModal(true)}
           onDelete={() => setShowDeleteModal(true)}
           onWallet={() => navigation.navigate("AddToWallet")}
         />
 
-        {/* ─── Animated Rezults Card ─── */}
-        <Animated.View
-          style={{
-            opacity: fadeAnim,
-            transform: [{ scale: fadeAnim }],
-          }}
-        >
+        <Animated.View style={{ opacity: fadeAnim, transform: [{ scale: fadeAnim }] }}>
           <RezultsCard
             realName={rezultsCache.card?.realName || null}
             isVerified={rezultsCache.card?.isVerified || false}
@@ -194,85 +148,55 @@ const renderAvatars = () => {
           </View>
         </Animated.View>
 
-        {/* ─── Share Button ─── */}
         <ZultsButton
           label="Share"
           type="primary"
           size="large"
-          onPress={onSharePress}
+          onPress={onSharePress ?? (() => navigation.navigate("Share"))}
           style={{ marginTop: 16 }}
         />
 
-        {/* ─── Activities Section ─── */}
-<View style={{ marginTop: 24 }}>
-  <View style={styles.activitiesHeader}>
-    <Text
-      style={styles.sectionTitle}
-      allowFontScaling
-      maxFontSizeMultiplier={1.3}   // ✅ now scales naturally like all sub-titles
-    >
-      Activities
-    </Text>
-    <TouchableOpacity
-      onPress={() => navigation.navigate("Activities")}
-      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-    >
-      <Text
-        style={styles.viewAll}
-        allowFontScaling
-        maxFontSizeMultiplier={1.3}
-      >
-        View All
-      </Text>
-    </TouchableOpacity>
-  </View>
+        <View style={{ marginTop: 24 }}>
+          <View style={styles.activitiesHeader}>
+            <Text style={styles.sectionTitle}>Activities</Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Activities")}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Text style={styles.viewAll}>View All</Text>
+            </TouchableOpacity>
+          </View>
 
-  <TouchableOpacity
-    style={styles.activitiesCard}
-    activeOpacity={0.8}
-    onPress={() => navigation.navigate("Activities")}
-  >
-    {recentUsers.length > 0 ? (
-      <View style={styles.row}>
-        {renderAvatars()}
-        <Text
-          style={styles.activityText}
-          allowFontScaling
-          maxFontSizeMultiplier={1.3}  // ✅ ensure activity text also scales
-        >
-          {unreadUsers.length > 0
-            ? `${unreadUsers.length} unread message${
-                unreadUsers.length > 1 ? "s" : ""
-              }`
-            : "No recent activity"}
-        </Text>
-      </View>
-    ) : (
-      <View>
-        <Text
-          style={styles.emptyTitle}
-          allowFontScaling
-          maxFontSizeMultiplier={1.3}
-        >
-          No recent activity
-        </Text>
-        <Text
-          style={styles.emptySubtitle}
-          allowFontScaling
-          maxFontSizeMultiplier={1.3}
-        >
-          You’ll see Rezults shared here
-        </Text>
-      </View>
-    )}
-  </TouchableOpacity>
-</View>
+          <TouchableOpacity
+            style={styles.activitiesCard}
+            activeOpacity={0.8}
+            onPress={() => navigation.navigate("Activities")}
+          >
+            {recentUsers.length > 0 ? (
+              <View style={styles.row}>
+                {renderAvatars()}
+                <Text style={styles.activityText}>
+                  {unreadUsers.length > 0
+                    ? `${unreadUsers.length} unread message${
+                        unreadUsers.length > 1 ? "s" : ""
+                      }`
+                    : "No recent activity"}
+                </Text>
+              </View>
+            ) : (
+              <View>
+                <Text style={styles.emptyTitle}>No recent activity</Text>
+                <Text style={styles.emptySubtitle}>
+                  You’ll see Rezults shared here
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
+        </View>
 
-        {/* ─── Notifications ─── */}
         <NotificationCard />
       </ScrollView>
 
-      {/* ─── Confirm Modal ─── */}
       <ConfirmModal
         visible={showAddModal}
         onClose={() => setShowAddModal(false)}
@@ -285,7 +209,6 @@ const renderAvatars = () => {
         }}
       />
 
-      {/* ─── Delete Modal ─── */}
       <DeleteModal
         visible={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
@@ -296,27 +219,21 @@ const renderAvatars = () => {
 }
 
 const styles = StyleSheet.create({
-  scrollContent: {
-    paddingHorizontal: 16,
-    paddingBottom: 32,
-    gap: 20,
-  },
-
-  // ─── Activities ───
+  scrollContent: { paddingHorizontal: 16, paddingBottom: 32, gap: 20 },
   activitiesHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginHorizontal: 4,
     marginBottom: 12,
+    marginHorizontal: 4,
   },
   sectionTitle: {
-    ...typography.title4Medium,       // ✅ 18 / 24 / -0.18 Apple section header
+    ...typography.title4Medium,
     color: colors.foreground.default,
   },
   viewAll: {
-    ...typography.subheadlineRegular, // ✅ 14 / 18 / -0.07 small link
-    color: colors.info.onContainer,   // ✅ Zults blue
+    ...typography.subheadlineRegular,
+    color: colors.info.onContainer,
   },
   activitiesCard: {
     backgroundColor: colors.background.surface2,
@@ -326,6 +243,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  row: { flexDirection: "row", alignItems: "center" },
   avatarRow: { flexDirection: "row", alignItems: "center" },
   avatar: {
     width: 36,
@@ -344,10 +262,6 @@ const styles = StyleSheet.create({
     ...typography.captionSmallRegular,
     color: colors.foreground.default,
     fontWeight: "600",
-  },
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
   },
   activityText: {
     ...typography.bodyRegular,

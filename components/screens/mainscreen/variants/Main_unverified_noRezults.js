@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   ScrollView,
@@ -16,12 +16,7 @@ import RezultsCardPlaceholder from "../../../ui/RezultsCardPlaceholder";
 import NotificationCard from "../../../ui/NotificationCard";
 import ZultsButton from "../../../ui/ZultsButton";
 import ScreenWrapper from "../../../ui/ScreenWrapper";
-
-import {
-  chatCache,
-  hasSeededDemo,
-  markDemoSeeded,
-} from "../../../../cache/chatCache";
+import { chatCache, hasSeededDemo, markDemoSeeded } from "../../../../cache/chatCache";
 import zultsLogo from "../../../../assets/images/zults.png";
 
 export default function MainUnverifiedNoRezults({ onLinkPress, onSharePress }) {
@@ -29,95 +24,67 @@ export default function MainUnverifiedNoRezults({ onLinkPress, onSharePress }) {
   const [recentUsers, setRecentUsers] = useState([]);
   const [headerHeight, setHeaderHeight] = useState(0);
 
-  // refresh whenever screen is focused
   useFocusEffect(
     React.useCallback(() => {
-      let users = Object.keys(chatCache)
-        .filter((k) => {
-          const v = chatCache[k];
-          return v && typeof v === "object" && v.user;
-        })
-        .map((username) => {
-          const chat = chatCache[username] || {};
-          const lastMsg = chat.chatData?.[chat.chatData.length - 1];
-          return {
-            id: username,
-            name: chat.user?.name || username,
-            avatar: chat.user?.image || zultsLogo,
-            lastTimestamp: lastMsg ? lastMsg.timestamp : "",
-            hasUnread: chat.hasUnread ?? false,
-          };
-        })
-        .sort((a, b) => (a.lastTimestamp < b.lastTimestamp ? 1 : -1));
+      const buildList = () => {
+        let users = Object.keys(chatCache)
+          .filter((k) => chatCache[k]?.user)
+          .map((key) => {
+            const chat = chatCache[key];
+            const lastMsg = chat.chatData?.[chat.chatData.length - 1];
+            return {
+              id: key,
+              name: chat.user?.name || key,
+              avatar: chat.user?.image || zultsLogo,
+              lastTimestamp: lastMsg ? lastMsg.timestamp : "",
+              hasUnread: chat.hasUnread ?? false,
+            };
+          })
+          .sort((a, b) => (a.lastTimestamp < b.lastTimestamp ? 1 : -1));
 
-      if (users.length === 0 && !hasSeededDemo()) {
-        const demoId = "zults-demo";
-        chatCache[demoId] = {
-          user: { id: demoId, name: "Rezy", image: zultsLogo, isBot: true },
-          chatData: [],
-          chatState: { hasShared: false, hasRequested: false },
-          otherUserState: { hasShared: false, hasRequested: false },
-          blocked: false,
-          hasUnread: true,
-        };
-
-        users = [
-          {
-            id: demoId,
-            name: "Rezy",
-            avatar: zultsLogo,
-            lastTimestamp: "Now",
+        // Seed demo if none exist
+        if (users.length === 0 && !hasSeededDemo()) {
+          const demoId = "zults-demo";
+          chatCache[demoId] = {
+            user: { id: demoId, name: "Rezy", image: zultsLogo, isBot: true },
+            chatData: [],
+            chatState: { hasShared: false, hasRequested: false },
+            otherUserState: { hasShared: false, hasRequested: false },
+            blocked: false,
             hasUnread: true,
-          },
-        ];
+          };
+          users = [
+            {
+              id: demoId,
+              name: "Rezy",
+              avatar: zultsLogo,
+              lastTimestamp: "Now",
+              hasUnread: true,
+            },
+          ];
+          markDemoSeeded();
+        }
+        setRecentUsers(users);
+      };
 
-        markDemoSeeded();
-      }
-
-      setRecentUsers(users);
+      buildList();
+      const subGlobal = DeviceEventEmitter.addListener("chat-updated", buildList);
+      return () => subGlobal.remove();
     }, [])
   );
 
-  useEffect(() => {
-  const sub = DeviceEventEmitter.addListener("chat-updated", () => {
-    // 🩵 Schedule the UI update safely for the next frame
-    requestAnimationFrame(() => {
-      let users = Object.keys(chatCache)
-        .filter((k) => {
-          const v = chatCache[k];
-          return v && typeof v === "object" && v.user;
-        })
-        .map((username) => {
-          const chat = chatCache[username] || {};
-          const lastMsg = chat.chatData?.[chat.chatData.length - 1];
-          return {
-            id: username,
-            name: chat.user?.name || username,
-            avatar: chat.user?.image || zultsLogo,
-            lastTimestamp: lastMsg ? lastMsg.timestamp : "",
-            hasUnread: chat.hasUnread ?? false,
-          };
-        })
-        .sort((a, b) => (a.lastTimestamp < b.lastTimestamp ? 1 : -1));
-
-      setRecentUsers(users);
-    });
-  });
-
-  return () => sub.remove();
-}, []);
+  const unreadUsers = recentUsers.filter((u) => u.hasUnread);
 
   const renderAvatars = () => {
     const display = recentUsers.slice(0, 4);
     const extra = recentUsers.length - display.length;
-
     return (
       <View style={styles.avatarRow}>
-        {display.map((user, index) => (
+        {display.map((user, i) => (
           <Image
             key={user.id}
             source={user.avatar}
-            style={[styles.avatar, { marginLeft: index === 0 ? 0 : -12 }]}
+            style={[styles.avatar, { marginLeft: i === 0 ? 0 : -12 }]}
           />
         ))}
         {extra > 0 && (
@@ -129,11 +96,9 @@ export default function MainUnverifiedNoRezults({ onLinkPress, onSharePress }) {
     );
   };
 
-  const unreadUsers = recentUsers.filter((u) => u.hasUnread);
-
   return (
     <ScreenWrapper>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+      <StatusBar barStyle="light-content" translucent />
       <UserProfileHeader
         hideVerification
         onLayout={(e) => setHeaderHeight(e.nativeEvent.layout.height)}
@@ -143,7 +108,7 @@ export default function MainUnverifiedNoRezults({ onLinkPress, onSharePress }) {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[styles.scrollContent, { paddingTop: headerHeight }]}
       >
-        {/* ─── Rezults Placeholder ─── */}
+        {/* Rezults Placeholder */}
         <TouchableOpacity
           activeOpacity={0.85}
           onPress={() => navigation.navigate("GetRezultsSelectProvider")}
@@ -151,7 +116,7 @@ export default function MainUnverifiedNoRezults({ onLinkPress, onSharePress }) {
           <RezultsCardPlaceholder />
         </TouchableOpacity>
 
-        {/* ─── Share Button ─── */}
+        {/* Share Button */}
         <ZultsButton
           label="Share"
           type="primary"
@@ -159,7 +124,7 @@ export default function MainUnverifiedNoRezults({ onLinkPress, onSharePress }) {
           onPress={onSharePress ?? (() => navigation.navigate("Share"))}
         />
 
-        {/* ─── Activities Section ─── */}
+        {/* Activities */}
         <View style={{ marginTop: 24 }}>
           <View style={styles.activitiesHeader}>
             <Text style={styles.sectionTitle}>Activities</Text>
@@ -198,7 +163,6 @@ export default function MainUnverifiedNoRezults({ onLinkPress, onSharePress }) {
           </TouchableOpacity>
         </View>
 
-        {/* ─── Notification Card ─── */}
         <NotificationCard />
       </ScrollView>
     </ScreenWrapper>
@@ -206,27 +170,21 @@ export default function MainUnverifiedNoRezults({ onLinkPress, onSharePress }) {
 }
 
 const styles = StyleSheet.create({
-  scrollContent: {
-    paddingHorizontal: 16,
-    paddingBottom: 32,
-    gap: 24,
-  },
-
-  // ─── Activities ───
+  scrollContent: { paddingHorizontal: 16, paddingBottom: 32, gap: 24 },
   activitiesHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginHorizontal: 4,
     marginBottom: 8,
+    marginHorizontal: 4,
   },
   sectionTitle: {
-    ...typography.title4Medium,       // ✅ 18 / 24 — Apple section header
+    ...typography.title4Medium,
     color: colors.foreground.default,
   },
   viewAll: {
-    ...typography.subheadlineRegular, // ✅ 14 / 18
-    color: colors.info.onContainer,   // ✅ Zults blue
+    ...typography.subheadlineRegular,
+    color: colors.info.onContainer,
   },
   activitiesCard: {
     backgroundColor: colors.background.surface2,
@@ -236,6 +194,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  row: { flexDirection: "row", alignItems: "center" },
   avatarRow: { flexDirection: "row", alignItems: "center" },
   avatar: {
     width: 32,
@@ -255,12 +214,8 @@ const styles = StyleSheet.create({
     color: colors.foreground.default,
     fontWeight: "600",
   },
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
   activityText: {
-    ...typography.bodyRegular,        // ✅ matches general body text
+    ...typography.bodyRegular,
     color: colors.foreground.soft,
     marginLeft: 12,
   },

@@ -1,77 +1,38 @@
-import React, { useEffect, useState } from "react";
-import ZultsButton from "./ZultsButton";
+import React from "react";
+import { TouchableOpacity, Text, StyleSheet } from "react-native";
 
-/**
- * 🧩 RezultsActionButton
- * Locks temporarily on "requested" state so UI stays consistent,
- * even when chat state rehydrates or re-renders too fast.
- */
 export default function RezultsActionButton({ status, onPress }) {
-  const [lockedRequested, setLockedRequested] = useState(false);
+  const disabled = status === "requested";
+  const label =
+    status === "view"
+      ? "View Rezults"
+      : status === "requested"
+      ? "Rezults Requested"
+      : "Request Rezults";
 
-  // When "requested" appears, lock visually for at least 3s
-  useEffect(() => {
-    if (status === "requested") {
-      setLockedRequested(true);
-      const t = setTimeout(() => setLockedRequested(false), 3000);
-      return () => clearTimeout(t);
-    }
-  }, [status]);
-
-  const finalStatus =
-    lockedRequested && status === "request" ? "requested" : status;
-
-  switch (finalStatus) {
-    case "request":
-      return (
-        <ZultsButton
-          label="Request Rezults"
-          type="secondary" // white pill
-          size="medium"
-          fullWidth={false}
-          pill
-          onPress={onPress}
-        />
-      );
-
-    case "requested":
-      return (
-        <ZultsButton
-          label="Rezults Requested"
-          type="ghost" // subtle muted pill
-          size="medium"
-          fullWidth={false}
-          pill
-          disabled
-          opacity={0.7}
-        />
-      );
-
-    case "view":
-      return (
-        <ZultsButton
-          label="View Rezults"
-          type="brand" // purple pill
-          size="medium"
-          fullWidth={false}
-          pill
-          onPress={onPress}
-        />
-      );
-
-    case "stop":
-      return (
-        <ZultsButton
-          label="Stop Sharing"
-          type="secondary" // white pill with dark text
-          size="medium"
-          fullWidth={true}
-          pill
-          onPress={onPress}
-        />
-      );
-
-    default:
-      return null;
-  }
+  return (
+    <TouchableOpacity
+      onPress={!disabled ? onPress : null}
+      activeOpacity={0.8}
+      style={[styles.button, disabled && styles.disabled]}
+    >
+      <Text style={styles.text}>{label}</Text>
+    </TouchableOpacity>
+  );
 }
+
+const styles = StyleSheet.create({
+  button: {
+    backgroundColor: "#9747FF",
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 28,
+    alignSelf: "center",
+  },
+  text: {
+    color: "#fff",
+    fontSize: 15,
+    fontWeight: "600",
+  },
+  disabled: { opacity: 0.5 },
+});
