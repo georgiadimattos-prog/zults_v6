@@ -2,7 +2,7 @@
 import { useRef } from "react";
 import { chatCache } from "../../cache/chatCache";
 import { DeviceEventEmitter } from "react-native";
-import { handleRezyAI } from "../activities/RezyAIHandler"; // 👈 NEW IMPORT
+import { handleRezyAI } from "../screens/activities/RezyAIHandler";
 
 // helper for scheduling
 const scheduleMessage = (delay, fn) => setTimeout(fn, delay);

@@ -84,130 +84,105 @@ export default function RezultActionBubble({
             </Text>
           </View>
           <Text
-            style={[
-              isFromUser ? styles.timestampRight : styles.timestampLeft,
-              isRezyChat && isFromOther && { color: "rgba(255,255,255,0.6)" },
-            ]}
-            allowFontScaling
-            maxFontSizeMultiplier={1.2}
-          >
-            {timestamp}
-          </Text>
+  style={[
+    isFromUser ? styles.timestampRight : styles.timestampLeft,
+  ]}
+  allowFontScaling
+  maxFontSizeMultiplier={1.2}
+>
+  {timestamp}
+</Text>
         </View>
         {isFromUser && <Image source={avatar || fallbackAvatar} style={styles.avatar} />}
       </View>
     );
   }
 
-  // --- Rezults-related bubbles
-  let label = "";
-  let subtext = "";
+// --- Rezults-related bubbles (titles only, minimal Zults style)
+let label = "";
 
-  if (type === "cancel-request") label = "Request Cancelled";
-  else if (type === "request") {
-    if (isFromOther) {
-      label = `Request from ${username || "User"}`;
-      subtext = `${username || "They"} want to see your Rezults`;
-    } else {
-      label = "Requested Rezults";
-      subtext = "You asked to view their Rezults";
-    }
-  } else if (type === "share") {
-    label = isFromOther
-      ? `${username || "User"} is sharing Rezults`
-      : "Sharing Rezults";
-    subtext = "Rezults are now available to view";
-  } else if (type === "stop-share") {
-    label = isFromOther
-      ? `${username || "User"} stopped sharing Rezults`
-      : "You stopped sharing Rezults";
-  }
+console.log("RezultsActionBubble type:", type);
 
-  return (
-    <View
-      style={[
-        styles.container,
-        isSystemMessage && styles.centerAlign,
-        isFromUser && styles.rightAlign,
-        isFromOther && styles.leftAlign,
-      ]}
-    >
-      {isFromOther && !isSystemMessage && (
-        <Image source={avatar || fallbackAvatar} style={styles.avatar} />
-      )}
+if (type === "cancel-request") {
+  label = "Request cancelled";
+} else if (type === "request") {
+  label = isFromOther
+    ? "Requested your Rezults"
+    : "You requested Rezults";
+} else if (type === "share") {
+  label = isFromOther
+    ? "Sharing their Rezults"
+    : "You’re sharing your Rezults";
+} else if (type === "stop-share") {
+  label = isFromOther
+    ? "Stopped sharing Rezults"
+    : "You stopped sharing Rezults";
+}
 
-      <View style={styles.contentBlock}>
-        {!isSystemMessage && (
-          <Text
-            style={[
-              styles.username,
-              isFromUser ? styles.usernameRight : styles.usernameLeft,
-              isRezyChat && isFromOther && { color: "rgba(255,255,255,0.8)" },
-            ]}
-            allowFontScaling
-            maxFontSizeMultiplier={1.2}
-          >
-            {username}
-          </Text>
-        )}
+return (
+  <View
+    style={[
+      styles.container,
+      isSystemMessage && styles.centerAlign,
+      isFromUser && styles.rightAlign,
+      isFromOther && styles.leftAlign,
+    ]}
+  >
+    {/* Avatar (left for incoming) */}
+    {isFromOther && !isSystemMessage && (
+      <Image source={avatar || fallbackAvatar} style={styles.avatar} />
+    )}
 
-        <View
+    <View style={styles.contentBlock}>
+      {/* 🧹 Username removed for both sides */}
+
+      {/* Rezults action bubble */}
+      <View
+        style={[
+          styles.messageBubble,
+          isFromUser ? styles.bubbleRight : styles.bubbleLeft,
+          isRezyChat && isFromOther && styles.rezyBubbleLeft,
+        ]}
+      >
+        <Text
           style={[
-            styles.messageBubble,
-            isFromUser ? styles.bubbleRight : styles.bubbleLeft,
-            type === "stop-share" && { backgroundColor: "#3A3A3C" },
-            isRezyChat && isFromOther && styles.rezyBubbleLeft, // 👈 dark bubble
+            isFromOther ? styles.labelOther : styles.label,
+            isRezyChat && isFromOther && { color: "#FFF" },
+            { flexShrink: 1, flexWrap: "wrap" },
           ]}
+          allowFontScaling
+          maxFontSizeMultiplier={1.3}
         >
-          <Text
-            style={[
-              isFromOther ? styles.labelOther : styles.label,
-              isRezyChat && isFromOther && { color: "#FFF" },
-              { flexShrink: 1, flexWrap: "wrap" },
-            ]}
-            allowFontScaling
-            maxFontSizeMultiplier={1.3}
-          >
-            {label}
-          </Text>
-
-          {!!subtext && !isSystemMessage && (
-            <Text
-              style={[
-                isFromOther ? styles.subtextOther : styles.subtext,
-                isRezyChat && isFromOther && { color: "rgba(255,255,255,0.6)" },
-              ]}
-              allowFontScaling
-              maxFontSizeMultiplier={1.2}
-            >
-              {subtext}
-            </Text>
-          )}
-        </View>
-
-        {!isSystemMessage && (
-          <Text
-            style={[
-              styles.timestamp,
-              type === "stop-share" && isFromUser && { color: "#A8A8A8" },
-              isRezyChat && isFromOther && { color: "rgba(255,255,255,0.55)" },
-            ]}
-            allowFontScaling
-            maxFontSizeMultiplier={1.2}
-          >
-            {timestamp}
-          </Text>
-        )}
+           {label && label.trim() !== "" ? label : text || "Sharing Rezults"}
+        </Text>
       </View>
 
-      {isFromUser && !isSystemMessage && (
-        <Image source={avatar || fallbackAvatar} style={styles.avatar} />
+      {/* Timestamp below bubble */}
+      {!isSystemMessage && (
+        <Text
+          style={[
+            isFromUser ? styles.timestampRight : styles.timestampLeft,
+            type === "stop-share" && isFromUser && { color: "#A8A8A8" },
+            isRezyChat && isFromOther && { color: "rgba(255,255,255,0.55)" },
+          ]}
+          allowFontScaling
+          maxFontSizeMultiplier={1.2}
+        >
+          {timestamp}
+        </Text>
       )}
     </View>
-  );
+
+    {/* Avatar (right for outgoing) */}
+    {isFromUser && !isSystemMessage && (
+      <Image source={avatar || fallbackAvatar} style={styles.avatar} />
+    )}
+  </View>
+);
 }
 
 const styles = StyleSheet.create({
+  // --- Layout containers
   container: {
     flexDirection: "row",
     alignItems: "flex-end",
@@ -218,6 +193,7 @@ const styles = StyleSheet.create({
   rightAlign: { justifyContent: "flex-end", alignSelf: "flex-end" },
   centerAlign: { justifyContent: "center" },
 
+  // --- Avatars
   avatar: {
     width: 34,
     height: 34,
@@ -226,25 +202,45 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
 
+  // --- Message content container
   contentBlock: { maxWidth: "80%", flexShrink: 1 },
 
-  username: {
-    ...typography.chatMeta,
-    fontSize: 12,
-    color: colors.foreground.soft,
+  // --- Header (username + top timestamp for incoming)
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 2,
     marginBottom: 2,
   },
-  usernameLeft: { textAlign: "left" },
-  usernameRight: { textAlign: "right" },
-
-  // --- Bubbles
-  messageBubble: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 18,
-    flexShrink: 1,
-    maxWidth: "100%",
+  usernameLeft: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#FFFFFF",
+    textAlign: "left",
   },
+  usernameRight: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#111",
+    textAlign: "right",
+  },
+  timestampHeader: {
+    fontSize: 12,
+    lineHeight: 16,
+    color: "rgba(255,255,255,0.45)",
+    includeFontPadding: false,
+  },
+
+  // --- Chat bubbles
+  messageBubble: {
+  paddingHorizontal: 15,     // ⬅️ tighter side padding
+  paddingVertical: 8,        // ⬅️ snug vertical rhythm
+  borderRadius: 16,
+  flexShrink: 1,
+  maxWidth: "100%",
+  marginBottom: 2,           // ⬅️ brings timestamp closer
+},
   bubbleLeft: {
     backgroundColor: colors.background.surface2,
     borderTopLeftRadius: 16,
@@ -260,10 +256,10 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 0,
   },
   rezyBubbleLeft: {
-    backgroundColor: "rgba(255,255,255,0.12)", // ✅ softer dark bubble for Rezy
+    backgroundColor: "rgba(255,255,255,0.12)", // dark bubble for Rezy
   },
 
-  // --- Text
+  // --- Message text (inside bubbles)
   messageTextUser: {
     ...typography.chatMessage,
     fontSize: 15,
@@ -288,44 +284,34 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     color: "#fff",
   },
-  subtext: {
-    ...typography.chatMessage,
-    fontSize: 14,
-    color: "#6E6E6E",
-    marginTop: 2,
-  },
-  subtextOther: {
-    ...typography.chatMessage,
-    fontSize: 14,
-    color: "#B1B1B1",
-    marginTop: 2,
-  },
 
-  timestamp: {
-  ...typography.chatMeta,
-  fontSize: 9,               // ⬇️ slightly smaller for visual balance
-  lineHeight: 12,            // tighter vertical space
-  color: "rgba(255,255,255,0.38)", // ✅ slightly dimmer white
-  fontWeight: "400",
-  marginTop: 3,
-  letterSpacing: 0.2,        // ✅ optical fine-tune
-  alignSelf: "flex-end",
-},
-
-timestampLeft: {
+  // --- Timestamps
+  timestampHeader: {
+    fontSize: 11,
+    lineHeight: 16,
+    color: "rgba(255,255,255,0.45)",
+    includeFontPadding: false,
+  },
+  timestampLeft: {
+  fontSize: 12,
+  lineHeight: 16,
+  color: "rgba(255,255,255,0.55)",
+  marginTop: 3,              // ⬅️ reduced gap
   alignSelf: "flex-start",
-  color: "rgba(255,255,255,0.38)", // ✅ left-side Rezy bubbles
-  fontSize: 9,
-  lineHeight: 12,
+  textAlign: "left",
+  includeFontPadding: false,
 },
-
 timestampRight: {
+  fontSize: 12,
+  lineHeight: 16,
+  color: "rgba(255,255,255,0.55)",
+  marginTop: 3,              // ⬅️ reduced gap
   alignSelf: "flex-end",
-  color: "#707070",          // ✅ softer grey for green (user) bubbles
-  fontSize: 9,
-  lineHeight: 12,
+  textAlign: "right",
+  includeFontPadding: false,
 },
 
+  // --- Typing indicator
   typingBubble: {
     backgroundColor: "#f0f0f0",
     borderRadius: 20,
@@ -340,4 +326,12 @@ timestampRight: {
     lineHeight: 10,
     color: "#8E8E93",
   },
+  usernameRight: {
+  textAlign: "right",
+  color: "#111", // dark text on light green bubble
+},
+usernameLeft: {
+  textAlign: "left",
+  color: "#FFFFFF", // white on Melany’s dark bubble
+},
 });

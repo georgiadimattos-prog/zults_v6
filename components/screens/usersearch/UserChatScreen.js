@@ -32,7 +32,8 @@ import { DeviceEventEmitter } from "react-native";
 import ChatTopActions from "../../ui/ChatTopActions";
 import { useFocusEffect } from "@react-navigation/native";
 
-const TomasAvatar = require("../../../assets/images/tomas.png");
+import { currentUser } from "../../../config/session";
+
 
 // Simple local time formatter
 const getLocalTime = () =>
@@ -149,7 +150,6 @@ export default function UserChatScreen() {
   const inputRef = useRef(null);
   const [footerHeight, setFooterHeight] = useState(0);
 
-  const currentUser = { name: "TomasB.", avatar: TomasAvatar };
   const user = route.params?.user || { name: "Unknown", image: fallbackAvatar };
   const isDemoChat = user.isBot === true;
 
@@ -463,114 +463,123 @@ const startRequestFlow = () => {
     chatCache[user.id].lastRequestStarted = Date.now();
   }
 
-  // Clear existing timers
-  requestTimers.current.forEach((t) => clearTimeout(t));
-  requestTimers.current = [];
+// 💜 startRequestFlow() — updated timing & logic
+requestTimers.current.forEach((t) => clearTimeout(t));
+requestTimers.current = [];
 
-  // After 3s -> typing indicator
-  requestTimers.current.push(
-    setTimeout(() => {
-      console.log("💬 Bot typing started:", user.name);
-      addTyping();
-    }, 3000)
+// After 3 s → typing indicator
+requestTimers.current.push(
+  setTimeout(() => {
+    console.log("💬 Bot typing started:", user.name);
+    addTyping();
+  }, 3000)
+);
+
+// After 7 s → Melany sends a visible "Request from Melany" bubble
+requestTimers.current.push(
+  setTimeout(() => {
+    removeTyping();
+    console.log("🟢 Incoming request bubble from", user.name);
+
+    setOtherUserState({ hasRequested: true, hasShared: false });
+
+    // 🟣 create the incoming request message
+    setChatData((prev) => [
+      ...prev,
+      {
+        id: Date.now().toString(),
+        type: "request",
+        direction: "from-other",
+        username: user.name || "Demo User",
+        avatar: user.image || fallbackAvatar,
+        timestamp: getLocalTime(),
+      },
+    ]);
+
+    // 🔄 update cache + emit so Activities & Main refresh
+    chatCache[user.id] = {
+      ...(chatCache[user.id] || {}),
+      user,
+      chatData: [...(chatCache[user.id]?.chatData || []), ...chatData],
+      hasUnread: true,
+    };
+    DeviceEventEmitter.emit("chat-updated");
+  }, 7000)
+);
+
+// After 12 s → Melany shares Rezults
+requestTimers.current.push(
+  setTimeout(() => {
+    removeTyping();
+    console.log("📤 Bot share bubble sent by", user.name);
+
+    setOtherUserState({ hasRequested: false, hasShared: true });
+
+// ✅ Force correct type for demo users and bots
+const isDemoUser =
+  user?.isBot === true ||
+  ["demo1", "demo2", "demo3", "demo4", "melany"].includes(
+    user?.id?.toLowerCase?.() || ""
   );
 
-  // After 5s -> Demo bot sends a REQUEST bubble
-  requestTimers.current.push(
-    setTimeout(() => {
-      removeTyping();
+const shareType = isDemoUser
+  ? "share"
+  : rezultsCache.hasRezults
+  ? "share"
+  : "note";
 
-      console.log("🟢 Bot request bubble sent by", user.name);
+setChatData((prev) => [
+  ...prev,
+  {
+    id: Date.now().toString(),
+    type: shareType,
+    direction: "from-other",
+    username: user.name || "Demo User",
+    avatar: user.image || fallbackAvatar,
+    timestamp: getLocalTime(),
+    // 🧹 remove text override so RezultActionBubble handles the copy
+  },
+]);
 
-      setOtherUserState({ hasRequested: true, hasShared: false });
+    chatCache[user.id] = {
+      ...(chatCache[user.id] || {}),
+      user,
+      chatData: [...(chatCache[user.id]?.chatData || []), ...chatData],
+      hasUnread: true,
+    };
+    DeviceEventEmitter.emit("chat-updated");
 
-      setChatData((prev) => [
-        ...prev,
-        {
-          id: Date.now().toString(),
-          type: "request",
-          direction: "from-other",
-          username: user.name || "Demo User",
-          avatar: user.image || fallbackAvatar,
-          timestamp: getLocalTime(),
-        },
-      ]);
+    // After 17 s → stop-share
+    requestTimers.current.push(
+      setTimeout(() => {
+        console.log("⛔ Bot stop-share bubble sent by", user.name);
 
-      chatCache[user.id] = {
-        ...(chatCache[user.id] || {}),
-        user,
-        chatData: [...(chatCache[user.id]?.chatData || []), ...chatData],
-        hasUnread: true,
-      };
-      DeviceEventEmitter.emit("chat-updated");
-    }, 5000)
-  );
+        setOtherUserState({ hasShared: false, hasRequested: false });
+        setChatState({ hasShared: false, hasRequested: false });
 
-  // After 10s -> Demo bot shares Rezults (based on whether user had Rezults)
-  requestTimers.current.push(
-    setTimeout(() => {
-      removeTyping();
+        setChatData((prev) => [
+          ...prev,
+          {
+            id: Date.now().toString(),
+            type: "stop-share",
+            direction: "from-other",
+            username: user.name || "Demo User",
+            avatar: user.image || fallbackAvatar,
+            timestamp: getLocalTime(),
+          },
+        ]);
 
-      console.log("📤 Bot share bubble sent by", user.name);
-
-      setOtherUserState({ hasRequested: false, hasShared: true });
-
-      const shareType = userHasRezults ? "share" : "note";
-
-      setChatData((prev) => [
-        ...prev,
-        {
-          id: Date.now().toString(),
-          type: shareType,
-          direction: "from-other",
-          username: user.name || "Demo User",
-          avatar: user.image || fallbackAvatar,
-          timestamp: getLocalTime(),
-          text: userHasRezults
-            ? undefined
-            : "User currently has no Rezults to share.",
-        },
-      ]);
-
-      chatCache[user.id] = {
-        ...(chatCache[user.id] || {}),
-        user,
-        chatData: [...(chatCache[user.id]?.chatData || []), ...chatData],
-        hasUnread: true,
-      };
-      DeviceEventEmitter.emit("chat-updated");
-
-      // After 15s -> Demo bot stops sharing
-      requestTimers.current.push(
-        setTimeout(() => {
-          console.log("⛔ Bot stop-share bubble sent by", user.name);
-
-          setOtherUserState({ hasShared: false, hasRequested: false });
-          setChatState({ hasShared: false, hasRequested: false });
-
-          setChatData((prev) => [
-            ...prev,
-            {
-              id: Date.now().toString(),
-              type: "stop-share",
-              direction: "from-other",
-              username: user.name || "Demo User",
-              avatar: user.image || fallbackAvatar,
-              timestamp: getLocalTime(),
-            },
-          ]);
-
-          chatCache[user.id] = {
-            ...(chatCache[user.id] || {}),
-            user,
-            chatData: [...(chatCache[user.id]?.chatData || []), ...chatData],
-            hasUnread: true,
-          };
-          DeviceEventEmitter.emit("chat-updated");
-        }, 15000)
-      );
-    }, 10000)
-  );
+        chatCache[user.id] = {
+          ...(chatCache[user.id] || {}),
+          user,
+          chatData: [...(chatCache[user.id]?.chatData || []), ...chatData],
+          hasUnread: true,
+        };
+        DeviceEventEmitter.emit("chat-updated");
+      }, 17000)
+    );
+  }, 12000)
+);
 };
 
 
