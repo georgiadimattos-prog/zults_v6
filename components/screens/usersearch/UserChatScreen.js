@@ -281,6 +281,88 @@ useEffect(() => {
       DeviceEventEmitter.emit("chat-updated");
     }
   }
+
+// 🕓 Fast-forward demo flow if a request started while user was away
+  if (
+    user &&
+    user.id &&
+    chatCache[user.id] &&
+    chatCache[user.id].lastRequestStarted
+  ) {
+    const elapsed = (Date.now() - chatCache[user.id].lastRequestStarted) / 1000; // seconds
+
+// step 0: if user came back within 2–5 s, show initial typing
+    if (
+      elapsed > 2 &&
+      elapsed < 5 &&
+      !chatCache[user.id].chatData?.some(
+        (m) => m.type === "typing"
+      )
+    ) {
+      setChatData((prev) => [
+        ...prev,
+        {
+          id: `typing-${Date.now()}`,
+          type: "typing",
+          direction: "from-other",
+          username: user.name,
+          avatar: user.image || fallbackAvatar,
+        },
+      ]);
+    }
+
+    // step 1: if >5s, ensure "Request from DemoX"
+    if (elapsed > 5 && !chatCache[user.id].chatData?.some(m => m.type === "request" && m.direction === "from-other")) {
+      setChatData(prev => [
+        ...prev,
+        {
+          id: Date.now().toString(),
+          type: "request",
+          direction: "from-other",
+          username: user.name,
+          avatar: user.image || fallbackAvatar,
+          timestamp: getLocalTime(),
+        },
+      ]);
+      chatCache[user.id].otherUserState = { hasRequested: true, hasShared: false };
+    }
+
+    // step 2: if >10s, ensure "share"
+    if (elapsed > 10 && !chatCache[user.id].chatData?.some(m => m.type === "share" && m.direction === "from-other")) {
+      setChatData(prev => [
+        ...prev,
+        {
+          id: Date.now().toString(),
+          type: "share",
+          direction: "from-other",
+          username: user.name,
+          avatar: user.image || fallbackAvatar,
+          timestamp: getLocalTime(),
+        },
+      ]);
+      chatCache[user.id].otherUserState = { hasRequested: false, hasShared: true };
+    }
+
+    // step 3: if >15s, ensure "stop-share"
+    if (elapsed > 15 && !chatCache[user.id].chatData?.some(m => m.type === "stop-share" && m.direction === "from-other")) {
+      setChatData(prev => [
+        ...prev,
+        {
+          id: Date.now().toString(),
+          type: "stop-share",
+          direction: "from-other",
+          username: user.name,
+          avatar: user.image || fallbackAvatar,
+          timestamp: getLocalTime(),
+        },
+      ]);
+      chatCache[user.id].otherUserState = { hasRequested: false, hasShared: false };
+      chatCache[user.id].chatState = { hasRequested: false, hasShared: false };
+      delete chatCache[user.id].lastRequestStarted; // clear flag once complete
+    }
+  }
+
+
 }, [user]);
 
   // persist (skip chatData for Rezy so Activities tagline stays static)
@@ -349,6 +431,14 @@ useFocusEffect(
     }
   };
 
+// 🧠 Helper: compute which top CTA button should display
+const getCurrentCTA = () => {
+  if (otherUserState.hasShared) return "view";
+  if (chatState.hasShared) return "stop";
+  if (chatState.hasRequested) return "requested";
+  return "request";
+};
+
 // ----- request/share demo flows -----
 const startRequestFlow = () => {
   console.log("🚀 startRequestFlow entered for", user.id);
@@ -359,6 +449,11 @@ const startRequestFlow = () => {
   }
 
   console.log("▶️ Starting request flow for", user.id);
+
+  // 🕒 store when this demo request began
+if (user && user.id && chatCache[user.id]) {
+  chatCache[user.id].lastRequestStarted = Date.now();
+}
 
   // Clear existing timers
   requestTimers.current.forEach((t) => clearTimeout(t));
