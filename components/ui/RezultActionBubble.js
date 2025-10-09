@@ -77,8 +77,6 @@ export default function RezultActionBubble({
                 isFromUser ? styles.messageTextUser : styles.messageTextOther,
                 isRezyChat && isFromOther && { color: "#FFF" },
               ]}
-              allowFontScaling
-              maxFontSizeMultiplier={1.3}
             >
               {text}
             </Text>
@@ -87,8 +85,6 @@ export default function RezultActionBubble({
   style={[
     isFromUser ? styles.timestampRight : styles.timestampLeft,
   ]}
-  allowFontScaling
-  maxFontSizeMultiplier={1.2}
 >
   {timestamp}
 </Text>
@@ -150,8 +146,6 @@ return (
             isRezyChat && isFromOther && { color: "#FFF" },
             { flexShrink: 1, flexWrap: "wrap" },
           ]}
-          allowFontScaling
-          maxFontSizeMultiplier={1.3}
         >
            {label && label.trim() !== "" ? label : text || "Sharing Rezults"}
         </Text>
@@ -165,8 +159,6 @@ return (
             type === "stop-share" && isFromUser && { color: "#A8A8A8" },
             isRezyChat && isFromOther && { color: "rgba(255,255,255,0.55)" },
           ]}
-          allowFontScaling
-          maxFontSizeMultiplier={1.2}
         >
           {timestamp}
         </Text>

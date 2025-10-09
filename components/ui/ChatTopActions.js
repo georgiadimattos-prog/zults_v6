@@ -27,7 +27,7 @@ export default function ChatTopActions({ status, onRequest, onTooltip, highlight
           onPress={onRequest}
           activeOpacity={0.85}
         >
-          <Text style={styles.buttonText} allowFontScaling maxFontSizeMultiplier={1.3}>
+          <Text style={styles.buttonText}>
             Request Rezults
           </Text>
         </TouchableOpacity>
@@ -35,7 +35,7 @@ export default function ChatTopActions({ status, onRequest, onTooltip, highlight
 
       {status === "requested" && (
         <View style={[styles.button, styles.disabled]}>
-          <Text style={styles.buttonText} allowFontScaling maxFontSizeMultiplier={1.3}>
+          <Text style={styles.buttonText}>
             Requested
           </Text>
         </View>
@@ -52,7 +52,7 @@ export default function ChatTopActions({ status, onRequest, onTooltip, highlight
             onPress={onTooltip}
             activeOpacity={0.85}
           >
-            <Text style={[styles.buttonText, { color: "#fff" }]} allowFontScaling maxFontSizeMultiplier={1.3}>
+            <Text style={[styles.buttonText, { color: "#fff" }]}>
               View Rezults
             </Text>
           </TouchableOpacity>

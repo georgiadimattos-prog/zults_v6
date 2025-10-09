@@ -7,6 +7,11 @@ import { useFonts } from "expo-font";
 import { Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
+// --- Global font scaling rules ---
+Text.defaultProps = Text.defaultProps || {};
+Text.defaultProps.allowFontScaling = true;
+Text.defaultProps.maxFontSizeMultiplier = 1.2;
+
 // Screens
 import MainScreen from "./components/screens/mainscreen/MainScreen";
 import SettingsScreen from "./components/screens/settings/SettingsScreen";

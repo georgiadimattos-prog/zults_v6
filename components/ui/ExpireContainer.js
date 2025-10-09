@@ -28,13 +28,11 @@ export default function ExpireContainer({ expiryDate = "20 Jan 2026" }) {
     <View style={styles.wrapper}>
       {/* ─── Header row ─── */}
       <View style={styles.row}>
-        <Text style={styles.label} allowFontScaling={1.3}>
+        <Text style={styles.label}>
           Expires
         </Text>
         <Text
           style={styles.date}
-          allowFontScaling
-          maxFontSizeMultiplier={1.2}
           numberOfLines={1}
           adjustsFontSizeToFit
         >
@@ -56,7 +54,7 @@ export default function ExpireContainer({ expiryDate = "20 Jan 2026" }) {
 
         {/* ─── Centered “days left” label ─── */}
         <View style={styles.progressLabelWrapper}>
-          <Text style={styles.progressText} allowFontScaling maxFontSizeMultiplier={1.2}>
+          <Text style={styles.progressText}>
             {daysLeft} days left
           </Text>
         </View>

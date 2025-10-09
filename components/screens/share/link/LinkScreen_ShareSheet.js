@@ -31,15 +31,12 @@ export default function LinkScreenShareSheet() {
         <View style={styles.headerBlock}>
           <Text
             style={typography.largeTitleMedium}
-            allowFontScaling={false} // ✅ lock Apple titles
           >
             Rezults-link
           </Text>
 
           <Text
             style={[typography.bodyRegular, styles.subtitle]}
-            allowFontScaling
-            maxFontSizeMultiplier={1.3} // ✅ accessible body text
           >
             You can share your Rezults link directly from here.
           </Text>

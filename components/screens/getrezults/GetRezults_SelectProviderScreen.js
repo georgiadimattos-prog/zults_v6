@@ -25,15 +25,12 @@ export default function GetRezults_SelectProviderScreen() {
         <View style={styles.headerBlock}>
           <Text
             style={typography.largeTitleMedium}
-            allowFontScaling={false}         // ✅ Apple titles never scale
           >
             Get Rezults
           </Text>
 
           <Text
             style={[typography.bodyRegular, styles.subtitle]}
-            allowFontScaling
-            maxFontSizeMultiplier={1.3}      // ✅ consistent with system body scaling
           >
             Choose an option below to get started.
           </Text>

@@ -24,7 +24,6 @@ export default function SearchBar({ value, onChangeText, onCancel, onFocus }) {
         placeholder="Search by username"
         placeholderTextColor={colors.foreground.muted} // ✅ muted grey, same as Paste Link
         onFocus={onFocus}
-        maxFontSizeMultiplier={1.2}                    // ✅ capped scaling
         autoCapitalize="none"
         autoCorrect={false}
       />

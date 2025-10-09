@@ -36,7 +36,6 @@ export default function SMSRequestSent() {
           />
           <Text
             style={styles.title}
-            allowFontScaling={false}   // 🚫 fixed size title
           >
             Sent!
           </Text>

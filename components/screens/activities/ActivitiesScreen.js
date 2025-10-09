@@ -172,7 +172,7 @@ export default function ActivitiesScreen() {
 
       {/* ─── Header Block ─── */}
       <View style={styles.headerBlock}>
-        <Text style={styles.pageTitle} allowFontScaling={false}>
+        <Text style={styles.pageTitle}>
           Activities
         </Text>
       </View>
@@ -189,8 +189,6 @@ export default function ActivitiesScreen() {
               numberOfLines={1}
               ellipsizeMode="tail"
               adjustsFontSizeToFit
-              allowFontScaling
-              maxFontSizeMultiplier={1.3}
               minimumFontScale={0.9}
               style={filter === tab.toLowerCase() ? styles.tabActiveText : styles.tabInactiveText}
             >
@@ -209,7 +207,7 @@ export default function ActivitiesScreen() {
         renderItem={renderItem}
         contentContainerStyle={{ paddingTop: 16, paddingHorizontal: 16, paddingBottom: 160 }}
         ListEmptyComponent={
-          <Text style={styles.empty} allowFontScaling maxFontSizeMultiplier={1.3}>
+          <Text style={styles.empty}>
             {filter === "all"
               ? "No recent activity"
               : filter === "unread"

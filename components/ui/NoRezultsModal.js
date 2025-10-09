@@ -32,8 +32,6 @@ export default function NoRezultsModal({ visible, onClose }) {
               {/* ─── Title ─── */}
               <Text
                 style={styles.title}
-                allowFontScaling
-                maxFontSizeMultiplier={1.3}
               >
                 Oops…
               </Text>
@@ -41,8 +39,6 @@ export default function NoRezultsModal({ visible, onClose }) {
               {/* ─── Description ─── */}
               <Text
                 style={styles.description}
-                allowFontScaling
-                maxFontSizeMultiplier={1.3}
               >
                 You don’t have any Rezults yet.{"\n"}
                 Get tested with one of our partner providers to add your Rezults.

@@ -10,7 +10,6 @@ export const typography = {
     lineHeight: 36,
     letterSpacing: -0.64,
     includeFontPadding: false,
-    allowFontScaling: false,
     color: colors.foreground.default,
   },
   largeTitleRegular: {
@@ -19,7 +18,6 @@ export const typography = {
     lineHeight: 36,
     letterSpacing: -0.64,
     includeFontPadding: false,
-    allowFontScaling: false,
     color: colors.foreground.default,
   },
 
@@ -40,8 +38,6 @@ export const typography = {
     lineHeight: 20,
     letterSpacing: -0.08,
     includeFontPadding: false,
-    allowFontScaling: true,
-    maxFontSizeMultiplier: 1.3,
   },
   headlineRegular:{
     fontFamily: fonts.regular,
@@ -49,8 +45,6 @@ export const typography = {
     lineHeight: 20,
     letterSpacing: -0.08,
     includeFontPadding: false,
-    allowFontScaling: true,
-    maxFontSizeMultiplier: 1.3,
   },
 
   // ─── Body ─────────────────────────────────────────────
@@ -60,8 +54,6 @@ export const typography = {
     lineHeight: 20,
     letterSpacing: 0,
     includeFontPadding: false,
-    allowFontScaling: true,
-    maxFontSizeMultiplier: 1.3,
     color: colors.foreground.soft,
   },
   bodyRegular:{
@@ -70,8 +62,6 @@ export const typography = {
     lineHeight: 20,
     letterSpacing: 0,
     includeFontPadding: false,
-    allowFontScaling: true,
-    maxFontSizeMultiplier: 1.3,
     color: colors.foreground.soft,
   },
 
@@ -82,8 +72,6 @@ export const typography = {
     lineHeight: 18,
     letterSpacing: -0.07,
     includeFontPadding: false,
-    allowFontScaling: true,
-    maxFontSizeMultiplier: 1.3,
   },
   subheadlineRegular:{
     fontFamily: fonts.regular,
@@ -91,8 +79,6 @@ export const typography = {
     lineHeight: 18,
     letterSpacing: -0.07,
     includeFontPadding: false,
-    allowFontScaling: true,
-    maxFontSizeMultiplier: 1.3,
   },
 
   // ─── Captions ─────────────────────────────────────────
@@ -102,8 +88,6 @@ export const typography = {
     lineHeight: 18,
     letterSpacing: -0.07,
     includeFontPadding: false,
-    allowFontScaling: true,
-    maxFontSizeMultiplier: 1.2,
   },
   captionLargeRegular:{
     fontFamily: fonts.regular,
@@ -111,8 +95,6 @@ export const typography = {
     lineHeight: 18,
     letterSpacing: -0.07,
     includeFontPadding: false,
-    allowFontScaling: true,
-    maxFontSizeMultiplier: 1.2,
   },
   captionSmallMedium:{
     fontFamily: fonts.medium,
@@ -120,8 +102,6 @@ export const typography = {
     lineHeight: 16,
     letterSpacing: -0.06,
     includeFontPadding: false,
-    allowFontScaling: true,
-    maxFontSizeMultiplier: 1.2,
   },
   captionSmallRegular:{
     fontFamily: fonts.regular,
@@ -129,8 +109,6 @@ export const typography = {
     lineHeight: 16,
     letterSpacing: -0.06,
     includeFontPadding: false,
-    allowFontScaling: true,
-    maxFontSizeMultiplier: 1.2,
   },
 
   // ─── Buttons ──────────────────────────────────────────
@@ -162,8 +140,6 @@ export const typography = {
     lineHeight: 20,
     letterSpacing: 0,
     includeFontPadding: false,
-    allowFontScaling: true,
-    maxFontSizeMultiplier: 1.3,
     color: colors.foreground.default,
   },
 };

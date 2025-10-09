@@ -208,8 +208,6 @@ useEffect(() => {
   <View style={styles.activitiesHeader}>
     <Text
       style={styles.sectionTitle}
-      allowFontScaling
-      maxFontSizeMultiplier={1.3}   // ✅ now scales naturally like all sub-titles
     >
       Activities
     </Text>
@@ -219,8 +217,6 @@ useEffect(() => {
     >
       <Text
         style={styles.viewAll}
-        allowFontScaling
-        maxFontSizeMultiplier={1.3}
       >
         View All
       </Text>
@@ -237,8 +233,6 @@ useEffect(() => {
         {renderAvatars()}
         <Text
           style={styles.activityText}
-          allowFontScaling
-          maxFontSizeMultiplier={1.3}  // ✅ ensure activity text also scales
         >
           {unreadUsers.length > 0
             ? `${unreadUsers.length} unread message${
@@ -251,15 +245,11 @@ useEffect(() => {
       <View>
         <Text
           style={styles.emptyTitle}
-          allowFontScaling
-          maxFontSizeMultiplier={1.3}
         >
           No recent activity
         </Text>
         <Text
           style={styles.emptySubtitle}
-          allowFontScaling
-          maxFontSizeMultiplier={1.3}
         >
           You’ll see Rezults shared here
         </Text>

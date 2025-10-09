@@ -30,13 +30,13 @@ export default function ConfirmModal({
           <TouchableWithoutFeedback>
             <View style={styles.container}>
               {/* Title */}
-              <Text style={styles.title} allowFontScaling={false}>
+              <Text style={styles.title}>
                 {title}
               </Text>
 
               {/* Description */}
               {description ? (
-                <Text style={styles.description} maxFontSizeMultiplier={1.3}>
+                <Text style={styles.description}>
                   {description}
                 </Text>
               ) : null}

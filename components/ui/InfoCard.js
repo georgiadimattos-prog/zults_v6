@@ -17,16 +17,12 @@ export default function InfoCard({ title, description, icon, onPress }) {
       <View style={styles.textBlock}>
         <Text
           style={styles.title}
-          allowFontScaling
-          maxFontSizeMultiplier={1.3}
         >
           {title}
         </Text>
 
         <Text
           style={styles.description}
-          allowFontScaling
-          maxFontSizeMultiplier={1.3}
         >
           {description}
         </Text>

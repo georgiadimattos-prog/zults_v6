@@ -33,8 +33,6 @@ export default function ActionModal({
               {title ? (
                 <Text
                   style={styles.title}
-                  allowFontScaling
-                  maxFontSizeMultiplier={1.3}
                 >
                   {title}
                 </Text>
@@ -44,8 +42,6 @@ export default function ActionModal({
               {description ? (
                 <Text
                   style={styles.description}
-                  allowFontScaling
-                  maxFontSizeMultiplier={1.3}
                 >
                   {description}
                 </Text>

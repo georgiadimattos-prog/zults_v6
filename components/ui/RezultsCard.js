@@ -111,24 +111,18 @@ export default function RezultsCard({
               {isVerified && showRealName && realName && (
                 <Text
                   style={styles.name}
-                  allowFontScaling
-                  maxFontSizeMultiplier={1.3}
                 >
                   {realName}
                 </Text>
               )}
               <Text
                 style={styles.provider}
-                allowFontScaling
-                maxFontSizeMultiplier={1.3}
               >
                 {providerName}
               </Text>
             </View>
             <Text
               style={styles.link}
-              allowFontScaling
-              maxFontSizeMultiplier={1.3}
             >
               Show Rezults
             </Text>
@@ -140,11 +134,9 @@ export default function RezultsCard({
           <View style={styles.backHeader}>
             <Text
               style={styles.testedOn}
-              allowFontScaling
-              maxFontSizeMultiplier={1.3}
             >
               Tested on{" "}
-              <Text style={styles.testedDate} allowFontScaling>
+              <Text style={styles.testedDate}>
                 {testDate}
               </Text>
             </Text>
@@ -177,8 +169,6 @@ export default function RezultsCard({
               <View key={idx} style={styles.pill}>
                 <Text
                   style={styles.pillText}
-                  allowFontScaling
-                  maxFontSizeMultiplier={1.3}
                 >
                   {label}
                 </Text>

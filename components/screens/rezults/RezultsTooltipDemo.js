@@ -43,7 +43,7 @@ export default function RezultsTooltipDemo() {
         <View style={styles.profileRow}>
           <Image source={avatarImg} style={styles.avatar} />
           <View style={styles.nameRow}>
-            <Text style={styles.username} allowFontScaling maxFontSizeMultiplier={1.3}>
+            <Text style={styles.username}>
               Rez
             </Text>
             <Image source={verifiedIcon} style={styles.verifiedIcon} />
@@ -70,7 +70,7 @@ export default function RezultsTooltipDemo() {
               showsVerticalScrollIndicator={false}
               contentContainerStyle={{ paddingBottom: 12 }}
             >
-              <Text style={styles.expandedText} allowFontScaling maxFontSizeMultiplier={1.3}>
+              <Text style={styles.expandedText}>
                 These Rezults were created from{" "}
                 <Text
                   style={styles.link}
@@ -81,30 +81,30 @@ export default function RezultsTooltipDemo() {
                 tests on 20 Oct 2025.
               </Text>
 
-              <Text style={styles.expandedTitle} allowFontScaling maxFontSizeMultiplier={1.3}>
+              <Text style={styles.expandedTitle}>
                 Infection Window Periods
               </Text>
-              <Text style={styles.expandedText} allowFontScaling maxFontSizeMultiplier={1.3}>
+              <Text style={styles.expandedText}>
                 Some STIs take time to show up in results, meaning a recent infection might not be
                 detected right away.
               </Text>
-              <Text style={styles.expandedText} allowFontScaling maxFontSizeMultiplier={1.3}>
+              <Text style={styles.expandedText}>
                 • Chlamydia & Gonorrhoea ≈ 2 weeks{"\n"}
                 • Syphilis, Hep B & C ≈ 6 – 12 weeks{"\n"}
                 • HIV ≈ 6 weeks
               </Text>
 
-              <Text style={styles.expandedTitle} allowFontScaling maxFontSizeMultiplier={1.3}>
+              <Text style={styles.expandedTitle}>
                 ID Verification
               </Text>
-              <Text style={styles.expandedText} allowFontScaling maxFontSizeMultiplier={1.3}>
+              <Text style={styles.expandedText}>
                 These are at-home tests, so we can’t fully guarantee who took the test. If you see a
                 blue tick next to someone’s profile, it means:{"\n"}
                 • We verified their name matches their test provider’s results{"\n"}
                 • Their photo matches their official ID
               </Text>
 
-              <Text style={styles.expandedText} allowFontScaling maxFontSizeMultiplier={1.3}>
+              <Text style={styles.expandedText}>
                 Rezults are a tool for safer dating, but they don’t replace other protections.
                 Using condoms is still the most reliable way to protect against STIs.
               </Text>
@@ -115,7 +115,7 @@ export default function RezultsTooltipDemo() {
         {/* Progressive captions */}
         <View style={styles.captionsWrapper}>
           {visibleCaptions.map((caption, index) => (
-            <Text key={index} style={styles.caption} allowFontScaling maxFontSizeMultiplier={1.3}>
+            <Text key={index} style={styles.caption}>
               {caption}
             </Text>
           ))}

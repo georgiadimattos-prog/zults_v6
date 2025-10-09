@@ -29,7 +29,7 @@ export default function AddToWalletDemo() {
           source={require("../../assets/images/user-verification-icon.png")}
           style={styles.walletIcon}
         />
-        <Text style={styles.walletText} allowFontScaling maxFontSizeMultiplier={1.3}>
+        <Text style={styles.walletText}>
           Add to Apple Wallet
         </Text>
       </Pressable>
@@ -53,15 +53,11 @@ export default function AddToWalletDemo() {
               <View style={{ marginTop: 20 }}>
                 <Text
                   style={[typography.captionLargeRegular, styles.label]}
-                  allowFontScaling
-                  maxFontSizeMultiplier={1.3}
                 >
                   Username
                 </Text>
                 <Text
                   style={[typography.title3Medium, styles.value]}
-                  allowFontScaling
-                  maxFontSizeMultiplier={1.3}
                 >
                   Jonster
                 </Text>
@@ -70,8 +66,6 @@ export default function AddToWalletDemo() {
               {/* Subtitle */}
               <Text
                 style={[typography.subheadlineRegular, styles.subText]}
-                allowFontScaling
-                maxFontSizeMultiplier={1.3}
               >
                 Scan to view Rezults
               </Text>
@@ -109,8 +103,6 @@ export default function AddToWalletDemo() {
         <View style={styles.toast}>
           <Text
             style={[typography.bodyMedium, styles.toastText]}
-            allowFontScaling
-            maxFontSizeMultiplier={1.3}
           >
             ✅ Rezults added to Wallet
           </Text>

@@ -16,8 +16,6 @@ export default function ActivityCard({ user, onPress, onToggleFavorite }) {
           <View style={styles.topRow}>
             <Text
               style={styles.name}
-              allowFontScaling
-              maxFontSizeMultiplier={1.3}
               numberOfLines={1}
               ellipsizeMode="tail"
             >
@@ -27,8 +25,6 @@ export default function ActivityCard({ user, onPress, onToggleFavorite }) {
             <View style={styles.rightCluster}>
               <Text
                 style={styles.date}
-                allowFontScaling
-                maxFontSizeMultiplier={1.2}
               >
                 {user.date}
               </Text>
@@ -73,8 +69,6 @@ export default function ActivityCard({ user, onPress, onToggleFavorite }) {
             style={styles.message}
             numberOfLines={1}
             ellipsizeMode="tail"
-            allowFontScaling
-            maxFontSizeMultiplier={1.3}
           >
             {user.message}
           </Text>

@@ -22,15 +22,12 @@ export default function LinkScreenSuccess() {
         <View style={styles.linkRow}>
           <Text
             style={styles.linkLabel}
-            allowFontScaling={false} // ✅ lock label
           >
             Rezults-link
           </Text>
 
           <Text
             style={styles.linkStatus}
-            allowFontScaling
-            maxFontSizeMultiplier={1.2} // ✅ micro text cap
           >
             ● Online
           </Text>
@@ -42,8 +39,6 @@ export default function LinkScreenSuccess() {
             style={styles.linkText}
             numberOfLines={1}
             ellipsizeMode="middle"
-            allowFontScaling
-            maxFontSizeMultiplier={1.3} // ✅ user-facing link
           >
             .../share/jonster/id8765
           </Text>
@@ -51,7 +46,6 @@ export default function LinkScreenSuccess() {
           <TouchableOpacity onPress={copyToClipboard}>
             <Text
               style={styles.copyIcon}
-              allowFontScaling={false} // ✅ icon locked
             >
               📋
             </Text>
@@ -62,8 +56,6 @@ export default function LinkScreenSuccess() {
         <TouchableOpacity style={styles.stopButton}>
           <Text
             style={styles.stopButtonText}
-            allowFontScaling
-            maxFontSizeMultiplier={1.2} // ✅ button label cap
           >
             Stop Sharing
           </Text>

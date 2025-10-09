@@ -88,13 +88,11 @@ export default function GetRezults_PasteLinkScreen() {
           >
             {/* Header */}
             <View style={styles.headerBlock}>
-              <Text style={styles.title} allowFontScaling={false}>
+              <Text style={styles.title}>
                 Add your Rezults
               </Text>
               <Text
                 style={[typography.bodyRegular, styles.subtitle]}
-                allowFontScaling
-                maxFontSizeMultiplier={1.3}
               >
                 Choose your test provider and paste your results link to turn it
                 into your Rezults.
@@ -120,7 +118,6 @@ export default function GetRezults_PasteLinkScreen() {
                   <Text
                     style={styles.dropdownText}
                     numberOfLines={1}
-                    maxFontSizeMultiplier={1.3}
                   >
                     {selectedProvider.name}
                   </Text>
@@ -128,7 +125,6 @@ export default function GetRezults_PasteLinkScreen() {
               ) : (
                 <Text
                   style={[styles.dropdownText, { color: colors.foreground.soft }]}
-                  maxFontSizeMultiplier={1.3}
                 >
                   Select your provider
                 </Text>
@@ -146,7 +142,6 @@ export default function GetRezults_PasteLinkScreen() {
                 keyboardType="url"
                 style={{ marginTop: 10 }}
                 placeholderTextColor={colors.foreground.muted}
-                maxFontSizeMultiplier={1.3}
               />
             )}
           </ScrollView>
@@ -178,8 +173,6 @@ export default function GetRezults_PasteLinkScreen() {
                     textAlign: "center",
                   },
                 ]}
-                allowFontScaling
-                maxFontSizeMultiplier={1.3}
               >
                 Don’t see your provider? Let us know.
               </Text>
@@ -197,7 +190,7 @@ export default function GetRezults_PasteLinkScreen() {
               <BlurView intensity={40} tint="dark" style={styles.overlay}>
                 <TouchableWithoutFeedback>
                   <View style={styles.sheetContainer}>
-                    <Text style={styles.sheetTitle} allowFontScaling={false}>
+                    <Text style={styles.sheetTitle}>
                       Choose your provider
                     </Text>
 
@@ -215,8 +208,6 @@ export default function GetRezults_PasteLinkScreen() {
                         />
                         <Text
                           style={styles.sheetText}
-                          allowFontScaling
-                          maxFontSizeMultiplier={1.3}
                           numberOfLines={1}
                         >
                           {p.name}

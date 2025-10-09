@@ -33,7 +33,6 @@ export default function SettingsScreen({ navigation }) {
         <Image source={tomas} style={styles.avatarLarge} />
         <Text
           style={styles.usernameCentered}
-          allowFontScaling={false} // ✅ lock for optical rhythm
         >
           Jonster
         </Text>
@@ -52,8 +51,6 @@ export default function SettingsScreen({ navigation }) {
             </View>
             <Text
               style={styles.cardLabel}
-              allowFontScaling
-              maxFontSizeMultiplier={1.3}
             >
               Personal details
             </Text>
@@ -65,8 +62,6 @@ export default function SettingsScreen({ navigation }) {
             </View>
             <Text
               style={styles.cardLabel}
-              allowFontScaling
-              maxFontSizeMultiplier={1.3}
             >
               Privacy settings
             </Text>
@@ -78,8 +73,6 @@ export default function SettingsScreen({ navigation }) {
             </View>
             <Text
               style={styles.cardLabel}
-              allowFontScaling
-              maxFontSizeMultiplier={1.3}
             >
               Legal info
             </Text>
@@ -95,8 +88,6 @@ export default function SettingsScreen({ navigation }) {
             </View>
             <Text
               style={styles.cardLabel}
-              allowFontScaling
-              maxFontSizeMultiplier={1.3}
             >
               Support
             </Text>
@@ -115,8 +106,6 @@ export default function SettingsScreen({ navigation }) {
         />
         <Text
           style={styles.version}
-          allowFontScaling
-          maxFontSizeMultiplier={1.2} // ✅ small label cap
         >
           Version 2.0.0
         </Text>

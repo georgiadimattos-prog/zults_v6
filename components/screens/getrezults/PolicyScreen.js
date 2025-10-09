@@ -17,12 +17,11 @@ export default function PolicyScreen() {
       >
         {/* Title + subtitle */}
         <View style={styles.headerBlock}>
-          <Text style={styles.title} allowFontScaling={false}>
+          <Text style={styles.title}>
             Rezults Policy
           </Text>
           <Text
             style={[typography.bodyRegular, styles.subtitle]}
-            maxFontSizeMultiplier={1.3}
           >
             Rezults are private sexual health information. Misuse can cause
             serious harm. Always add only your own Rezults.
@@ -31,27 +30,27 @@ export default function PolicyScreen() {
 
         {/* Policy content */}
         <Text style={styles.sectionTitle}>Your Responsibility</Text>
-        <Text style={styles.infoBlock} maxFontSizeMultiplier={1.3}>
+        <Text style={styles.infoBlock}>
           • By adding Rezults, you confirm the information is yours and accurate.{"\n"}
           • Never upload or share someone else’s test results.{"\n"}
           • Misrepresentation of your sexual health puts others at risk.
         </Text>
 
         <Text style={styles.sectionTitle}>Limitations of Testing</Text>
-        <Text style={styles.infoBlock} maxFontSizeMultiplier={1.3}>
+        <Text style={styles.infoBlock}>
           • Some STIs take time to show up in results — a recent infection may not be detected immediately.{"\n"}
           • These Rezults reflect your status only on the date of the test.{"\n"}
           • Regular testing is the only way to stay up to date.
         </Text>
 
         <Text style={styles.sectionTitle}>ID Verification</Text>
-        <Text style={styles.infoBlock} maxFontSizeMultiplier={1.3}>
+        <Text style={styles.infoBlock}>
           • A blue tick on a Rezults profile means we verified the name and photo against official ID.{"\n"}
           • Verification increases trust but does not guarantee who took the test.
         </Text>
 
         <Text style={styles.sectionTitle}>Window Periods</Text>
-        <Text style={styles.infoBlock} maxFontSizeMultiplier={1.3}>
+        <Text style={styles.infoBlock}>
           • Chlamydia & Gonorrhoea: ~2 weeks{"\n"}
           • Syphilis, Hep B & C: 6–12 weeks{"\n"}
           • HIV: ~6 weeks
@@ -87,7 +86,6 @@ const styles = StyleSheet.create({
     ...typography.largeTitleMedium,
     color: colors.foreground.default,
     marginBottom: 8,
-    allowFontScaling: false,
   },
 
   subtitle: {

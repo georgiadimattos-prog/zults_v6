@@ -99,7 +99,6 @@ export default function LinkTab() {
         <View style={styles.cardHeader}>
           <Text
             style={styles.cardTitle}
-            allowFontScaling={false} // ✅ lock card title
           >
             Rezults-link
           </Text>
@@ -119,8 +118,6 @@ export default function LinkTab() {
                 styles.statusText,
                 { color: linkActive ? "#00D775" : "#FA5F21" },
               ]}
-              allowFontScaling
-              maxFontSizeMultiplier={1.2} // ✅ micro text cap
             >
               {linkActive ? "Online" : "Offline"}
             </Text>
@@ -143,8 +140,6 @@ export default function LinkTab() {
                 style={styles.linkText}
                 numberOfLines={1}
                 ellipsizeMode="middle"
-                allowFontScaling
-                maxFontSizeMultiplier={1.3} // ✅ user content
               >
                 {link}
               </Text>
@@ -177,8 +172,6 @@ export default function LinkTab() {
         <Animated.View style={[styles.toast, { opacity: fadeAnim }]}>
           <Text
             style={styles.toastText}
-            allowFontScaling
-            maxFontSizeMultiplier={1.2} // ✅ small label cap
           >
             {toast}
           </Text>

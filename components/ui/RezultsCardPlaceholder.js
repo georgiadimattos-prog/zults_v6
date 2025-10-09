@@ -87,7 +87,7 @@ export default function RezultsCardPlaceholder() {
         </Svg>
 
         <View style={styles.content}>
-          <Text style={styles.title} allowFontScaling maxFontSizeMultiplier={1.3}>
+          <Text style={styles.title}>
             Tap to add your Rezults  ›
           </Text>
         </View>

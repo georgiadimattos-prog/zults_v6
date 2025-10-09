@@ -28,8 +28,6 @@ export default function ZultsInput({
   secureTextEntry={secureTextEntry}
   autoCapitalize="none"
   autoCorrect={false}
-  allowFontScaling={true}             // ✅ scales like all body text
-  maxFontSizeMultiplier={1.3}        // ✅ unified baseline
   {...props}
 />
       </View>

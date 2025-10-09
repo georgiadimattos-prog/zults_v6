@@ -77,14 +77,12 @@ const providerName = PROVIDERS[providerId] || "Your Provider";
       >
         {/* ─── Header ─── */}
         <View style={styles.headerBlock}>
-          <Text style={styles.title} allowFontScaling={false}>
+          <Text style={styles.title}>
             Your Rezults
           </Text>
 
           <Text
             style={[typography.bodyRegular, styles.subtitle]}
-            allowFontScaling
-            maxFontSizeMultiplier={1.3}
           >
             By tapping <Text style={styles.highlight}>Add Rezults</Text>, you confirm this
             information is your own and accurate.{" "}

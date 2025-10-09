@@ -36,7 +36,7 @@ export default function NotificationCard() {
     >
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.title} allowFontScaling={1.3}>
+        <Text style={styles.title}>
           Notifications
         </Text>
         <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
@@ -47,8 +47,6 @@ export default function NotificationCard() {
       {/* Description */}
       <Text
         style={styles.text}
-        allowFontScaling
-        maxFontSizeMultiplier={1.3}
       >
         Get notified when someone sends you their Rezults or requests yours.
       </Text>

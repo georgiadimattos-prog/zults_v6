@@ -61,7 +61,7 @@ export default function ZultsButton({
             resizeMode="contain"
           />
         )}
-        <Text style={[textStyle, colorStyle]} maxFontSizeMultiplier={1.2}>
+        <Text style={[textStyle, colorStyle]}>
           {label}
         </Text>
         {icon && iconPosition === "right" && (

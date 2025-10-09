@@ -59,8 +59,6 @@ export default function SMSTab({ navigation }) {
             placeholder="Add phone number"
             placeholderTextColor={colors.foreground.muted}
             keyboardType="phone-pad"
-            allowFontScaling
-            maxFontSizeMultiplier={1.2} // ✅ input field text cap
             onFocus={() => {
               if (!phone) {
                 setPhone("+447123456789"); // 👈 demo number prefilled
@@ -74,13 +72,9 @@ export default function SMSTab({ navigation }) {
           <Image source={infoIcon} style={styles.infoIcon} />
           <Text
             style={styles.infoText}
-            allowFontScaling
-            maxFontSizeMultiplier={1.2} // ✅ small UI label
           >
             <Animated.Text
               style={[styles.infoHighlight, { transform: [{ scale: pulseAnim }] }]}
-              allowFontScaling
-              maxFontSizeMultiplier={1.2}
             >
               1 of 1
             </Animated.Text>{" "}

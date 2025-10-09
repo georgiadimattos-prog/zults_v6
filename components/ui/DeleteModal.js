@@ -42,12 +42,12 @@ export default function DeleteModal({ visible, onClose }) {
           <TouchableWithoutFeedback>
             <View style={styles.container}>
               {/* Title */}
-              <Text style={styles.title} allowFontScaling={false}>
+              <Text style={styles.title}>
                 Delete Rezults?
               </Text>
 
               {/* Description */}
-              <Text style={styles.description} maxFontSizeMultiplier={1.3}>
+              <Text style={styles.description}>
                 This will permanently remove your Rezults and disable sharing.
                 You can always add them again later.
               </Text>

@@ -85,13 +85,11 @@ export default function ProvidersListScreen() {
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.title} allowFontScaling={false}>
+        <Text style={styles.title}>
           Get Tested
         </Text>
         <Text
           style={styles.subtitle}
-          allowFontScaling
-          maxFontSizeMultiplier={1.3}
         >
           Get tested with one of our trusted providers to access your Rezults.
         </Text>

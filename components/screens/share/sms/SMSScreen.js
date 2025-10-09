@@ -51,14 +51,11 @@ export default function SMSScreen() {
               <View style={styles.headerBlock}>
                 <Text
                   style={styles.pageTitle}
-                  allowFontScaling={false} // ✅ hero title locked
                 >
                   SMS
                 </Text>
                 <Text
                   style={styles.subtitle}
-                  allowFontScaling
-                  maxFontSizeMultiplier={1.3} // ✅ accessible subtitle
                 >
                   Send someone an anonymous nudge to get tested.
                 </Text>
@@ -68,8 +65,6 @@ export default function SMSScreen() {
               <View style={styles.section}>
                 <Text
                   style={styles.label}
-                  allowFontScaling
-                  maxFontSizeMultiplier={1.2} // ✅ micro text cap
                 >
                   Phone number
                 </Text>
@@ -82,8 +77,6 @@ export default function SMSScreen() {
                     placeholder="Add phone number"
                     placeholderTextColor={colors.neutralText.subtext}
                     keyboardType="phone-pad"
-                    allowFontScaling
-                    maxFontSizeMultiplier={1.2}
                     onFocus={() => {
                       if (!phone) setPhone("+447123456789");
                     }}
@@ -94,11 +87,9 @@ export default function SMSScreen() {
                   <Image source={infoIcon} style={styles.infoIcon} />
                   <Text
                     style={styles.infoText}
-                    allowFontScaling
-                    maxFontSizeMultiplier={1.2} // ✅ small info cap
                   >
                     You have{" "}
-                    <Text style={styles.infoHighlight} allowFontScaling>
+                    <Text style={styles.infoHighlight}>
                       1 of 1
                     </Text>{" "}
                     SMS available this week

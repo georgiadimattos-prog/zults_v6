@@ -17,7 +17,6 @@ export default function UserProfileHeader({ onLayout }) {
         <View style={styles.profileText}>
           <Text
             style={styles.username}
-            allowFontScaling={false} // ✅ lock Apple-style username
           >
             Jonster
           </Text>

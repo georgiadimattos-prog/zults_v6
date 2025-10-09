@@ -85,7 +85,6 @@ export default function ShareScreen({ navigation }) {
                 style={styles.username}
                 numberOfLines={1}
                 ellipsizeMode="tail"
-                maxFontSizeMultiplier={1.3}
               >
                 {user.name}
               </Text>
@@ -95,7 +94,6 @@ export default function ShareScreen({ navigation }) {
           {search.trim().length > 0 && listToShow.length === 0 && (
             <Text
               style={[typography.bodyMedium, styles.emptyText]}
-              maxFontSizeMultiplier={1.3}
             >
               No users found
             </Text>
@@ -147,15 +145,12 @@ export default function ShareScreen({ navigation }) {
 <View style={styles.headerBlock}>
   <Text
     style={typography.largeTitleMedium}
-    allowFontScaling={false}
   >
     Share
   </Text>
 
   <Text
     style={[typography.bodyRegular, styles.subtitle]}
-    allowFontScaling
-    maxFontSizeMultiplier={1.3}
   >
     Send or request Rezults with users.
   </Text>
@@ -179,7 +174,6 @@ export default function ShareScreen({ navigation }) {
                           ? styles.tabActiveText
                           : styles.tabInactiveText
                       }
-                      maxFontSizeMultiplier={1.3}
                     >
                       {tab}
                     </Text>

@@ -51,14 +51,12 @@ export default function GetRezults_HowToFindLinkScreen() {
       >
         {/* ─── Header ─── */}
         <View style={styles.headerBlock}>
-          <Text style={typography.largeTitleMedium} allowFontScaling={false}>
+          <Text style={typography.largeTitleMedium}>
             How to find your link
           </Text>
 
           <Text
             style={[typography.bodyRegular, styles.subtitle]}
-            allowFontScaling
-            maxFontSizeMultiplier={1.3}
           >
             Follow these steps in your {providerName} account to find and copy your results link.
           </Text>
@@ -69,16 +67,12 @@ export default function GetRezults_HowToFindLinkScreen() {
           <View key={i} style={styles.stepRow}>
             <Text
               style={styles.stepNumber}
-              allowFontScaling
-              maxFontSizeMultiplier={1.3}
             >
               {i + 1}.
             </Text>
             <View style={{ flex: 1 }}>
               <Text
                 style={styles.stepText}
-                allowFontScaling
-                maxFontSizeMultiplier={1.3}
               >
                 {s}
               </Text>
@@ -90,8 +84,6 @@ export default function GetRezults_HowToFindLinkScreen() {
         <View style={styles.videoContainer}>
           <Text
             style={styles.tutorialTitle}
-            allowFontScaling
-            maxFontSizeMultiplier={1.3}
           >
             Watch the video tutorial
           </Text>

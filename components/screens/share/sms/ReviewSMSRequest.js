@@ -42,14 +42,11 @@ export default function ReviewSMSRequest() {
             <View style={styles.headerBlock}>
               <Text
                 style={typography.largeTitleMedium}
-                allowFontScaling={false} // ✅ hero title locked
               >
                 Review SMS
               </Text>
               <Text
                 style={[typography.bodyRegular, styles.subtitle]}
-                allowFontScaling
-                maxFontSizeMultiplier={1.3} // ✅ accessible subtitle
               >
                 Check the details before you send.
               </Text>
@@ -59,16 +56,12 @@ export default function ReviewSMSRequest() {
             <View style={styles.inputGroup}>
               <Text
                 style={styles.label}
-                allowFontScaling
-                maxFontSizeMultiplier={1.2}
               >
                 Phone number
               </Text>
               <View style={styles.inputWrapper}>
                 <Text
                   style={styles.inputText}
-                  allowFontScaling
-                  maxFontSizeMultiplier={1.3}
                 >
                   {String(phone)}
                 </Text>
@@ -79,16 +72,12 @@ export default function ReviewSMSRequest() {
             <View style={styles.inputGroup}>
               <Text
                 style={styles.label}
-                allowFontScaling
-                maxFontSizeMultiplier={1.2}
               >
                 Message
               </Text>
               <View style={styles.staticBox}>
                 <Text
                   style={styles.staticText}
-                  allowFontScaling
-                  maxFontSizeMultiplier={1.3}
                 >
                   A reminder to consider getting tested for STIs. This may be
                   from a past or potential partner.
@@ -108,8 +97,6 @@ export default function ReviewSMSRequest() {
                 </View>
                 <Text
                   style={styles.checkboxText}
-                  allowFontScaling
-                  maxFontSizeMultiplier={1.2}
                 >
                   I confirm this request is for a legitimate purpose and I’ve
                   considered its impact on the recipient.
