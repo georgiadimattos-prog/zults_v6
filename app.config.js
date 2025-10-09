@@ -2,7 +2,7 @@ export default {
   expo: {
     name: "Zults",
     slug: "snack-56e4b4f5-f1e0-4ec3-b012-82d267abd500",
-    version: "8.0.1",
+    version: "8.0.2",
     orientation: "portrait",
     userInterfaceStyle: "dark",
     newArchEnabled: true,
@@ -13,15 +13,25 @@ export default {
       backgroundColor: "#000000",
     },
     ios: {
-      bundleIdentifier: "com.ewellness.zults.v5demo",
-      buildNumber: "13",
-      supportsTablet: true,
-      infoPlist: {
-        ITSAppUsesNonExemptEncryption: false,
-        NSContactsUsageDescription:
-          "Zults needs access to your contacts so you can invite friends via SMS.",
-      },
+  bundleIdentifier: "com.ewellness.zults.v5demo",
+  supportsTablet: true,
+  infoPlist: {
+    ITSAppUsesNonExemptEncryption: false,
+    NSAppTransportSecurity: {
+      NSAllowsArbitraryLoads: true,
+      NSExceptionDomains: {
+        "api.openai.com": {
+          NSExceptionAllowsInsecureHTTPLoads: false,
+          NSIncludesSubdomains: true,
+          NSTemporaryExceptionAllowsInsecureHTTPLoads: false,
+          NSTemporaryExceptionMinimumTLSVersion: "TLSv1.2"
+        }
+      }
     },
+    NSContactsUsageDescription:
+      "Zults needs access to your contacts so you can invite friends via SMS."
+  }
+},
     android: {
       adaptiveIcon: {
         foregroundImage: "./assets/icon.png",
