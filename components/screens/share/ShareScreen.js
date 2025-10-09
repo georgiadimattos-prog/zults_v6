@@ -51,7 +51,7 @@ export default function ShareScreen({ navigation }) {
   }, [searchFocused, activeTab]);
 
   const users = [
-    { id: "zults-demo", name: "Rezy", image: zultsImage, isBot: true },
+    { id: "zults-demo", name: "Rez", image: zultsImage, isBot: true },
     { id: "demo1", name: "Melany", image: melany, isVerified: true },
     { id: "demo2", name: "Demo2", image: tomas },
     { id: "demo3", name: "Demo3", image: madman },

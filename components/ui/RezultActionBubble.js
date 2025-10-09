@@ -48,7 +48,7 @@ export default function RezultActionBubble({
   const isFromOther = direction === "from-other";
   const isSystemMessage = type === "cancel-request";
 
-  // ✅ Detect Rezy dark chat
+  // ✅ Detect Rez dark chat
   const isRezyChat = chatUserId === "zults-demo";
 
   if (type === "typing") return <TypingIndicator avatar={avatar} />;
@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 0,
   },
   rezyBubbleLeft: {
-    backgroundColor: "rgba(255,255,255,0.12)", // dark bubble for Rezy
+    backgroundColor: "rgba(255,255,255,0.12)", // dark bubble for Rez
   },
 
   // --- Message text (inside bubbles)

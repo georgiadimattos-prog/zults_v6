@@ -38,19 +38,34 @@ export function useDemoChat() {
     }
   };
 
-  const seedDemoChat = (user, setChatData, flatListRef, setHighlightTopCTA) => {
+// --- Short intro (clean + to the point, runs once)
+  const seedDemoChatShortIntro = (user, setChatData, flatListRef /*, setHighlightTopCTA*/) => {
     const key = user.id || user.name || "default";
 
+    // 🚫 prevent duplicate intro (React StrictMode or fast remount)
+    if (chatCache[key]?.__introStarted) return;
+    chatCache[key] = { ...(chatCache[key] || {}), __introStarted: true };
+
     chatCache[key] = {
-      user: { id: user.id, name: "Rezy", image: user.image, isBot: true },
-      chatData: [],
+      ...chatCache[key],
+      user: { id: user.id, name: "Rez", image: user.image, isBot: true },
+      chatData: chatCache[key]?.chatData || [],
       chatState: { hasShared: false, hasRequested: false },
       otherUserState: { hasShared: false, hasRequested: false },
       blocked: false,
       hasUnread: true,
     };
 
-    const pushMessage = (msg) => {
+    const pushMessage = (text) => {
+      const msg = {
+        id: createId(),
+        type: "text",
+        direction: "from-other",
+        username: "Rez",
+        avatar: user.image,
+        text,
+        timestamp: getLocalTime(),
+      };
       setChatData((prev) => [...prev, msg]);
       chatCache[key].chatData.push(msg);
       chatCache[key].hasUnread = true;
@@ -60,129 +75,55 @@ export function useDemoChat() {
       }, 300);
     };
 
-    // ---- Intro Messages ----
-    pushMessage({
-      id: createId(),
-      type: "text",
-      direction: "from-other",
-      username: "Rezy",
-      avatar: user.image,
-      text: "Hey 👋 I’m Rezy.",
-      timestamp: getLocalTime(),
-    });
-
-    pushMessage({
-      id: createId(),
-      type: "text",
-      direction: "from-other",
-      username: "Rezy",
-      avatar: user.image,
-      text: "Think of me as your sexual health friend 💜.",
-      timestamp: getLocalTime(),
-    });
-
-    // Companion role
-    scheduleMessage(3500, () => {
+    const sendWithTyping = (text, delay = 2000) => {
       addTyping(setChatData, user);
-      scheduleMessage(2000, () => {
+      setTimeout(() => {
         removeTyping(setChatData);
-        pushMessage({
-          id: createId(),
-          type: "text",
-          direction: "from-other",
-          username: "Rezy",
-          avatar: user.image,
-          text: "Someone you can chat with about sexual health without shame or awkwardness.",
-          timestamp: getLocalTime(),
-        });
-      });
-    });
+        pushMessage(text);
+      }, delay);
+    };
 
-    // Nudges
-    scheduleMessage(8000, () => {
-      addTyping(setChatData, user);
-      scheduleMessage(2000, () => {
-        removeTyping(setChatData);
-        pushMessage({
-          id: createId(),
-          type: "text",
-          direction: "from-other",
-          username: "Rezy",
-          avatar: user.image,
-          text: "And sometimes, I’ll nudge you… little reminders to re-test or bite-sized STI facts 🌱.",
-          timestamp: getLocalTime(),
-        });
-      });
-    });
+    // ✨ Rez’s friendly, stigma-free intro (with slower, natural pacing)
+pushMessage("Hi there, I’m Rez 👋");
 
-    // Reassurance
-    scheduleMessage(12000, () => {
-      addTyping(setChatData, user);
-      scheduleMessage(2000, () => {
-        removeTyping(setChatData);
-        pushMessage({
-          id: createId(),
-          type: "text",
-          direction: "from-other",
-          username: "Rezy",
-          avatar: user.image,
-          text: "Nothing heavy... just enough to keep you fresh.",
-          timestamp: getLocalTime(),
-        });
-      });
-    });
+scheduleMessage(3500, () =>
+  sendWithTyping(
+    "Think of me as a new friend you can actually talk to about sexual health, without the shame.",
+    3500
+  )
+);
 
-    // CTA intro
-    scheduleMessage(16000, () => {
-      addTyping(setChatData, user);
-      scheduleMessage(2000, () => {
-        removeTyping(setChatData);
-        pushMessage({
-          id: createId(),
-          type: "text",
-          direction: "from-other",
-          username: "Rezy",
-          avatar: user.image,
-          text: "Alright, enough talking. See the View Rezults button up top?",
-          timestamp: getLocalTime(),
-        });
-        setHighlightTopCTA?.(true);
-      });
-    });
+scheduleMessage(9500, () =>
+  sendWithTyping(
+    "I’m here to help you stay informed and in control of your sexual health 💜.",
+    3500
+  )
+);
 
-    // Final tap instruction
-    scheduleMessage(20000, () => {
-      addTyping(setChatData, user);
-      scheduleMessage(2000, () => {
-        removeTyping(setChatData);
-        pushMessage({
-          id: createId(),
-          type: "text",
-          direction: "from-other",
-          username: "Rezy",
-          avatar: user.image,
-          text: "Tap it and I’ll show you a demo Rezults card 💳.",
-          timestamp: getLocalTime(),
-        });
-      });
-    });
+scheduleMessage(15500, () =>
+  sendWithTyping(
+    "So… if you ever have any questions about sexual health, ask away 💬.",
+    4000
+  )
+);
   };
 
-  // 👇 now async + powered by OpenAI
+
+
+  // --- AI replies
   const handleUserMessage = async (user, setChatData, flatListRef, message) => {
     const key = user.id || user.name || "default";
 
     addTyping(setChatData, user);
     try {
-      const answer = await handleRezyAI(message); // 👈 AI REPLY HERE
-
+      const answer = await handleRezyAI(message);
       setTimeout(() => {
         removeTyping(setChatData);
         const botReply = {
           id: createId(),
           type: "text",
           direction: "from-other",
-          username: "Rezy",
+          username: "Rez",
           avatar: user.image,
           text: answer,
           timestamp: getLocalTime(),
@@ -198,5 +139,5 @@ export function useDemoChat() {
     }
   };
 
-  return { seedDemoChat, handleUserMessage };
+  return { seedDemoChatShortIntro, handleUserMessage };
 }

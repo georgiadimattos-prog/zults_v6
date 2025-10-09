@@ -53,7 +53,7 @@ export default function MainUnverifiedNoRezults({ onLinkPress, onSharePress }) {
       if (users.length === 0 && !hasSeededDemo()) {
         const demoId = "zults-demo";
         chatCache[demoId] = {
-          user: { id: demoId, name: "Rezy", image: zultsLogo, isBot: true },
+          user: { id: demoId, name: "Rez", image: zultsLogo, isBot: true },
           chatData: [],
           chatState: { hasShared: false, hasRequested: false },
           otherUserState: { hasShared: false, hasRequested: false },
@@ -64,7 +64,7 @@ export default function MainUnverifiedNoRezults({ onLinkPress, onSharePress }) {
         users = [
           {
             id: demoId,
-            name: "Rezy",
+            name: "Rez",
             avatar: zultsLogo,
             lastTimestamp: "Now",
             hasUnread: true,

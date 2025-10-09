@@ -139,7 +139,7 @@ export default function App() {
           <Stack.Screen name="UserChat" component={UserChatScreen} />
           <Stack.Screen name="Rezults" component={RezultsScreen} />
 
-          {/* Demo tutorial for Rezy */}
+          {/* Demo tutorial for Rez */}
           <Stack.Screen
             name="RezultsTooltipDemo"
             component={RezultsTooltipDemo}

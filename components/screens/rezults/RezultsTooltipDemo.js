@@ -44,7 +44,7 @@ export default function RezultsTooltipDemo() {
           <Image source={avatarImg} style={styles.avatar} />
           <View style={styles.nameRow}>
             <Text style={styles.username} allowFontScaling maxFontSizeMultiplier={1.3}>
-              Rezy
+              Rez
             </Text>
             <Image source={verifiedIcon} style={styles.verifiedIcon} />
           </View>

@@ -47,7 +47,7 @@ ${Object.values(rezyPersona.guidelines)
 Fallback behaviours:
 - If unsure: ${rezyPersona.fallback_behavior.if_unsure}
 - If topic is sensitive: ${rezyPersona.fallback_behavior.if_sensitive}
-When you respond, speak as Rezy — warm, concise, and deeply kind.
+When you respond, speak as Rez — warm, concise, and deeply kind.
 Do not reintroduce yourself if the user already knows you.
 `;
 
@@ -78,12 +78,12 @@ console.log("🩵 Raw OpenAI reply:", JSON.stringify(data, null, 2));
 
 const reply = data?.choices?.[0]?.message?.content?.trim();
 
-// 💾 Save Rezy’s reply in memory
+// 💾 Save Rez’s reply in memory
 conversationHistory.push({ role: "assistant", content: reply });
 
 return (
   reply ||
-  "I’m here with you — can you tell me a bit more about what you’d like to understand?"
+  "I’m here with you - can you tell me a bit more about what you’d like to understand?"
 );
   } catch (error) {
     console.error("RezyAI error:", error);

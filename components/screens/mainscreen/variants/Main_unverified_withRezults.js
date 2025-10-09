@@ -59,7 +59,7 @@ useFocusEffect(
       chatCache[demoId] = {
         user: {
           id: demoId,
-          name: "Rezy",
+          name: "Rez",
           image: zultsLogo,
           isBot: true,
         },
@@ -73,7 +73,7 @@ useFocusEffect(
       users = [
         {
           id: demoId,
-          name: "Rezy",
+          name: "Rez",
           avatar: zultsLogo,
           lastTimestamp: "Now",
           hasUnread: true,

@@ -145,7 +145,7 @@ export default function UserChatScreen() {
   const navigation = useNavigation();
   const route = useRoute();
 
-  const { seedDemoChat, handleUserMessage } = useDemoChat();
+  const { seedDemoChatShortIntro, handleUserMessage } = useDemoChat();
 
   const inputRef = useRef(null);
   const [footerHeight, setFooterHeight] = useState(0);
@@ -208,6 +208,19 @@ const handleScroll = (e) => {
 };
 
 const hasSeededRef = useRef(false);
+
+// --- Rez intro logic ---
+useEffect(() => {
+  if (user.id === "zults-demo") {
+    const key = user.id || `user-${user.name}`;
+    const rezyState = chatCache[key] || {};
+
+    if (!rezyState.hasPlayedIntro) {
+      seedDemoChatShortIntro(user, setChatData, flatListRef);
+      chatCache[key] = { ...rezyState, hasPlayedIntro: true };
+    }
+  }
+}, [user]);
 
 // Mark active chat (non-enumerable so it won't appear in loops)
 useEffect(() => {
@@ -279,7 +292,7 @@ if (rezultsCache.isSharing) {
   if (user.isBot && !hasSeededRef.current) {
     hasSeededRef.current = true;
     setChatData([]);
-    seedDemoChat(user, setChatData, flatListRef, setHighlightTopCTA);
+    seedDemoChatShortIntro(user, setChatData, flatListRef, setHighlightTopCTA);
 
     if (chatCache[key]) {
       chatCache[key].hasUnread = false;
@@ -370,7 +383,7 @@ if (rezultsCache.isSharing) {
 
 }, [user]);
 
-  // persist (skip chatData for Rezy so Activities tagline stays static)
+  // persist (skip chatData for Rez so Activities tagline stays static)
 useEffect(() => {
   const key = user.id || `user-${user.name}`;
   const hasAction = chatData.length > 0;
@@ -449,7 +462,7 @@ const startRequestFlow = () => {
   console.log("🚀 startRequestFlow entered for", user.id);
 
   if (user.id === "zults-demo") {
-    console.log("⏭️ Skipping flow for Rezy");
+    console.log("⏭️ Skipping flow for Rez");
     return;
   }
 
@@ -761,7 +774,7 @@ return (
       },
     ]);
 
-    // ✅ Quick patch: trigger scripted flow for anyone that's not Rezy
+    // ✅ Quick patch: trigger scripted flow for anyone that's not Rez
     if (user.id !== "zults-demo") {
       console.log("▶️ Triggering startRequestFlow for", user.id);
       startRequestFlow();

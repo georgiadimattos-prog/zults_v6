@@ -87,7 +87,7 @@ export default function ActivitiesScreen() {
     if (data.length === 0) {
       if (!chatCache["zults-demo"]) {
         chatCache["zults-demo"] = {
-          user: { id: "zults-demo", name: "Rezy", image: zultsLogo, isBot: true },
+          user: { id: "zults-demo", name: "Rez", image: zultsLogo, isBot: true },
           chatData: [],
           chatState: {},
           otherUserState: {},
@@ -97,7 +97,7 @@ export default function ActivitiesScreen() {
       }
       data.push({
         id: "zults-demo",
-        name: "Rezy",
+        name: "Rez",
         avatar: zultsLogo,
         lastText: "Ask me anything about sexual health...",
         lastTimestamp: "",
@@ -156,7 +156,7 @@ export default function ActivitiesScreen() {
         onPress={() => {
           navigation.navigate("UserChat", {
             user: item.isBot
-              ? { id: "zults-demo", name: "Rezy", image: zultsLogo, isBot: true }
+              ? { id: "zults-demo", name: "Rez", image: zultsLogo, isBot: true }
               : chatCache[item.id]?.user,
             from: "Activities",
           });
