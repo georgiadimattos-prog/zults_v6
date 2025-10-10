@@ -26,6 +26,8 @@ import GetRezults_HowToFindLinkScreen from "./components/screens/getrezults/GetR
 import AddRezultsCardScreen from "./components/screens/getrezults/AddRezultsCardScreen";
 import PolicyScreen from "./components/screens/getrezults/PolicyScreen";
 import ProvidersListScreen from "./components/screens/getrezults/ProvidersListScreen";
+import GetRezults_ManualUploadScreen from "./components/screens/getrezults/GetRezults_ManualUploadScreen";
+import GetRezults_SelfieVerifyScreen from "./components/screens/getrezults/GetRezults_SelfieVerifyScreen";
 
 // Share flow
 import ShareScreen from "./components/screens/share/ShareScreen";
@@ -118,6 +120,16 @@ export default function App() {
           <Stack.Screen
             name="GetRezultsPasteLink"
             component={GetRezults_PasteLinkScreen}
+          />
+          <Stack.Screen
+            name="GetRezultsManualUpload"
+            component={GetRezults_ManualUploadScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="GetRezultsSelfieVerify"
+            component={GetRezults_SelfieVerifyScreen}
+            options={{ headerShown: false }}
           />
           <Stack.Screen
             name="GetRezultsLoading"

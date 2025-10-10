@@ -29,7 +29,7 @@ export default function AddRezultsCardScreen() {
   openhouse: "Open House",
 };
 
-const providerName = PROVIDERS[providerId] || "Your Provider";
+const providerName = PROVIDERS[providerId] || "Manual Upload";
 
   const handleAddRezults = () => {
     rezultsCache.hasRezults = true;

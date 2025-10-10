@@ -158,25 +158,21 @@ export default function GetRezults_PasteLinkScreen() {
             />
 
             <TouchableOpacity
-              style={{ marginTop: 12 }}
-              onPress={() =>
-                Linking.openURL(
-                  "mailto:support@myrezults.com?subject=Request a new provider"
-                )
-              }
-            >
-              <Text
-                style={[
-                  typography.subheadlineRegular,
-                  {
-                    color: colors.foreground.muted,
-                    textAlign: "center",
-                  },
-                ]}
-              >
-                Don’t see your provider? Let us know.
-              </Text>
-            </TouchableOpacity>
+  style={{ marginTop: 12 }}
+  onPress={() => navigation.navigate("GetRezultsManualUpload")}
+>
+  <Text
+    style={[
+      typography.subheadlineRegular,
+      {
+        color: colors.foreground.muted,
+        textAlign: "center",
+      },
+    ]}
+  >
+    Don’t see your provider? Upload your Rezults manually.
+  </Text>
+</TouchableOpacity>
           </ScreenFooter>
 
           {/* Provider Picker Modal */}

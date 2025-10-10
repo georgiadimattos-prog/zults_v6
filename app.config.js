@@ -2,7 +2,7 @@ export default {
   expo: {
     name: "Zults",
     slug: "snack-56e4b4f5-f1e0-4ec3-b012-82d267abd500",
-    version: "8.0.3",
+    version: "8.0.4",
     orientation: "portrait",
     userInterfaceStyle: "dark",
     newArchEnabled: true,
