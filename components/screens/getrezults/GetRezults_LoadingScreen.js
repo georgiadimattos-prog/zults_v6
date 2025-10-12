@@ -49,21 +49,29 @@ export default function GetRezults_LoadingScreen() {
     }).start();
   }, [step]);
 
-  // Step progression
-  useEffect(() => {
-    let current = 0;
-    const interval = setInterval(() => {
-      current += 1;
-      if (current < STATUS_MESSAGES.length) {
-        setStep(current);
-      } else {
-        clearInterval(interval);
-        navigation.navigate('AddRezultsCard', { providerId, resultsLink });
-      }
-    }, 2000);
+// ✅ Step progression with manual upload detection
+useEffect(() => {
+  let current = 0;
+  const interval = setInterval(() => {
+    current += 1;
+    if (current < STATUS_MESSAGES.length) {
+      setStep(current);
+    } else {
+      clearInterval(interval);
 
-    return () => clearInterval(interval);
-  }, [navigation, providerId, resultsLink]);
+      // ✅ Detect if this came from manual upload (no link = manual)
+      const fromManualUpload = !resultsLink; // true if no resultsLink
+
+      navigation.navigate("AddRezultsCard", {
+        providerId,
+        resultsLink,
+        fromManualUpload, // 👈 flag for AddRezultsCardScreen
+      });
+    }
+  }, 2000);
+
+  return () => clearInterval(interval);
+}, [navigation, providerId, resultsLink]);
 
   // Animate dots in sequence
   useEffect(() => {

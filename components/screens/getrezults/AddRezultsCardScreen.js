@@ -9,37 +9,48 @@ import Navbar from "../../ui/Navbar";
 import ScreenFooter from "../../ui/ScreenFooter";
 import { rezultsCache } from "../../../cache/rezultsCache";
 
-const PROVIDER_NAMES = {
-  pp: "Planned Parenthood",
-  shl: "Sexual Health London",
-  nhs: "NHS",
-  randox: "Randox Health",
-};
-
 export default function AddRezultsCardScreen() {
   const navigation = useNavigation();
   const route = useRoute();
-  const { providerId } = route.params || {};
-  const PROVIDERS = {
-  pp: "Planned Parenthood",
-  soapoli: "Soapoli-Online",
-  shl: "Sexual Health London",
-  shuk: "SH.UK",
-  testme: "TestMe",
-  openhouse: "Open House",
-};
 
-const providerName = PROVIDERS[providerId] || "Manual Upload";
+  // ✅ Provider name passed from previous screen
+  const { providerId, fromManualUpload } = route.params || {};
+  const isManual = fromManualUpload === true;
+
+  // ✅ Provider name mapping (expanded list)
+  const PROVIDERS = {
+    pp: "Planned Parenthood",
+    soapoli: "Soapoli-Online",
+    shl: "Sexual Health London",
+    shuk: "SH.UK",
+    sh24: "SH:24",
+    randox: "Randox Health",
+    testme: "TestMe",
+    testforme: "TestForMe",
+    openhouse: "Open House",
+    luud: "Luud Health",
+  };
+
+  const providerName = PROVIDERS[providerId?.toLowerCase()] || "Manual Upload";
+
+  // ✅ Use manual-upload card if it exists
+  const existingCard = rezultsCache?.card;
 
   const handleAddRezults = () => {
-    rezultsCache.hasRezults = true;
-    rezultsCache.card = {
-      realName: "John Doe",
-      isVerified: true,
-      showRealName: true,
-      providerName, // ✅ dynamically applied
-      testDate: "20 Oct 2025",
-    };
+    // Manual uploads already have full info — just save and go home
+    if (isManual && existingCard) {
+      console.log("💾 Confirmed manual upload card:", existingCard);
+    } else if (!existingCard) {
+      // Provider-link (demo) fallback → use fake John Doe card
+      rezultsCache.hasRezults = true;
+      rezultsCache.card = {
+        realName: "John Doe",
+        isVerified: true,
+        showRealName: true,
+        providerName,
+        testDate: "20 Oct 2025",
+      };
+    }
 
     navigation.reset({
       index: 0,
@@ -50,12 +61,29 @@ const providerName = PROVIDERS[providerId] || "Manual Upload";
   const handleCancel = () => {
     rezultsCache.hasRezults = false;
     rezultsCache.card = null;
-
     navigation.reset({
       index: 0,
       routes: [{ name: "MainScreen" }],
     });
   };
+
+  // ✅ Pick which card to display in preview
+  const cardToShow =
+    isManual && existingCard
+      ? {
+          realName: existingCard.realName,
+          isVerified: existingCard.isVerified,
+          showRealName: existingCard.showRealName,
+          providerName: existingCard.providerName,
+          testDate: existingCard.testDate,
+        }
+      : {
+          realName: "John Doe",
+          isVerified: true,
+          showRealName: true,
+          providerName,
+          testDate: "12 Dec 2025",
+        };
 
   return (
     <ScreenWrapper topPadding={0}>
@@ -75,15 +103,10 @@ const providerName = PROVIDERS[providerId] || "Manual Upload";
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* ─── Header ─── */}
         <View style={styles.headerBlock}>
-          <Text style={styles.title}>
-            Your Rezults
-          </Text>
+          <Text style={styles.title}>Your Rezults</Text>
 
-          <Text
-            style={[typography.bodyRegular, styles.subtitle]}
-          >
+          <Text style={[typography.bodyRegular, styles.subtitle]}>
             By tapping <Text style={styles.highlight}>Add Rezults</Text>, you confirm this
             information is your own and accurate.{" "}
             <Text
@@ -95,19 +118,17 @@ const providerName = PROVIDERS[providerId] || "Manual Upload";
           </Text>
         </View>
 
-        {/* ─── Rezults Card Preview ─── */}
         <View style={styles.cardWrapper}>
           <RezultsCard
-            realName="John Doe"
-            isVerified={true}
-            showRealName={true}
-            providerName={providerName}
-            testDate="12 Dec 2025"
+            realName={cardToShow.realName}
+            isVerified={cardToShow.isVerified}
+            showRealName={cardToShow.showRealName}
+            providerName={cardToShow.providerName}
+            testDate={cardToShow.testDate}
           />
         </View>
       </ScrollView>
 
-      {/* ─── Footer ─── */}
       <ScreenFooter>
         <ZultsButton
           label="Add Rezults"
@@ -133,16 +154,14 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     paddingBottom: 120,
-    paddingHorizontal: 16, // ✅ baseline gutter
+    paddingHorizontal: 16,
   },
-
-  // ─── Header ───
   headerBlock: {
     marginTop: 32,
     marginBottom: 24,
   },
   title: {
-    ...typography.largeTitleMedium, // ✅ Apple-style hero title
+    ...typography.largeTitleMedium,
     color: colors.foreground.default,
     marginBottom: 8,
   },
@@ -152,14 +171,12 @@ const styles = StyleSheet.create({
   },
   highlight: {
     color: colors.foreground.default,
-    fontWeight: "500", // ✅ subtle visual anchor
+    fontWeight: "500",
   },
   link: {
-    color: colors.info.onContainer, // ✅ Zults blue link
+    color: colors.info.onContainer,
     textDecorationLine: "underline",
   },
-
-  // ─── Card Preview ───
   cardWrapper: {
     width: "100%",
     alignItems: "center",

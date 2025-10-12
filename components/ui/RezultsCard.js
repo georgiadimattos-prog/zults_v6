@@ -1,4 +1,4 @@
-// ✅ RezultsCard.js (final Zults baseline)
+// ✅ RezultsCard.js (supports real infections + demo fallback)
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -32,6 +32,7 @@ export default function RezultsCard({
   showRealName = false,
   providerName = "Planned Parenthood",
   testDate = "20 Oct 2025",
+  infections = [], // 👈 new prop
   videoSource = require("../../assets/videos/Card_All_GlowingBorder_25sec.mp4"),
   showExpand = false,
   onExpand,
@@ -62,7 +63,7 @@ export default function RezultsCard({
     iconRotate.value = withTiming(next ? 180 : 0, { duration: 300 });
   };
 
-  // quick flip teaser
+  // Quick flip teaser (for effect)
   useEffect(() => {
     const timer = setTimeout(() => {
       rotate.value = withTiming(180, { duration: 600 });
@@ -92,6 +93,22 @@ export default function RezultsCard({
     transform: [{ rotate: `${iconRotate.value}deg` }],
   }));
 
+  // ✅ Merge default infections (for demo users) and real data (for manual uploads)
+  const infectionsToShow =
+    infections.length > 0
+      ? infections // from parsed PDF
+      : [
+          "Tested negative:",
+          "Gonorrhoea",
+          "HIV",
+          "Syphilis",
+          "Chlamydia",
+          "Hepatitis B",
+          "Hepatitis C",
+          "Gardnerella",
+          "Ureaplasma",
+        ];
+
   return (
     <TouchableWithoutFeedback onPress={flipCard}>
       <Animated.View style={[styles.container, entryAnimStyle, styles.tooltipBorder]}>
@@ -109,36 +126,19 @@ export default function RezultsCard({
           <View style={styles.overlay}>
             <View>
               {isVerified && showRealName && realName && (
-                <Text
-                  style={styles.name}
-                >
-                  {realName}
-                </Text>
+                <Text style={styles.name}>{realName}</Text>
               )}
-              <Text
-                style={styles.provider}
-              >
-                {providerName}
-              </Text>
+              <Text style={styles.provider}>{providerName}</Text>
             </View>
-            <Text
-              style={styles.link}
-            >
-              Show Rezults
-            </Text>
+            <Text style={styles.link}>Show Rezults</Text>
           </View>
         </Animated.View>
 
         {/* Back */}
         <Animated.View style={[styles.cardBack, backAnimatedStyle]}>
           <View style={styles.backHeader}>
-            <Text
-              style={styles.testedOn}
-            >
-              Tested on{" "}
-              <Text style={styles.testedDate}>
-                {testDate}
-              </Text>
+            <Text style={styles.testedOn}>
+              Tested on <Text style={styles.testedDate}>{testDate}</Text>
             </Text>
 
             {showExpand && (
@@ -146,7 +146,10 @@ export default function RezultsCard({
                 <View style={styles.expandButton}>
                   <Animated.Image
                     source={expanded ? collapseIcon : expandIcon}
-                    style={[{ width: 20, height: 20, tintColor: "#FFF" }, iconAnimatedStyle]}
+                    style={[
+                      { width: 20, height: 20, tintColor: "#FFF" },
+                      iconAnimatedStyle,
+                    ]}
                     resizeMode="contain"
                   />
                 </View>
@@ -154,24 +157,11 @@ export default function RezultsCard({
             )}
           </View>
 
+          {/* 🧩 Dynamic pills for infections */}
           <View style={styles.pillsBottom}>
-            {[
-              "Tested negative:",
-              "Gonorrhoea",
-              "HIV",
-              "Syphilis",
-              "Chlamydia",
-              "Hepatitis B",
-              "Hepatitis C",
-              "Gardnerella",
-              "Ureaplasma",
-            ].map((label, idx) => (
+            {infectionsToShow.map((label, idx) => (
               <View key={idx} style={styles.pill}>
-                <Text
-                  style={styles.pillText}
-                >
-                  {label}
-                </Text>
+                <Text style={styles.pillText}>{label}</Text>
               </View>
             ))}
           </View>
@@ -218,8 +208,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "flex-end",
   },
-
-  // ─── Front ───
   name: {
     ...typography.bodyMedium,
     fontSize: 16,
@@ -240,8 +228,6 @@ const styles = StyleSheet.create({
     color: colors.foreground.soft,
     fontWeight: "500",
   },
-
-  // ─── Back ───
   cardBack: {
     position: "absolute",
     width: CARD_WIDTH,
@@ -266,18 +252,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-
-  // ─── Text (back side) ───
   testedOn: {
-    ...typography.captionLargeRegular, // ✅ 14 / 18 / -0.07
+    ...typography.captionLargeRegular,
     color: colors.foreground.soft,
   },
   testedDate: {
     color: colors.foreground.default,
     fontWeight: "600",
   },
-
-  // ─── Pills ───
   pillsBottom: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -292,7 +274,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   pillText: {
-    ...typography.captionLargeRegular, // ✅ 14pt matches expanded info hierarchy
+    ...typography.captionLargeRegular,
     color: colors.foreground.default,
     textAlign: "center",
   },
